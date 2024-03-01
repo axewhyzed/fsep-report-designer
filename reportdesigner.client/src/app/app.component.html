@@ -1,24 +1,53 @@
-﻿<h1 id="tableLabel">Weather forecast</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
-
-<p *ngIf="!forecasts"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
-
-<table *ngIf="forecasts">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let forecast of forecasts">
-            <td>{{ forecast.date }}</td>
-            <td>{{ forecast.temperatureC }}</td>
-            <td>{{ forecast.temperatureF }}</td>
-            <td>{{ forecast.summary }}</td>
-        </tr>
-    </tbody>
-</table>
+﻿<main class="container">
+    <div class="title-bar">Report Designer</div>
+    <section class="ribbon-section">
+      <app-ribbon (toggleComponent)="toggleComponent($event)"></app-ribbon>
+    </section>
+    <div class="middle-section">
+      <section class="navigation-panel-section">
+        <app-navigation-panel></app-navigation-panel>
+      </section>
+      <section class="work-area-section">
+        <ng-container *ngIf="currentComponent === 'design-view'">
+          <app-design-view></app-design-view>
+        </ng-container>
+        <ng-container *ngIf="currentComponent === 'print-preview'">
+          <app-print-preview></app-print-preview>
+        </ng-container>
+      </section>
+      <!-- *ngIf="comptest == 1"  -->
+      <section class="property-sheet-section">
+        <p>Test sentence</p>
+      </section>
+    </div>
+  
+    <section class="status-bar-section">
+      <app-status-bar></app-status-bar>
+    </section>
+  </main>
+  
+  <!-- <h1 id="tableLabel">Weather forecast</h1>
+  
+  <p>This component demonstrates fetching data from the server.</p>
+  
+  <p *ngIf="!forecasts"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
+  
+  <table *ngIf="forecasts">
+      <thead>
+          <tr>
+              <th>Date</th>
+              <th>Temp. (C)</th>
+              <th>Temp. (F)</th>
+              <th>Summary</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let forecast of forecasts">
+              <td>{{ forecast.date }}</td>
+              <td>{{ forecast.temperatureC }}</td>
+              <td>{{ forecast.temperatureF }}</td>
+              <td>{{ forecast.summary }}</td>
+          </tr>
+      </tbody>
+  </table> -->
+  

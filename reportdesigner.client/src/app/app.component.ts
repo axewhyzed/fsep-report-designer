@@ -14,6 +14,13 @@ interface WeatherForecast {
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
+  currentComponent: string = 'design-view';
+
+  toggleComponent(componentName: string) {
+    this.currentComponent = componentName;
+    console.log(componentName);
+  }
+
   public forecasts: WeatherForecast[] = [];
 
   constructor(private http: HttpClient) {}
