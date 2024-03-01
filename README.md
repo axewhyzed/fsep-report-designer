@@ -10,3 +10,4 @@ It is a full stack application created using the following technologies: <br/><b
   - MS-SQL Server 2019 <br/>
 - **Code Editor Used**
   - Visual Studio 2022
+  - Visual Studio Code ( For editing Frontend part )	
