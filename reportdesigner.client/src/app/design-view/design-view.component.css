@@ -1,179 +1,184 @@
 .design-view-container{
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  height: 85vh;
+  width: 145vh;
+  padding: 0 10px;
+}
+
+.selected-cell {
+  /* background-color: #cceeff;  */
+  /* Light blue background color */
+  outline: 2px solid #0078d4; /* Blue border */
+}
+
+.edit-container{
+  flex-grow: 1;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.table-container{
+  max-height: 100%;
+}
+
+.column-header {
+  height: 30px; /* Adjust as needed */
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.table-header{
+  padding: 3px;
+}
+
+.column-headers {
+  display: flex;
+}
+
+.row-header {
+  width: 30px;
+  height: 30px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.table-container {
+  overflow: auto; /* Enable scrolling for large tables */
+}
+
+.cell-content{
+  padding: 5px;
+}
+
+table, th, td{
+  border: 1px solid black;
+}
+
+.tbl-data{
+  margin: 10px;
+}
+
+.formatting-toolbar {
+  display: flex;
+  justify-content: space-between; /* Space elements evenly */
+  align-items: center;
+  padding: 8px;
+  background-color: #f8f9fa; /* Light gray background */
+  border-bottom: 1px solid #ccc; /* Light border */
+}
+
+/* .formatting-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ccc;
+} */
+
+.button-container {
+  margin-right: 20px;
+}
+
+.format-button {
+  padding: 8px 16px;
+  margin-right: 6px;
+  background-color: #0078d4; /* Microsoft blue */
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.format-button:hover {
+  background-color: #005a9e; /* Darker blue on hover */
+}
+
+.color-container {
+  align-items: center;
+  margin-right: 20px;
+}
+
+.color-label {
+  margin:0 10px;
+}
+
+.custom-color-input {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.select-box {
+  padding: 6px;
+  margin-right: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.select-box:focus {
+  outline: none;
+}
+
+/* Optionally, you can style the font family select box separately for better visual separation */
+.font-family-select-box {
+  margin-right: 20px;
+}
+
+/* .data-bar{
     display: flex;
-    flex-direction: column;
-    border: 1px solid black;
-    height: 85vh;
-    width: 145vh;
-    padding: 0 10px;
-  }
-  
-  .selected-cell {
-    background-color: #cceeff; /* Light blue background color */
-    outline: 2px solid #0078d4; /* Blue border */
-  }
-  
-  .edit-container{
-    flex-grow: 1;
-    max-width: 100%;
-    overflow: auto;
-  }
-  
-  .table-container{
-    max-height: 100%;
-  }
-  
-  .column-header {
-    height: 30px; /* Adjust as needed */
-    background-color: #f0f0f0;
+    flex-wrap: wrap;
+}
+
+.select-all{
+    height: 30px;
+    width: 30px;
+    border: 1px solid lightgray;
+}
+
+.col-bar{
     display: flex;
-    align-items: center;
+    width: calc(100vw-30px);
+    height: 30px;
+}
+
+.row-bar{
+    height: calc(75vh-30px);
+    width: 30px;
+}
+
+.col-name{
+    width: 100px;
+    font-weight: bold;
+    display: flex;
     justify-content: center;
-  }
-  
-  .table-header{
-    padding: 3px;
-  }
-  
-  .column-headers {
-    display: flex;
-  }
-  
-  .row-header {
-    width: 30px; /* Adjust as needed */
-    background-color: #f0f0f0;
-    display: flex;
     align-items: center;
+    border: 1px solid lightgray;
+}
+
+.row-name{
+    height: 30px;
+    display: flex;
     justify-content: center;
-  }
-  
-  .table-container {
-    overflow: auto; /* Enable scrolling for large tables */
-  }
-  
-  .cell-content{
-    padding: 5px;
-  }
-  
-  .tbl-data, tbody, tr, th, td {
-    border: 1px solid black;
-  }
-  
-  .tbl-data{
-    margin: 10px;
-  }
-  
-  .formatting-toolbar {
+    align-items: center;
+    border: 1px solid lightgray;
+}
+
+.cell-row{
     display: flex;
-    justify-content: space-between; /* Space elements evenly */
-    align-items: center;
-    padding: 8px;
-    background-color: #f8f9fa; /* Light gray background */
-    border-bottom: 1px solid #ccc; /* Light border */
-  }
-  
-  /* .formatting-toolbar {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ccc;
-  } */
-  
-  .button-container {
-    margin-right: 20px;
-  }
-  
-  .format-button {
-    padding: 8px 16px;
-    margin-right: 6px;
-    background-color: #0078d4; /* Microsoft blue */
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .format-button:hover {
-    background-color: #005a9e; /* Darker blue on hover */
-  }
-  
-  .color-container {
-    align-items: center;
-    margin-right: 20px;
-  }
-  
-  .color-label {
-    margin:0 10px;
-  }
-  
-  .custom-color-input {
-    width: 50px;
+}
+
+.input-cell{
+    width: 100px;
     height: 25px;
-    cursor: pointer;
-  }
-  
-  .select-box {
-    padding: 6px;
-    margin-right: 20px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .select-box:focus {
-    outline: none;
-  }
-  
-  /* Optionally, you can style the font family select box separately for better visual separation */
-  .font-family-select-box {
-    margin-right: 20px;
-  }
-  
-  /* .data-bar{
-      display: flex;
-      flex-wrap: wrap;
-  }
-  
-  .select-all{
-      height: 30px;
-      width: 30px;
-      border: 1px solid lightgray;
-  }
-  
-  .col-bar{
-      display: flex;
-      width: calc(100vw-30px);
-      height: 30px;
-  }
-  
-  .row-bar{
-      height: calc(75vh-30px);
-      width: 30px;
-  }
-  
-  .col-name{
-      width: 100px;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 1px solid lightgray;
-  }
-  
-  .row-name{
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 1px solid lightgray;
-  }
-  
-  .cell-row{
-      display: flex;
-  }
-  
-  .input-cell{
-      width: 100px;
-      height: 25px;
-  } */
+} */

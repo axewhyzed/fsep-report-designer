@@ -1,185 +1,113 @@
 <div class="design-view-container">
-    <button (click)="reloadData()">Reload Data</button>
-    <div class="formatting-toolbar">
-      <div class="button-container">
-        <button class="material-icons menu-icon icon-bold format-button"
-          (click)="toggleFormat('bold')">format_bold</button>
-        <button class="material-icons menu-icon icon-italic format-button"
-          (click)="toggleFormat('italic')">format_italic</button>
-        <button class="material-icons menu-icon icon-underline format-button"
-          (click)="toggleFormat('underline')">format_underline</button>
-        <button class="material-icons menu-icon icon-strikethrough format-button"
-          (click)="toggleFormat('strikethrough')">format_strikethrough</button>
-      </div>
-  
-      <div class="font-dropdowns">
-        <select class="select-box" #fontSizeSelect (change)="changeFontSize(fontSizeSelect.value)">
-          <option value="1">12px</option>
-          <option value="2">14px</option>
-          <option value="3">16px</option>
-          <option value="4">18px</option>
-          <option value="5">24px</option>
-          <option value="6">32px</option>
-          <option value="7">48px</option>
-          <!-- Add more font sizes as needed -->
-        </select>
-  
-        <select class="select-box" #fontFamilySelect (change)="changeFontFamily(fontFamilySelect.value)">
-          <option value="Arial" style="font-family: Arial">Arial</option>
-          <option value="'Brush Script MT', cursive" style="font-family: Brush Script MT">
-            Brush Script MT
-          </option>
-          <option value="Calibri" style="font-family: Calibri">Calibri</option>
-          <option value="Cambria" style="font-family: Cambria">Cambria</option>
-          <option value="Comic Sans MS" style="font-family: Comic Sans MS">
-            Comic Sans MS
-          </option>
-          <option value="Courier New" style="font-family: Courier New">
-            Courier New
-          </option>
-          <option value="Franklin Gothic" style="font-family: Franklin Gothic">
-            Franklin Gothic
-          </option>
-          <option value="Garamond" style="font-family: Garamond">Garamond</option>
-          <option value="Georgia" style="font-family: Georgia">Georgia</option>
-          <option value="Goudy Old Style" style="font-family: Goudy Old Style">
-            Goudy Old Style
-          </option>
-          <option value="Helvetica" style="font-family: Helvetica">Helvetica</option>
-          <option value="Impact" style="font-family: Impact">Impact</option>
-          <option value="Microsoft Sans Serif" style="font-family: Microsoft Sans Serif">
-            MS Sans Serif
-          </option>
-          <option value="Perpetua" style="font-family: Perpetua">Perpetua</option>
-          <option value="Rockwell" style="font-family: Rockwell">Rockwell</option>
-          <option value="Tahoma" style="font-family: Tahoma">Tahoma</option>
-          <option value="Times New Roman" style="font-family: Times New Roman">
-            Times New Roman
-          </option>
-          <option value="Verdana" style="font-family: Verdana">Verdana</option>
-          <!-- Add more font families as needed -->
-        </select>
-      </div>
-  
-      <div class="color-container">
-        <label for="text-color-input" class="color-label">Text Color:</label>
-        <input id="text-color-input" type="color" class="custom-color-input"
-          (input)="changeTextColor($any($event.target).value)" />
-  
-        <label for="background-color-input" class="color-label">Background Color:</label>
-        <input id="background-color-input" type="color" class="custom-color-input"
-          (input)="changeBackgroundColor($any($event.target).value)" />
-      </div>
-      <!-- <div class="select-all"></div>
-    <div class="col-bar">
-      <div class="col-name">A</div>
-      <div class="col-name">B</div>
+  <button (click)="reloadData()">Reload Data</button>
+  <div class="formatting-toolbar">
+    <div class="button-container">
+      <button class="material-icons menu-icon icon-bold format-button"
+        (click)="toggleFormat('bold')">format_bold</button>
+      <button class="material-icons menu-icon icon-italic format-button"
+        (click)="toggleFormat('italic')">format_italic</button>
+      <button class="material-icons menu-icon icon-underline format-button"
+        (click)="toggleFormat('underline')">format_underline</button>
+      <button class="material-icons menu-icon icon-strikethrough format-button"
+        (click)="toggleFormat('strikethrough')">format_strikethrough</button>
     </div>
-    <div class="row-bar">
-      <div class="row-name">1</div>
-      <div class="row-name">2</div>
+
+    <div class="font-dropdowns">
+      <select class="select-box" #fontSizeSelect (change)="changeFontSize(fontSizeSelect.value)">
+        <option value="10px">10px</option>
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+        <option value="20px">20px</option>
+        <option value="24px">24px</option>
+        <option value="32px">32px</option>
+        <option value="48px">48px</option>
+        <option value="56px">56px</option>
+        <option value="64px">64px</option>
+        <option value="72px">72px</option>
+        <option value="84px">84px</option>
+        <option value="96px">96px</option>
+        <!-- Add more font sizes as needed -->
+      </select>
+
+      <select class="select-box" #fontFamilySelect (change)="changeFontFamily(fontFamilySelect.value)">
+        <option value="Arial" style="font-family: Arial">Arial</option>
+        <option value="'Brush Script MT', cursive" style="font-family: Brush Script MT">
+          Brush Script MT
+        </option>
+        <option value="Calibri" style="font-family: Calibri">Calibri</option>
+        <option value="Cambria" style="font-family: Cambria">Cambria</option>
+        <option value="Comic Sans MS" style="font-family: Comic Sans MS">
+          Comic Sans MS
+        </option>
+        <option value="Courier New" style="font-family: Courier New">
+          Courier New
+        </option>
+        <option value="Franklin Gothic" style="font-family: Franklin Gothic">
+          Franklin Gothic
+        </option>
+        <option value="Garamond" style="font-family: Garamond">Garamond</option>
+        <option value="Georgia" style="font-family: Georgia">Georgia</option>
+        <option value="Goudy Old Style" style="font-family: Goudy Old Style">
+          Goudy Old Style
+        </option>
+        <option value="Helvetica" style="font-family: Helvetica">Helvetica</option>
+        <option value="Impact" style="font-family: Impact">Impact</option>
+        <option value="Microsoft Sans Serif" style="font-family: Microsoft Sans Serif">
+          MS Sans Serif
+        </option>
+        <option value="Perpetua" style="font-family: Perpetua">Perpetua</option>
+        <option value="Rockwell" style="font-family: Rockwell">Rockwell</option>
+        <option value="Tahoma" style="font-family: Tahoma">Tahoma</option>
+        <option value="Times New Roman" style="font-family: Times New Roman">
+          Times New Roman
+        </option>
+        <option value="Verdana" style="font-family: Verdana">Verdana</option>
+        <!-- Add more font families as needed -->
+      </select>
     </div>
-    <div class="input-cell-container">
-      <div class="cell-row">
-        <div class="input-cell" contenteditable="true"></div>
-        <div class="input-cell" contenteditable="true"></div>
-      </div>
-      <div class="cell-row">
-        <div class="input-cell" contenteditable="true"></div>
-        <div class="input-cell" contenteditable="true"></div>
-      </div>
-    </div> -->
-    </div>
-  
-    <!-- <input type="color" class="custom-color-input" (input)="changeTextColor($any($event.target).value)" /> -->
-  
-    <!-- <input type="color" class="custom-color-input" (input)="changeBackgroundColor($any($event.target).value)" /> -->
-  
-  
-  
-    <div class="edit-container" contenteditable="true" onbeforeinput="return false" #editableDiv>
-      <!-- Default size is 16px in this currently-->
-      <div class="table-container">
-        <table class="tbl-data">
-          <thead>
-            <tr>
-              <th (click)="toggleCellSelection(-1, 'row-header')"></th> <!-- Empty cell for numbering columns -->
-              <th *ngFor="let header of tableHeaders; let i = index" class="col-names" (click)="toggleCellSelection(-1, header)">
-                <div class="column-header">{{ getColumnHeader(i) }}</div>
-              </th>
-            </tr>
-            <tr>
-              <th></th> <!-- Empty cell for numbering columns -->
-  
-              <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-2, header)" [ngClass]="{ 'selected-cell': isSelected(-2, header) }">
-                <div class="table-header">{{ header }}</div> <!-- Show original table header -->
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of data; let i = index">
-              <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">{{ i + 1 }}</td> <!-- Display row numbers (1-based index) -->
-              <td *ngFor="let header of tableHeaders" (click)="toggleCellSelection(i, header)"
-                [ngClass]="{ 'selected-cell': isSelected(i, header) }" class="cell-content">
-                {{ item[header] }}
-              </td>
-            </tr>
-          </tbody>
-          <!-- <tbody>
-            <ng-container *ngFor="let item of data; let i = index">
-              <tr>
-                <td class="row-header">{{ i + 1 }}</td>
-                <td *ngFor="let header of tableHeaders">{{ item[header] }}</td>
-              </tr>
-            </ng-container>
-          </tbody> -->
-        </table>
-      </div>
+
+    <div class="color-container">
+      <label for="text-color-input" class="color-label">Text Color:</label>
+      <input id="text-color-input" type="color" class="custom-color-input"
+        (input)="changeTextColor($any($event.target).value)" />
+
+      <label for="background-color-input" class="color-label">Background Color:</label>
+      <input id="background-color-input" type="color" class="custom-color-input"
+        (input)="changeBackgroundColor($any($event.target).value)" />
     </div>
   </div>
-  
-  <!-- <p>work-area works!</p>
-  <div class="comp">
-    <h1 id="tableLabel">Weather forecast</h1>
-  
-    <p>This component demonstrates fetching data from the server.</p>
-    <p>
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sequi at, quas
-      maiores quos temporibus reprehenderit pariatur fuga repellendus soluta
-      magnam quibusdam voluptates, autem quae. Maxime velit hic temporibus quis
-      error ab modi aspernatur iusto eveniet sed, itaque animi, veritatis ut
-      laboriosam similique quam vero delectus vel maiores atque illo corporis nam
-      cum. Provident aliquam earum architecto facere neque! Nam totam assumenda
-      deleniti, amet suscipit libero fugiat optio voluptatum dolorum ad magni
-      maxime, asperiores, vel cupiditate sapiente velit necessitatibus magnam
-      cumque consequatur similique laboriosam et id placeat corporis? Sequi
-      voluptate distinctio, ea vel commodi ducimus corrupti vero? Velit facere
-      reiciendis at.
-    </p>
-  
-    <p *ngIf="!forecasts">
-      <em
-        >Loading... Please refresh once the ASP.NET backend has started. See
-        <a href="https://aka.ms/jspsintegrationangular"
-          >https://aka.ms/jspsintegrationangular</a
-        >
-        for more details.</em
-      >
-    </p>
-  
-    <table *ngIf="forecasts">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Temp. (C)</th>
-          <th>Temp. (F)</th>
-          <th>Summary</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let forecast of forecasts">
-          <td>{{ forecast }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div> -->
+
+  <div class="edit-container" #editableDiv>
+    <!-- Default size is 16px in this currently-->
+    <div class="table-container">
+      <table class="tbl-data">
+        <thead>
+          <tr>
+            <th (click)="toggleCellSelection(-2, 'row-header')"></th> <!-- Empty cell for numbering columns -->
+            <th *ngFor="let header of tableHeaders; let i = index" class="col-names" (click)="toggleCellSelection(-2, header)">
+              <div class="column-header">{{ getColumnHeader(i) }}</div>
+            </th>
+          </tr>
+          <tr>
+            <th></th> <!-- Empty cell for numbering columns -->
+
+            <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-1, header)" [ngClass]="{ 'selected-cell': isSelected(-1, header) }" [ngStyle]="applyStyle(-1, header)">
+              <div class="table-header">{{ header }}</div> <!-- Show original table header -->
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data; let i = index">
+            <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">{{ i + 1 }}</td> <!-- Display row numbers (1-based index) -->
+            <td *ngFor="let header of tableHeaders; let j = index" (click)="toggleCellSelection(i, header)"
+              [ngClass]="{ 'selected-cell': isSelected(i, header) }" [ngStyle]="applyStyle(i, header)" class="cell-content" [attr.data-row]="i" [attr.data-col]="header">
+              {{ item[header] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
