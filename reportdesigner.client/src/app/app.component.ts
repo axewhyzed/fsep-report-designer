@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   }
 
   getForecasts() {
-    this.http.get<WeatherForecast[]>('/weatherforecast').subscribe(
+    this.http.get<WeatherForecast[]>('/databaseinfo/databases').subscribe(
       (result) => {
         this.forecasts = result;
       },

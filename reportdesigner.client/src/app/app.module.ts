@@ -10,6 +10,7 @@ import { RibbonComponent } from './ribbon/ribbon.component';
 import { StatusBarComponent } from './status-bar/status-bar.component';
 import { PrintPreviewComponent } from './print-preview/print-preview.component';
 import { FormsModule } from '@angular/forms';
+import { DataToolbarComponent } from './data-toolbar/data-toolbar.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { FormsModule } from '@angular/forms';
     NavigationPanelComponent,
     RibbonComponent,
     StatusBarComponent,
-    PrintPreviewComponent
+    PrintPreviewComponent,
+    DataToolbarComponent
   ],
   imports: [
     BrowserModule, HttpClientModule,
