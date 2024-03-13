@@ -261,6 +261,77 @@ export class DesignViewComponent implements OnInit {
     document.execCommand(format);
   }
 
+  removeFormatting(): void {
+    if (this.selectedCells.size === 0) return; // No cells selected
+    // Loop through selected cells and reset formatting to initial state
+    this.selectedCells.forEach((cellKey) => {
+      const [rowIndex, columnName] = cellKey.split('_');
+      const cellFormattingKey = `${rowIndex}_${columnName}`;
+
+      // Reset formatting to initial state
+      this.localCellFormatting[cellFormattingKey] = {
+        bold: false,
+        italic: false,
+        underline: false,
+        strikethrough: false,
+        fontSize: '16px',
+        fontColor: '#000000',
+        fontFamily: 'Times New Roman',
+        backgroundColor: '#ffffff',
+      };
+
+      // Apply the initial formatting to the cell
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'fontWeight',
+        'normal'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'fontStyle',
+        'normal'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'textDecoration',
+        'none'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'fontSize',
+        '16px'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'color',
+        '#000000'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'fontFamily',
+        'Times New Roman'
+      );
+      this.applyFormatting(
+        parseInt(rowIndex, 10),
+        columnName,
+        'backgroundColor',
+        '#ffffff'
+      );
+    });
+
+    // Save the updated cell formatting to local storage
+    localStorage.setItem(
+      'cellFormatting',
+      JSON.stringify(this.localCellFormatting)
+    );
+  }
+
   applyStyle(row: number, column: string) {
     // Retrieve cellFormatting from localStorage
     const cellFormatting = localStorage.getItem('cellFormatting');

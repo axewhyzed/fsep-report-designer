@@ -2,17 +2,24 @@
   <button (click)="reloadData()">Reload Data</button>
   <div class="formatting-toolbar">
     <div class="button-container">
-      <button class="material-icons menu-icon icon-bold format-button"
-        (click)="toggleFormat('bold')">format_bold</button>
-      <button class="material-icons menu-icon icon-italic format-button"
-        (click)="toggleFormat('italic')">format_italic</button>
-      <button class="material-icons menu-icon icon-underline format-button"
-        (click)="toggleFormat('underline')">format_underline</button>
-      <button class="material-icons menu-icon icon-strikethrough format-button"
-        (click)="toggleFormat('strikethrough')">format_strikethrough</button>
+      <button class="material-icons menu-icon icon-bold format-button" title="Bold" (click)="toggleFormat('bold')">
+        format_bold
+      </button>
+      <button class="material-icons menu-icon icon-italic format-button" title="Italic" (click)="toggleFormat('italic')">
+        format_italic
+      </button>
+      <button class="material-icons menu-icon icon-underline format-button" title="Underline" (click)="toggleFormat('underline')">
+        format_underline
+      </button>
+      <button class="material-icons menu-icon icon-strikethrough format-button" title="Strike-through" (click)="toggleFormat('strikethrough')">
+        format_strikethrough
+      </button>
+      <button class="material-icons menu-icon icon-remove-format format-button" title="Clear Formatting" (click)="removeFormatting()">
+        format_clear
+      </button>
     </div>
 
-    <div class="font-dropdowns">
+    <div class="font-dropdowns" title="Font Size">
       <select class="select-box" #fontSizeSelect (change)="changeFontSize(fontSizeSelect.value)">
         <option value="10px">10px</option>
         <option value="12px">12px</option>
@@ -31,7 +38,7 @@
         <!-- Add more font sizes as needed -->
       </select>
 
-      <select class="select-box" #fontFamilySelect (change)="changeFontFamily(fontFamilySelect.value)">
+      <select class="select-box" title="Font Family" #fontFamilySelect (change)="changeFontFamily(fontFamilySelect.value)">
         <option value="Arial" style="font-family: Arial">Arial</option>
         <option value="'Brush Script MT', cursive" style="font-family: Brush Script MT">
           Brush Script MT
@@ -52,7 +59,9 @@
         <option value="Goudy Old Style" style="font-family: Goudy Old Style">
           Goudy Old Style
         </option>
-        <option value="Helvetica" style="font-family: Helvetica">Helvetica</option>
+        <option value="Helvetica" style="font-family: Helvetica">
+          Helvetica
+        </option>
         <option value="Impact" style="font-family: Impact">Impact</option>
         <option value="Microsoft Sans Serif" style="font-family: Microsoft Sans Serif">
           MS Sans Serif
@@ -70,11 +79,11 @@
 
     <div class="color-container">
       <label for="text-color-input" class="color-label">Text Color:</label>
-      <input id="text-color-input" type="color" class="custom-color-input"
+      <input id="text-color-input" title="Font Color" type="color" class="custom-color-input"
         (input)="changeTextColor($any($event.target).value)" />
 
       <label for="background-color-input" class="color-label">Background Color:</label>
-      <input id="background-color-input" type="color" class="custom-color-input"
+      <input id="background-color-input" title="Background Color" type="color" class="custom-color-input"
         (input)="changeBackgroundColor($any($event.target).value)" />
     </div>
   </div>
@@ -85,24 +94,33 @@
       <table class="tbl-data">
         <thead>
           <tr>
-            <th (click)="toggleCellSelection(-2, 'row-header')"></th> <!-- Empty cell for numbering columns -->
-            <th *ngFor="let header of tableHeaders; let i = index" class="col-names" (click)="toggleCellSelection(-2, header)">
+            <th (click)="toggleCellSelection(-2, 'row-header')"></th>
+            <!-- Empty cell for numbering columns -->
+            <th *ngFor="let header of tableHeaders; let i = index" class="col-names"
+              (click)="toggleCellSelection(-2, header)">
               <div class="column-header">{{ getColumnHeader(i) }}</div>
             </th>
           </tr>
           <tr>
-            <th></th> <!-- Empty cell for numbering columns -->
+            <th></th>
+            <!-- Empty cell for numbering columns -->
 
-            <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-1, header)" [ngClass]="{ 'selected-cell': isSelected(-1, header) }" [ngStyle]="applyStyle(-1, header)">
-              <div class="table-header">{{ header }}</div> <!-- Show original table header -->
+            <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-1, header)"
+              [ngClass]="{ 'selected-cell': isSelected(-1, header) }" [ngStyle]="applyStyle(-1, header)">
+              <div class="table-header">{{ header }}</div>
+              <!-- Show original table header -->
             </th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of data; let i = index">
-            <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">{{ i + 1 }}</td> <!-- Display row numbers (1-based index) -->
+            <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">
+              {{ i + 1 }}
+            </td>
+            <!-- Display row numbers (1-based index) -->
             <td *ngFor="let header of tableHeaders; let j = index" (click)="toggleCellSelection(i, header)"
-              [ngClass]="{ 'selected-cell': isSelected(i, header) }" [ngStyle]="applyStyle(i, header)" class="cell-content" [attr.data-row]="i" [attr.data-col]="header">
+              [ngClass]="{ 'selected-cell': isSelected(i, header) }" [ngStyle]="applyStyle(i, header)"
+              class="cell-content" [attr.data-row]="i" [attr.data-col]="header">
               {{ item[header] }}
             </td>
           </tr>
