@@ -5,26 +5,27 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DesignViewComponent } from './design-view/design-view.component';
-import { NavigationPanelComponent } from './navigation-panel/navigation-panel.component';
 import { RibbonComponent } from './ribbon/ribbon.component';
 import { StatusBarComponent } from './status-bar/status-bar.component';
-import { PrintPreviewComponent } from './print-preview/print-preview.component';
+import { NavigationPanelComponent } from './navigation-panel/navigation-panel.component';
 import { FormsModule } from '@angular/forms';
+import { PrintPreviewComponent } from './print-preview/print-preview.component';
 import { DataToolbarComponent } from './data-toolbar/data-toolbar.component';
+import {NgxPrintModule} from 'ngx-print';
 
 @NgModule({
   declarations: [
     AppComponent,
     DesignViewComponent,
-    NavigationPanelComponent,
     RibbonComponent,
     StatusBarComponent,
+    NavigationPanelComponent,
     PrintPreviewComponent,
-    DataToolbarComponent
+    DataToolbarComponent,
   ],
   imports: [
     BrowserModule, HttpClientModule,
-    AppRoutingModule, FormsModule
+    AppRoutingModule, FormsModule, NgxPrintModule
   ],
   providers: [],
   bootstrap: [AppComponent]

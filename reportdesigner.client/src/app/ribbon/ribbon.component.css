@@ -1,63 +1,7 @@
-.menu-bar {
-    height: 5vh;
-    background-color: #a63d41;
-    display: flex;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-  
-  .menu-item {
-    padding: 0 20px;
-    font-size: 16px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-  }
-  
-  .menu-item.selected {
-    background-color: #fff;
-    color: #a63d41;
-  }
-  
-  .menu-item:hover {
-    background-color: #8a3133;
-    cursor: pointer;
-  }
-  
-  .menu-item.selected:hover {
-    background-color: #fff;
-    cursor: default;
-  }
-  
-  .toggle-view-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 5vh;
-    background-color: rgb(241, 241, 241);
-  }
-  
-  .menu-icon {
-    display: flex;
-    align-items: center;
-    padding: 0 7px;
-    height: 100%;
-  }
-  
-  .menu-icon:hover {
-    background-color: lightgray;
-    cursor: pointer;
-  }
-  
-  .font-family-selector {
-    width: 150px;
-  }
-  
-  .selector {
-    height: 30px;
-    font-size: 18px;
-  }
-  
-  .selector option {
-    font-size: 18px;
-  }
-  
+.toggle-view-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  background-color: rgb(241, 241, 241);
+}

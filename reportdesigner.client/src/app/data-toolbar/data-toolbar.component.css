@@ -1,0 +1,4 @@
+.data-toolbar-container{
+    height: 100vh;
+    max-height: calc(100vh - 100px); /* Adjust as needed */
+}

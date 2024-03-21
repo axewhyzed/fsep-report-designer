@@ -1,20 +1,23 @@
 <div class="design-view-container">
-  <button (click)="reloadData()">Reload Data</button>
   <div class="formatting-toolbar">
     <div class="button-container">
       <button class="material-icons menu-icon icon-bold format-button" title="Bold" (click)="toggleFormat('bold')">
         format_bold
       </button>
-      <button class="material-icons menu-icon icon-italic format-button" title="Italic" (click)="toggleFormat('italic')">
+      <button class="material-icons menu-icon icon-italic format-button" title="Italic"
+        (click)="toggleFormat('italic')">
         format_italic
       </button>
-      <button class="material-icons menu-icon icon-underline format-button" title="Underline" (click)="toggleFormat('underline')">
+      <button class="material-icons menu-icon icon-underline format-button" title="Underline"
+        (click)="toggleFormat('underline')">
         format_underline
       </button>
-      <button class="material-icons menu-icon icon-strikethrough format-button" title="Strike-through" (click)="toggleFormat('strikethrough')">
+      <button class="material-icons menu-icon icon-strikethrough format-button" title="Strike-through"
+        (click)="toggleFormat('strikethrough')">
         format_strikethrough
       </button>
-      <button class="material-icons menu-icon icon-remove-format format-button" title="Clear Formatting" (click)="removeFormatting()">
+      <button class="material-icons menu-icon icon-remove-format format-button" title="Clear Formatting"
+        (click)="removeFormatting()">
         format_clear
       </button>
     </div>
@@ -38,7 +41,8 @@
         <!-- Add more font sizes as needed -->
       </select>
 
-      <select class="select-box" title="Font Family" #fontFamilySelect (change)="changeFontFamily(fontFamilySelect.value)">
+      <select class="select-box" title="Font Family" #fontFamilySelect
+        (change)="changeFontFamily(fontFamilySelect.value)">
         <option value="Arial" style="font-family: Arial">Arial</option>
         <option value="'Brush Script MT', cursive" style="font-family: Brush Script MT">
           Brush Script MT
@@ -86,46 +90,142 @@
       <input id="background-color-input" title="Background Color" type="color" class="custom-color-input"
         (input)="changeBackgroundColor($any($event.target).value)" />
     </div>
+    <button (click)="reloadDbData()" class="material-icons-outlined reload_btn" title="Reload Data">change_circle</button>
   </div>
 
   <div class="edit-container" #editableDiv>
-    <!-- Default size is 16px in this currently-->
-    <div class="table-container">
-      <table class="tbl-data">
-        <thead>
-          <tr>
-            <th (click)="toggleCellSelection(-2, 'row-header')"></th>
-            <!-- Empty cell for numbering columns -->
-            <th *ngFor="let header of tableHeaders; let i = index" class="col-names"
-              (click)="toggleCellSelection(-2, header)">
-              <div class="column-header">{{ getColumnHeader(i) }}</div>
-            </th>
-          </tr>
-          <tr>
-            <th></th>
-            <!-- Empty cell for numbering columns -->
-
-            <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-1, header)"
-              [ngClass]="{ 'selected-cell': isSelected(-1, header) }" [ngStyle]="applyStyle(-1, header)">
-              <div class="table-header">{{ header }}</div>
-              <!-- Show original table header -->
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of data; let i = index">
-            <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">
-              {{ i + 1 }}
-            </td>
-            <!-- Display row numbers (1-based index) -->
-            <td *ngFor="let header of tableHeaders; let j = index" (click)="toggleCellSelection(i, header)"
-              [ngClass]="{ 'selected-cell': isSelected(i, header) }" [ngStyle]="applyStyle(i, header)"
-              class="cell-content" [attr.data-row]="i" [attr.data-col]="header">
-              {{ item[header] }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="report-container">
+      <div class="top-section">
+        <!-- Image and title -->
+        <div class="image-and-title">
+          <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="Image">
+          <h1>Title</h1>
+        </div>
+        <!-- Current date/time -->
+        <div class="date-time">
+          <p>{{currentDate}}</p>
+          <p>{{currentTime}}</p>
+        </div>
+      </div>
+      <div class="table-container">
+        <ng-container *ngFor="let db of databaseInfo.databases">
+          <h2>{{ db.name }}</h2>
+          <ng-container *ngFor="let table of db.tables">
+            <h3>{{ table.name }}</h3>
+            <table class="tbl-data">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th *ngFor="
+                      let header of table.data[0] | keyvalue;
+                      let i = index
+                    " (click)="
+                      toggleCellSelection(
+                        'column-header' + '|' + i,
+                        db.name + '|' + table.name + '|' + header.key
+                      )
+                    ">
+                    <div class="column-header">{{ getColumnHeader(i) }}</div>
+                  </th>
+                </tr>
+                <tr>
+                  <th></th>
+                  <!-- Empty cell for numbering columns -->
+                  <th *ngFor="
+                      let header of table.data[0] | keyvalue;
+                      let z = index
+                    " (click)="
+                      toggleCellSelection(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    " [ngClass]="{
+                      'selected-cell': isSelected(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    }" [ngStyle]="
+                      applyStyle(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    ">
+                    <div class="table-header">{{ header.key }}</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of table.data; let i = index">
+                  <td class="row-header" (click)="
+                      toggleCellSelection(
+                        'row-header' + '|' + i,
+                        db.name + '|' + table.name
+                      )
+                    ">
+                    {{ i + 1 }}
+                  </td>
+                  <td *ngFor="let cell of row | keyvalue; let j = index" (click)="
+                      toggleCellSelection(
+                        i,
+                        db.name + '-' + table.name + '-' + j
+                      )
+                    " [ngClass]="{
+                      'selected-cell': isSelected(
+                        i,
+                        db.name + '-' + table.name + '-' + j
+                      )
+                    }" [ngStyle]="
+                      applyStyle(i, db.name + '-' + table.name + '-' + j)
+                    " class="cell-content" [attr.data-row]="i" [attr.data-col]="cell.key">
+                    {{ cell.value }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+        </ng-container>
+      </div>
     </div>
   </div>
+
+  <!-- <div class="edit-container" #editableDiv> -->
+  <!-- Default size is 16px in this currently-->
+  <!-- <div class="table-container"> -->
+  <!-- <table class="tbl-data"> -->
+  <!-- <thead> -->
+  <!-- <tr> -->
+  <!-- <th (click)="toggleCellSelection(-2, 'row-header')"></th> -->
+  <!-- Empty cell for numbering columns -->
+  <!-- <th *ngFor="let header of tableHeaders; let i = index" class="col-names" -->
+  <!-- (click)="toggleCellSelection(-2, header)"> -->
+  <!-- <div class="column-header">{{ getColumnHeader(i) }}</div> -->
+  <!-- </th> -->
+  <!-- </tr> -->
+  <!-- <tr> -->
+  <!-- <th></th> -->
+  <!-- Empty cell for numbering columns -->
+
+  <!-- <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(-1, header)" -->
+  <!-- [ngClass]="{ 'selected-cell': isSelected(-1, header) }" [ngStyle]="applyStyle(-1, header)"> -->
+  <!-- <div class="table-header">{{ header }}</div> -->
+  <!-- Show original table header -->
+  <!-- </th> -->
+  <!-- </tr> -->
+  <!-- </thead> -->
+  <!-- <tbody> -->
+  <!-- <tr *ngFor="let item of databaseInfo; let i = index"> -->
+  <!-- <td class="row-header" (click)="toggleCellSelection(i, 'row-header')"> -->
+  <!-- {{ i + 1 }} -->
+  <!-- </td> -->
+  <!-- Display row numbers (1-based index) -->
+  <!-- <td *ngFor="let header of tableHeaders; let j = index" (click)="toggleCellSelection(i, header)" -->
+  <!-- [ngClass]="{ 'selected-cell': isSelected(i, header) }" [ngStyle]="applyStyle(i, header)" -->
+  <!-- class="cell-content" [attr.data-row]="i" [attr.data-col]="header"> -->
+  <!-- {{ item[header] }} -->
+  <!-- </td> -->
+  <!-- </tr> -->
+  <!-- </tbody> -->
+  <!-- </table> -->
+  <!-- </div> -->
+  <!-- </div> -->
 </div>

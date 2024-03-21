@@ -13,7 +13,7 @@ interface WeatherForecast {
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   currentComponent: string = 'design-view';
 
   toggleComponent(componentName: string) {
@@ -25,20 +25,20 @@ export class AppComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {
-    this.getForecasts();
-  }
+  // ngOnInit() {
+  //   this.getForecasts();
+  // }
 
-  getForecasts() {
-    this.http.get<WeatherForecast[]>('/databaseinfo/databases').subscribe(
-      (result) => {
-        this.forecasts = result;
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-  }
+  // getForecasts() {
+  //   this.http.get<WeatherForecast[]>('/databaseinfo/databases').subscribe(
+  //     (result) => {
+  //       this.forecasts = result;
+  //     },
+  //     (error) => {
+  //       console.error(error);
+  //     }
+  //   );
+  // }
 
-  title = 'reportdesigner.client';
+  title = 'reportdesignerprac.client';
 }

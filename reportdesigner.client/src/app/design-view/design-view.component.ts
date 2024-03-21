@@ -1,11 +1,8 @@
-import { HttpClient, JsonpInterceptor } from '@angular/common/http';
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { DatabaseInfoService } from '../database-info.service';
+import { DatentimeService } from '../datentime.service';
+import { CheckConnectionService } from '../check-connection.service';
 
 @Component({
   selector: 'app-design-view',
@@ -13,104 +10,145 @@ import {
   styleUrl: './design-view.component.css',
 })
 export class DesignViewComponent implements OnInit {
-  data: any[] = [];
-  apiUrl = 'https://dummyjson.com/products';
-  tableHeaders: string[] = [];
+  databaseInfo: any = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private dbService: DatabaseInfoService,
+    private datentimeService: DatentimeService,
+    private connectionService: CheckConnectionService
+  ) {}
 
   localCellFormatting: any;
 
   // Initialize component data and fetch data if not already stored locally
   ngOnInit(): void {
-    // Check if cellFormatting exists in local storage
-    let cellFormatting = localStorage.getItem('cellFormatting');
-
-    const storedData = localStorage.getItem('designViewData');
-    if (storedData) {
-      this.data = JSON.parse(storedData);
-      if (this.data.length > 0) {
-        this.tableHeaders = Object.keys(this.data[0]);
-        const numRows = this.data.length; // Number of rows
-        const numColumns = this.tableHeaders.length; // Number of columns
-        if (!cellFormatting) {
-          // If it doesn't exist, initialize it and store it in local storage
-          cellFormatting = this.initializeCellFormatting(
-            numRows,
-            numColumns,
-            this.tableHeaders
-          );
-          localStorage.setItem('cellFormatting', cellFormatting);
-          this.localCellFormatting = JSON.parse(cellFormatting);
-        }
-        this.localCellFormatting = JSON.parse(cellFormatting);
-        // this.applySavedFormatting(numRows, numColumns, this.tableHeaders);
+    const storedDatabaseInfo = localStorage.getItem('databaseInfo');
+    if (storedDatabaseInfo) {
+      // this.data = JSON.parse(storedDatabaseInfo);
+      this.databaseInfo = JSON.parse(storedDatabaseInfo);
+      // Modify initialization of cellFormatting based on databaseInfo structure
+      if (!localStorage.getItem('cellFormatting')) {
+        this.initializeCellFormatting();
       }
+      this.localCellFormatting = JSON.parse(
+        localStorage.getItem('cellFormatting')!
+      );
     } else {
-      this.fetchData();
+      this.fetchDbData();
     }
   }
 
   // Initialize cell formatting for table headers and cells
-  initializeCellFormatting(
-    numRows: number,
-    numColumns: number,
-    tableHeaders: string[]
-  ): string {
+  initializeCellFormatting(): void {
     let cellFormatting: { [key: string]: any } = {};
 
-    // Add formatting for table headers with index -1
-    for (let j = 0; j < tableHeaders.length; j++) {
-      cellFormatting[`-1_${tableHeaders[j]}`] = {
-        bold: false,
-        italic: false,
-        underline: false,
-        strikethrough: false,
-        fontSize: '16px',
-        fontColor: '#000000',
-        fontFamily: 'Times New Roman',
-        backgroundColor: '#ffffff',
-      };
-    }
+    for (const db of this.databaseInfo.databases) {
+      for (const table of db.tables) {
+        // Initialize cell formatting for table headers
+        const headerKeys: string[] = Object.keys(table.data[0]); // Assuming the first row contains the headers
+        for (
+          let columnIndex = 0;
+          columnIndex < headerKeys.length;
+          columnIndex++
+        ) {
+          const headerKey = `-1|${db.name}-${table.name}-${headerKeys[columnIndex]}`;
+          cellFormatting[headerKey] = {
+            bold: true,
+            italic: false,
+            underline: false,
+            strikethrough: false,
+            fontSize: '16px',
+            fontColor: '#000000',
+            fontFamily: 'Times New Roman',
+            backgroundColor: '#ffffff',
+          };
+        }
 
-    // Add formatting for cells
-    for (let i = 0; i < numRows; i++) {
-      for (let j = 0; j < numColumns; j++) {
-        cellFormatting[`${i}_${tableHeaders[j]}`] = {
-          bold: false,
-          italic: false,
-          underline: false,
-          strikethrough: false,
-          fontSize: '16px',
-          fontColor: '#000000',
-          fontFamily: 'Times New Roman',
-          backgroundColor: '#ffffff',
-        };
+        // Initialize cell formatting for data rows
+        for (let rowIndex = 0; rowIndex < table.data.length; rowIndex++) {
+          const rowData = table.data[rowIndex];
+          for (
+            let columnIndex = 0;
+            columnIndex < headerKeys.length;
+            columnIndex++
+          ) {
+            const columnName = headerKeys[columnIndex];
+            const cellKey = `${rowIndex}|${db.name}-${table.name}-${columnIndex}`;
+            cellFormatting[cellKey] = {
+              bold: false,
+              italic: false,
+              underline: false,
+              strikethrough: false,
+              fontSize: '16px',
+              fontColor: '#000000',
+              fontFamily: 'Times New Roman',
+              backgroundColor: '#ffffff',
+            };
+          }
+        }
       }
     }
-    return JSON.stringify(cellFormatting);
+
+    localStorage.setItem('cellFormatting', JSON.stringify(cellFormatting));
   }
 
-  reloadData(): void {
-    localStorage.removeItem('designViewData');
-    this.fetchData();
+  reloadDbData(): void {
+    this.connectionService.checkConnectionStatus().subscribe(
+      (response) => {
+        localStorage.removeItem('databaseInfo');
+        localStorage.removeItem('cellFormatting');
+        this.fetchDbData().then(() => {
+          this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
+        });
+      },
+      (error) => {
+        console.error('Error checking connection status:', error);
+        alert('Not Connected to Backend');
+        // Handle errors here, e.g., show an error message
+      }
+    );
   }
 
   // Fetch data from the API and store it locally
-  fetchData(): void {
-    this.http.get<any>(this.apiUrl).subscribe({
-      next: (response) => {
-        this.data = response.products.slice(0, 10);
-        if (this.data.length > 0) {
-          this.tableHeaders = Object.keys(this.data[0]);
-        }
-        localStorage.setItem('designViewData', JSON.stringify(this.data));
+  fetchDbData(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.databaseInfo = { databases: [] }; // Clear existing data
+      this.dbService.getDatabases().subscribe((databases) => {
+        databases.forEach((database) => {
+          const dbObject: any = {
+            name: database,
+            tables: [],
+          };
 
-        console.log('Data:', this.data); // Add this line for debugging
-      },
-      error: (error) => {
-        console.error('Error fetching data:', error);
-      },
+          this.dbService.getTables(database).subscribe((tables) => {
+            const tableDataPromises = tables.map((table) => {
+              return this.dbService.getTableData(database, table).toPromise();
+            });
+
+            Promise.all(tableDataPromises).then((tableDataArray) => {
+              tables.forEach((table, index) => {
+                const tableObject: any = {
+                  name: table,
+                  data: tableDataArray[index],
+                };
+                dbObject.tables.push(tableObject);
+              });
+
+              this.databaseInfo.databases.push(dbObject);
+
+              // Store databaseInfo in local storage after all tables are fetched for the database
+              localStorage.setItem(
+                'databaseInfo',
+                JSON.stringify(this.databaseInfo)
+              );
+              console.log(this.databaseInfo);
+
+              resolve(); // Resolve the Promise after data fetching is complete
+            });
+          });
+        });
+      });
     });
   }
 
@@ -122,32 +160,58 @@ export class DesignViewComponent implements OnInit {
   }
 
   // Handle cell selection based on provided row index and column name
-  toggleCellSelection(rowIndex: number, columnName: string): void {
-    const cellKey = `${rowIndex}_${columnName}`; // Unique identifier for the cell
-
+  toggleCellSelection(
+    rowIndex: number | string,
+    columnName: string | any
+  ): void {
+    const cellKey = `${rowIndex}|${columnName}`; // Unique identifier for the cell
     // Treat row headers differently
-    if (columnName === 'row-header') {
-      // Select entire row
-      this.selectedCells.clear(); // Clear previous selections
-      for (let header of this.tableHeaders) {
-        console.log(`${rowIndex}_${header}`);
-        this.selectedCells.add(`${rowIndex}_${header}`); // Add cell keys for the entire row
+    if (typeof rowIndex == 'string') {
+      const [rwClass, rwIndex] = rowIndex.split('|');
+      if (rwClass === 'row-header') {
+        this.selectedCells.clear(); // Clear previous selections
+        const [dbName, tbName] = columnName.split('|');
+        // Select entire row
+        for (let database of this.databaseInfo.databases) {
+          if (database.name == dbName) {
+            for (let table of database.tables) {
+              if (table.name === tbName) {
+                const selCols = Object.keys(table.data[0]).length;
+                for (let i = 0; i < selCols; i++) {
+                  this.selectedCells.add(`${rwIndex}|${dbName}-${tbName}-${i}`);
+                  console.log(`${rwIndex}|${dbName}-${tbName}-${i}`);
+                }
+              }
+            }
+          }
+        }
+        return;
+      } else if (rwClass === 'column-header') {
+        console.log(cellKey);
+        this.selectedCells.clear();
+        const [dbName, tbName, clName] = columnName.split('|');
+        // Select entire column
+        console.log(dbName + ' ' + tbName + ' ' + clName + ' unga');
+        for (let database of this.databaseInfo.databases) {
+          if (database.name == dbName) {
+            for (let table of database.tables) {
+              if (table.name === tbName) {
+                this.selectedCells.add(`-1|${dbName}-${tbName}-${clName}`);
+                console.log(table.data.length);
+                for (let i = 0; i < table.data.length; i++) {
+                  this.selectedCells.add(`${i}|${dbName}-${tbName}-${rwIndex}`);
+                  console.log(`${i}|${dbName}-${tbName}-${rwIndex}`);
+                }
+              }
+            }
+          }
+        }
+        return;
+      } else {
+        console.log(cellKey);
+        this.selectedCells.clear();
+        this.selectedCells.add(cellKey);
       }
-      return;
-    }
-
-    // Check if it's a row header, column header, or table header
-    if (rowIndex === -2) {
-      // For column headers, table headers, and row headers
-      console.log(columnName);
-      this.selectedCells.clear(); // Clear previous selections
-      // Add all cells in the selected column
-      for (let i = 0; i < this.data.length; i++) {
-        this.selectedCells.add(`${i}_${columnName}`);
-        console.log(`${i}_${columnName}`);
-      }
-
-      // this.selectedCells.add(columnName); // Select the clicked header
     } else {
       // For normal cells
       console.log(cellKey);
@@ -157,11 +221,9 @@ export class DesignViewComponent implements OnInit {
   }
 
   // Check if the cell at the provided row index and column name is selected
-  isSelected(rowIndex: number, columnName: string): boolean {
-    const cellKey = `${rowIndex}_${columnName}`;
-    return (
-      this.selectedCells.has(cellKey) || this.selectedCells.has(columnName)
-    );
+  isSelected(rowIndex: number, columnName: string | any): boolean {
+    const cellKey = `${rowIndex}|${columnName}`;
+    return this.selectedCells.has(cellKey);
   }
 
   @ViewChild('editableDiv') editableDiv!: ElementRef;
@@ -171,9 +233,9 @@ export class DesignViewComponent implements OnInit {
     if (this.selectedCells.size === 0) return; // No cells selected
     // Update the formatting of the selected cell and the corresponding entry in the cellFormatting object
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
+      const [rowIndex, columnName] = cellKey.split('|');
       const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       // Update the formatting based on the button clicked
       switch (format) {
@@ -256,17 +318,14 @@ export class DesignViewComponent implements OnInit {
       'cellFormatting',
       JSON.stringify(this.localCellFormatting)
     );
-
-    // Apply formatting to the selected text
-    document.execCommand(format);
   }
 
   removeFormatting(): void {
     if (this.selectedCells.size === 0) return; // No cells selected
     // Loop through selected cells and reset formatting to initial state
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const [rowIndex, columnName] = cellKey.split('|');
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       // Reset formatting to initial state
       this.localCellFormatting[cellFormattingKey] = {
@@ -332,12 +391,11 @@ export class DesignViewComponent implements OnInit {
     );
   }
 
-  applyStyle(row: number, column: string) {
+  applyStyle(row: number, column: string | any) {
     // Retrieve cellFormatting from localStorage
     const cellFormatting = localStorage.getItem('cellFormatting');
     if (cellFormatting) {
-      // const cellKey = row.toString() + '-' + column;
-      const cellKey = `${row}_${column}`;
+      const cellKey = `${row}|${column}`;
       const formatting = JSON.parse(cellFormatting)[cellKey];
 
       // Check if the style in cellFormatting differs from default style
@@ -394,9 +452,9 @@ export class DesignViewComponent implements OnInit {
   // Change the text color to the specified color
   changeTextColor(color: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
+      const [rowIndex, columnName] = cellKey.split('|');
       const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       this.localCellFormatting[cellFormattingKey].fontColor = color;
       console.log(color);
@@ -411,9 +469,9 @@ export class DesignViewComponent implements OnInit {
   // Change the background color to the specified color
   changeBackgroundColor(color: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
+      const [rowIndex, columnName] = cellKey.split('|');
       const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       this.localCellFormatting[cellFormattingKey].backgroundColor = color;
       console.log(color);
@@ -428,9 +486,9 @@ export class DesignViewComponent implements OnInit {
   // Change the font size to the specified size
   changeFontSize(fontSize: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
+      const [rowIndex, columnName] = cellKey.split('|');
       const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       this.localCellFormatting[cellFormattingKey].fontSize = fontSize;
       localStorage.setItem(
@@ -444,9 +502,9 @@ export class DesignViewComponent implements OnInit {
   // Change the font family to the specified font
   changeFontFamily(fontFamily: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('_');
+      const [rowIndex, columnName] = cellKey.split('|');
       const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}_${columnName}`;
+      const cellFormattingKey = `${rowIndex}|${columnName}`;
 
       this.localCellFormatting[cellFormattingKey].fontFamily = fontFamily;
       localStorage.setItem(
@@ -456,4 +514,54 @@ export class DesignViewComponent implements OnInit {
     });
     // document.execCommand('fontName', false, fontFamily);
   }
+
+  get currentDateTime(): string {
+    return this.datentimeService.currentDateTime;
+  }
+
+  get currentDate(): string {
+    return this.datentimeService.currentDate;
+  }
+
+  get currentTime(): string {
+    return this.datentimeService.currentTime;
+  }
+
+  // updateCellStyle(property: keyof CSSStyleDeclaration, value: string): void {
+  //   if (this.selectedCells.size === 0) return; // No cells selected
+
+  //   this.selectedCells.forEach((cellKey) => {
+  //     const [rowIndex, columnName] = cellKey.split('_');
+  //     const rowIndexNumber = parseInt(rowIndex, 10);
+  //     const cellFormattingKey = `${rowIndex}_${columnName}`;
+
+  //     // Update localCellFormatting
+  //     this.localCellFormatting[cellFormattingKey][property] = value;
+  //   });
+
+  //   // Save the updated cell formatting to local storage
+  //   localStorage.setItem('cellFormatting', JSON.stringify(this.localCellFormatting));
+
+  //   // Apply formatting to the selected cells
+  //   this.selectedCells.forEach((cellKey) => {
+  //     const [rowIndex, columnName] = cellKey.split('_');
+  //     this.applyFormatting(parseInt(rowIndex, 10), columnName, property, value);
+  //   });
+  // }
+
+  // changeTextColor(color: string): void {
+  //   this.updateCellStyle('fontColor', color);
+  // }
+
+  // changeBackgroundColor(color: string): void {
+  //   this.updateCellStyle('backgroundColor', color);
+  // }
+
+  // changeFontSize(fontSize: string): void {
+  //   this.updateCellStyle('fontSize', fontSize);
+  // }
+
+  // changeFontFamily(fontFamily: string): void {
+  //   this.updateCellStyle('fontFamily', fontFamily);
+  // }
 }

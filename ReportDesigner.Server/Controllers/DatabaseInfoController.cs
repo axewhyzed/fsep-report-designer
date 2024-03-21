@@ -113,5 +113,11 @@ namespace ReportDesignerPrac.Server.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet("status")]
+        public IActionResult GetConnectionStatus()
+        {
+            return Ok("Connected");
+        }
     }
 }

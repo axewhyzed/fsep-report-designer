@@ -12,7 +12,7 @@ export class DatabaseInfoService {
   constructor(private http: HttpClient) { }
 
   // API endpoint URLs
-  private apiUrl = 'https://127.0.0.1:4200/databaseinfo';
+  private apiUrl = 'https://localhost:4200/databaseinfo';
 
   // Fetch list of databases from the backend
   getDatabases(): Observable<string[]> {
