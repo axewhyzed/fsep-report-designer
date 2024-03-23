@@ -1,8 +1,9 @@
 <div class="print-preview-container">
   <div class="top-toolbar">
-    <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button>
+    <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br>
+    <button (click)="exportDivToHtml()">Export as HTML</button>
   </div>
-    <div class="report-container" id="printable-section">
+    <div class="report-container" id="printable-section" #exportedDiv>
         <div class="top-section">
           <!-- Image and title -->
           <div class="image-and-title">

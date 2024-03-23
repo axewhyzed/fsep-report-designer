@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { DatentimeService } from '../datentime.service';
 
 @Component({
@@ -8,8 +8,9 @@ import { DatentimeService } from '../datentime.service';
 })
 export class PrintPreviewComponent {
   databaseInfo: any = [];
+  @ViewChild('exportedDiv') exportedDiv!: ElementRef;
 
-  constructor(private datentimeService: DatentimeService){}
+  constructor(private datentimeService: DatentimeService, private renderer: Renderer2) { }
 
   ngOnInit(): void {
     const databaseInfoJson = localStorage.getItem('databaseInfo');
@@ -76,5 +77,42 @@ export class PrintPreviewComponent {
 
   get currentTime(): string {
     return this.datentimeService.currentTime;
+  }
+
+  exportDivToHtml() {
+    const divToExport = this.exportedDiv.nativeElement.innerHTML;
+    const exportDoc = document.implementation.createHTMLDocument('Exported HTML');
+
+    // Create a div element to hold the exported content
+    const exportDiv = exportDoc.createElement('div');
+    exportDiv.innerHTML = divToExport;
+
+    // Append the export div to the body of the export document
+    exportDoc.body.appendChild(exportDiv);
+
+    // Inject CSS styles
+    const styles = Array.from(document.styleSheets)
+      .filter(styleSheet => !styleSheet.href || !styleSheet.href.endsWith('styles.css')) // Exclude styles.css
+      .map(styleSheet => Array.from(styleSheet.cssRules)
+        .map(rule => rule.cssText)
+        .join('\n'))
+      .join('\n');
+    const styleElement = exportDoc.createElement('style');
+    styleElement.textContent = styles;
+    exportDoc.head.appendChild(styleElement);
+
+    // Serialize the new document to HTML
+    const exportedHtml = exportDoc.documentElement.outerHTML;
+
+    // Download the HTML content
+    const blob = new Blob([exportedHtml], { type: 'text/html' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'exported_content.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }
