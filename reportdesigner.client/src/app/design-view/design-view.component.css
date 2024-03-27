@@ -183,3 +183,64 @@ table, th, td{
   font-size: 30px;
   cursor: pointer;
 }
+
+/* CSS for Report Wizard */
+.report-wizard-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999; /* Ensure the popup appears on top of other content */
+}
+
+.popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.start-wizard-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.start-wizard-button:hover {
+  background-color: #0056b3;
+}
+
+/* Ensure the popup is visible when showReportWizard is true */
+.report-wizard-popup.ng-enter,
+.report-wizard-popup.ng-leave {
+  transition: opacity 0.5s;
+}
+
+.report-wizard-popup.ng-enter {
+  opacity: 0;
+}
+
+.report-wizard-popup.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+.report-wizard-popup.ng-leave {
+  opacity: 1;
+}
+
+.report-wizard-popup.ng-leave.ng-leave-active {
+  opacity: 0;
+}

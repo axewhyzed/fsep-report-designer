@@ -2,6 +2,9 @@
 
 @import '../node_modules/material-icons/iconfont/material-icons.css';
 /* @import '../node_modules/font-awesome/css/font-awesome.css'; */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
 
 /* *{
   color-adjust: exact;

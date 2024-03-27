@@ -11,6 +11,14 @@ import { CheckConnectionService } from '../check-connection.service';
 })
 export class DesignViewComponent implements OnInit {
   databaseInfo: any = [];
+  reportTitle: string = '';
+  showReportWizard: boolean = false;
+  numberOfTables: number = 0;
+  tableSelectionRows: any[] = [];
+  tableSelections: { database: string, table: string, tables: string[] }[] = [];
+  selectedDatabase: string = ''; // Holds the selected database
+  selectedTables: string[] = []; // Holds the selected table
+  selectedDatabaseTables: any[] = []; // Holds tables of the selected database
 
   constructor(
     private http: HttpClient,
@@ -35,8 +43,60 @@ export class DesignViewComponent implements OnInit {
         localStorage.getItem('cellFormatting')!
       );
     } else {
-      this.fetchDbData();
+      this.fetchDbData().then(() => {
+        this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
+      });
     }
+  }
+
+  onDatabaseChange() {
+    this.selectedTables = []; // Reset selected table when database changes
+    const selectedDb = this.databaseInfo.databases.find((db:any) => db.name === this.selectedDatabase);
+    this.selectedDatabaseTables = selectedDb ? selectedDb.tables : [];
+  }
+
+  toggleReportWizard() {
+    this.showReportWizard = !this.showReportWizard;
+  }
+
+  submitReport() {
+    console.log('Submitted report title:', this.reportTitle);
+    this.toggleReportWizard(); // Close the wizard after submission
+  }
+
+  cancelReport() {
+    this.toggleReportWizard(); // Close the wizard
+  }
+
+  generateTableSelectionRows() {
+    this.tableSelectionRows = Array.from({ length: this.numberOfTables }, (_, i) => i);
+    this.tableSelections = Array.from({ length: this.numberOfTables }, () => ({ database: '', table: '', tables: [] }));
+  }
+
+  fetchTablesDropdown(databaseName: string, index: number) {
+    const selectedDatabase = this.databaseInfo.databases.find((db: any) => db.name === databaseName);
+    if (selectedDatabase) {
+      this.tableSelections[index].table = ''; // Reset selected table
+      this.tableSelections[index].database = databaseName;
+      this.tableSelections[index].tables = selectedDatabase.tables.map((table: any) => table.name); // Assign table names for the selected database
+    }
+  }
+
+  private findSelectedTable(database: string, table: string): { data: any[] } | undefined {
+    const selectedDatabase = this.databaseInfo.databases.find((db: any) => db.name === database);
+    return selectedDatabase?.tables.find((tbl: any) => tbl.name === table);
+  }
+
+  getTableData(database: string, table: string): any[] {
+    // Find the selected database in databaseInfo
+    const selectedTable = this.findSelectedTable(database, table);
+    return selectedTable ? selectedTable.data : [];
+  }
+  
+  getTableHeaders(database: string, table: string): string[] {
+    // Find the selected database in databaseInfo
+    const selectedTable = this.findSelectedTable(database, table);
+    return selectedTable && selectedTable.data.length > 0 ? Object.keys(selectedTable.data[0]) : [];
   }
 
   // Initialize cell formatting for table headers and cells

@@ -1,0 +1,78 @@
+<div class="table-container">
+  <ng-container *ngFor="let db of databaseInfo.databases">
+    <h2>{{ db.name }}</h2>
+    <ng-container *ngFor="let table of db.tables">
+      <h3>{{ table.name }}</h3>
+      <table class="tbl-data">
+        <thead>
+          <tr>
+            <th></th>
+            <th *ngFor="
+                      let header of table.data[0] | keyvalue;
+                      let i = index
+                    " (click)="
+                      toggleCellSelection(
+                        'column-header' + '|' + i,
+                        db.name + '|' + table.name + '|' + header.key
+                      )
+                    ">
+              <div class="column-header">{{ getColumnHeader(i) }}</div>
+            </th>
+          </tr>
+          <tr>
+            <th></th>
+            <!-- Empty cell for numbering columns -->
+            <th *ngFor="
+                      let header of table.data[0] | keyvalue;
+                      let z = index
+                    " (click)="
+                      toggleCellSelection(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    " [ngClass]="{
+                      'selected-cell': isSelected(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    }" [ngStyle]="
+                      applyStyle(
+                        -1,
+                        db.name + '-' + table.name + '-' + header.key
+                      )
+                    ">
+              <div class="table-header">{{ header.key }}</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of table.data; let i = index">
+            <td class="row-header" (click)="
+                      toggleCellSelection(
+                        'row-header' + '|' + i,
+                        db.name + '|' + table.name
+                      )
+                    ">
+              {{ i + 1 }}
+            </td>
+            <td *ngFor="let cell of row | keyvalue; let j = index" (click)="
+                      toggleCellSelection(
+                        i,
+                        db.name + '-' + table.name + '-' + j
+                      )
+                    " [ngClass]="{
+                      'selected-cell': isSelected(
+                        i,
+                        db.name + '-' + table.name + '-' + j
+                      )
+                    }" [ngStyle]="
+                      applyStyle(i, db.name + '-' + table.name + '-' + j)
+                    " class="cell-content" [attr.data-row]="i" [attr.data-col]="cell.key">
+              {{ cell.value }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </ng-container>
+</div>
