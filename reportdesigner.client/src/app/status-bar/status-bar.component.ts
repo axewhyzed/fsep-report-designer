@@ -10,9 +10,7 @@ export class StatusBarComponent implements OnInit{
 
   constructor(private datentimeService: DatentimeService) { }
 
-  ngOnInit(): void {
-      this.datentimeService.updateCurrentTime(); // Initial update
-  
+  ngOnInit(): void {  
       // Update the current time every second
       setInterval(() => {
         this.datentimeService.updateCurrentTime();

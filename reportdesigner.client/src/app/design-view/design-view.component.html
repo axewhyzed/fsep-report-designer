@@ -142,20 +142,25 @@
   </div>
 
   <!-- Start Report Wizard button -->
-  <button *ngIf="!showReportWizard" class="start-wizard-button" (click)="toggleReportWizard()">Start Report Wizard</button>
+  <button *ngIf="!showReportWizard && !showReportContainer" class="start-wizard-button" (click)="toggleReportWizard()">Start Report Wizard</button>
 
   <!-- Popup/modal for the report wizard -->
-  <div class="report-wizard-popup" *ngIf="showReportWizard">
+  <div class="report-wizard-popup" *ngIf="showReportWizard && !showReportContainer">
     <div class="popup-content">
       <h2>Report Wizard</h2>
       <label for="reportTitle">Report Title:</label>
-      <input type="text" id="reportTitle" [(ngModel)]="reportTitle" />
+      <input type="text" id="reportTitle" [(ngModel)]="reportTitle" /><br><br />
+
+      <!-- Input field for logo selection -->
+      <label for="reportLogo">Report Logo:</label>
+      <input type="file" id="reportLogo" (change)="onLogoSelected($event)" accept="image/*" /><br><br />
       <!-- Add other input fields for logo selection, database, and table selection -->
 
       <div>
         <label for="numberOfTables">Number of Tables:</label>
-        <input type="number" id="numberOfTables" [(ngModel)]="numberOfTables" (change)="generateTableSelectionRows()" />
-      </div>
+        <button (click)="addTable()">+</button>
+        <!-- <input type="number" id="numberOfTables" [(ngModel)]="numberOfTables" (change)="generateTableSelectionRows()" /> -->
+      </div><br />
       <div *ngFor="let tableSelectionRow of tableSelectionRows; let i = index">
         <label for="database{{i}}">Database:</label>
         <select id="database{{i}}" [(ngModel)]="tableSelections[i].database" (change)="fetchTablesDropdown($any($event.target).value, i)">
@@ -165,7 +170,8 @@
         <select id="table{{i}}" [(ngModel)]="tableSelections[i].table">
           <option *ngFor="let table of tableSelections[i].tables" [value]="table">{{ table }}</option>
         </select>
-      </div>
+        <button (click)="removeTable(i)" *ngIf="numberOfTables > 1">-</button>
+      </div><br />
 
       <div class="button-container">
         <button (click)="submitReport()">Submit</button>
@@ -175,15 +181,12 @@
   </div>
 
   <div class="edit-container" #editableDiv>
-    <div class="report-container">
+    <div class="report-container" *ngIf="showReportContainer">
       <div class="top-section">
         <!-- Image and title -->
         <div class="image-and-title">
-          <img
-            src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png"
-            alt="Image"
-          />
-          <h1>Title</h1>
+          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo"/>
+          <h1>{{reportTitle}}</h1>
         </div>
         <!-- Current date/time -->
         <div class="date-time">
@@ -192,51 +195,49 @@
         </div>
       </div>
 
-      <div class="selection-container">
-        <label for="databaseSelect">Select Database:</label>
-        <select id="databaseSelect" [(ngModel)]="selectedDatabase" (change)="onDatabaseChange()">
-          <option *ngFor="let db of databaseInfo.databases" [value]="db.name">{{ db.name }}</option>
-        </select>
-      
-        <label for="tableSelect">Select Tables:</label>
-        <select id="tableSelect" multiple [(ngModel)]="selectedTables">
-          <option *ngFor="let table of selectedDatabaseTables" [value]="table.name">{{ table.name }}</option>
-        </select>
-      
-        <button (click)="submitReport()">Submit</button>
-      </div>
-
-      <div class="tabl-container">
-        <ng-container *ngFor="let tableName of selectedTables">
-          <h2>{{ selectedDatabase }}</h2>
-          <h3>{{ tableName }}</h3>
-          <!-- Table content for each selected table -->
-          <table class="tbl-data">
-            <!-- Table headers and rows for selected table -->
-          </table>
-        </ng-container>
-      </div>
-
-      <div class="table-container" *ngIf="!showReportWizard">
+      <div class="table-container">
         <ng-container *ngFor="let tableSelection of tableSelections">
           <h2>{{ tableSelection.database }}</h2>
           <h3>{{ tableSelection.table }}</h3>
           <!-- Include the table rendering code here -->
-          <table>
+          <table class="tbl-data">
             <thead>
               <tr>
+                <th></th>
+                <th *ngFor="
+                          let header of getTableHeaders(tableSelection.database, tableSelection.table);
+                          let i = index
+                        " (click)="
+                          toggleCellSelection(
+                            'column-header' + '|' + i,
+                            tableSelection.database + '|' + tableSelection.table + '|' + header
+                          )
+                        ">
+                  <div class="column-header">{{ getColumnHeader(i) }}</div>
+                </th>
+              </tr>
+              <tr>
+                <th></th>
                 <!-- Include table headers here -->
-                <th *ngFor="let header of getTableHeaders(tableSelection.database, tableSelection.table)">
-                  {{ header }}
+                <th *ngFor="let header of getTableHeaders(tableSelection.database, tableSelection.table); let z = index" (click)="toggleCellSelection(-1, tableSelection.database + '-' + tableSelection.table + '-' + header)" [ngClass]="{'selected-cell': isSelected(-1,tableSelection.database + '-' + tableSelection.table + '-' + header)}">
+                  <div class="table-header">{{ header }}</div>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of getTableData(tableSelection.database, tableSelection.table)">
+              <tr *ngFor="let row of getTableData(tableSelection.database, tableSelection.table); let i = index">
+                <td class="row-header" (click)="
+                      toggleCellSelection(
+                        'row-header' + '|' + i,
+                        tableSelection.database + '|' + tableSelection.table
+                      )
+                    ">
+              {{ i + 1 }}
+            </td>
                 <!-- Include table cells here -->
-                <!-- <td *ngFor="let cell of row">{{ cell.value }}</td> -->
-                <td *ngFor="let cell of row">{{ cell }}</td>
-                <td *ngFor="let cell of row">{{ row }}</td>
+                <td *ngFor="let cell of row | keyvalue; let j = index" class="cell-content" (click)="toggleCellSelection( i, tableSelection.database + '-' + tableSelection.table + '-' + j)" [ngClass]="{'selected-cell': isSelected(i,tableSelection.database + '-' + tableSelection.table + '-' + j)}" [ngStyle]="applyStyle(i,tableSelection.database + '-' + tableSelection.table + '-' + j)" [attr.data-row]="i" [attr.data-col]="cell.key">
+                {{ cell.value }}
+                </td>
               </tr>
             </tbody>
           </table>

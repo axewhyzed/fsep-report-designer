@@ -25,6 +25,10 @@
     padding: 20px;
 }
 
+.report-logo{
+  margin-right: 15px;
+}
+
 .top-section {
     display: flex;
     justify-content: space-between;

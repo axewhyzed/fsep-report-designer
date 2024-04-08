@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { DatabaseInfoService } from '../database-info.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-data-toolbar',
@@ -7,58 +8,57 @@ import { DatabaseInfoService } from '../database-info.service';
   styleUrl: './data-toolbar.component.css',
 })
 export class DataToolbarComponent {
-  // databaseInfo: any = [];
 
-  // constructor(private dbService: DatabaseInfoService) {}
+  constructor(private router: Router){}
 
-  // ngOnInit(): void {
-  //   const storedDatabaseInfo = localStorage.getItem('databaseInfo');
-  //   if (storedDatabaseInfo) {
-  //     this.databaseInfo = JSON.parse(storedDatabaseInfo);
-  //   } else {
-  //     this.fetchDbData();
-  //   }
-  // }
+  saveReportState() {
+    const reportDataString = localStorage.getItem('reportData');
+    if (!reportDataString) {
+      alert('No report data found to save');
+      return;
+    }
+    const savedReportData = JSON.parse(reportDataString);
+    const savedReportTitle = savedReportData.reportTitle;
+    const data = JSON.stringify(localStorage);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${savedReportTitle}-ReportData.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
-  // reloadDbData(): void {
-  //   localStorage.removeItem('databaseInfo');
-  //   this.fetchDbData();
-  // }
+  loadReportState(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-  // fetchDbData() {
-  //   this.databaseInfo = { databases: [] }; // Clear existing data
-  //   this.dbService.getDatabases().subscribe((databases) => {
-  //     databases.forEach((database) => {
-  //       const dbObject: any = {
-  //         name: database,
-  //         tables: [],
-  //       };
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = JSON.parse((event.target as FileReader).result as string);
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          localStorage.setItem(key, data[key]);
+        }
+      }
+      alert('Report loaded successfully!');
+    };
+    reader.readAsText(file);
 
-  //       this.dbService.getTables(database).subscribe((tables) => {
-  //         const tableDataPromises = tables.map((table) => {
-  //           return this.dbService.getTableData(database, table).toPromise();
-  //         });
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      window.location.reload();
+    });
+  }
 
-  //         Promise.all(tableDataPromises).then((tableDataArray) => {
-  //           tables.forEach((table, index) => {
-  //             const tableObject: any = {
-  //               name: table,
-  //               data: tableDataArray[index],
-  //             };
-  //             dbObject.tables.push(tableObject);
-  //           });
-
-  //           this.databaseInfo.databases.push(dbObject);
-
-  //           // Store databaseInfo in local storage after all tables are fetched for the database
-  //           localStorage.setItem(
-  //             'databaseInfo',
-  //             JSON.stringify(this.databaseInfo)
-  //           );
-  //           console.log(this.databaseInfo);
-  //         });
-  //       });
-  //     });
-  //   });
-  // }
+  resetReportData(){
+    localStorage.removeItem('cellFormatting');
+    localStorage.removeItem('reportData');
+    localStorage.removeItem('tableSelections');
+    alert('New Report Initiated');
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      window.location.reload();
+    });
+  }
 }

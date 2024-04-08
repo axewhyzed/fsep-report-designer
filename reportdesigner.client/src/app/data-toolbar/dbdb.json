@@ -1,6 +1,52 @@
 {
   "databases": [
     {
+      "name": "Another_DB",
+      "tables": [
+        {
+          "name": "PersonalExpenses",
+          "data": [
+            {
+              "Date": "2024-03-02T00:00:00",
+              "Category": "Maintenance",
+              "Description": "Equipment maintenance",
+              "Amount": 1200
+            },
+            {
+              "Date": "2024-03-07T00:00:00",
+              "Category": "Insurance",
+              "Description": "Health insurance premiums",
+              "Amount": 2500
+            },
+            {
+              "Date": "2024-03-12T00:00:00",
+              "Category": "Training",
+              "Description": "Employee training programs",
+              "Amount": 3000
+            },
+            {
+              "Date": "2024-03-17T00:00:00",
+              "Category": "Consulting",
+              "Description": "Consulting fees for project",
+              "Amount": 4000
+            },
+            {
+              "Date": "2024-03-21T00:00:00",
+              "Category": "Software",
+              "Description": "Software licenses renewal",
+              "Amount": 1500
+            },
+            {
+              "Date": "2024-03-25T00:00:00",
+              "Category": "Legal",
+              "Description": "Legal consultation fees",
+              "Amount": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FSEP_DB",
       "tables": [
         {
@@ -209,6 +255,47 @@
             { "deptno": 2, "dname": "RESEARCH", "loc": "NEW YORK" },
             { "deptno": 3, "dname": "SALES", "loc": "ATLANTA" },
             { "deptno": 4, "dname": "OPERATIONS", "loc": "SEATTLE" }
+          ]
+        },
+        {
+          "name": "CompanyExpenses",
+          "data": [
+            {
+              "Date": "2024-03-01T00:00:00",
+              "Category": "Office Rent",
+              "Description": "Rent for main office",
+              "Amount": 5000
+            },
+            {
+              "Date": "2024-03-05T00:00:00",
+              "Category": "Utilities",
+              "Description": "Electricity bill",
+              "Amount": 1200
+            },
+            {
+              "Date": "2024-03-10T00:00:00",
+              "Category": "Salaries",
+              "Description": "Payroll for employees",
+              "Amount": 15000
+            },
+            {
+              "Date": "2024-03-15T00:00:00",
+              "Category": "Supplies",
+              "Description": "Office supplies replenishment",
+              "Amount": 800
+            },
+            {
+              "Date": "2024-03-18T00:00:00",
+              "Category": "Marketing",
+              "Description": "Digital marketing campaign",
+              "Amount": 2500
+            },
+            {
+              "Date": "2024-03-20T00:00:00",
+              "Category": "Travel",
+              "Description": "Business trip expenses",
+              "Amount": 3000
+            }
           ]
         }
       ]

@@ -3,6 +3,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DatabaseInfoService } from '../database-info.service';
 import { DatentimeService } from '../datentime.service';
 import { CheckConnectionService } from '../check-connection.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-design-view',
@@ -12,10 +13,13 @@ import { CheckConnectionService } from '../check-connection.service';
 export class DesignViewComponent implements OnInit {
   databaseInfo: any = [];
   reportTitle: string = '';
+  selectedLogo: File | null = null;
+  logoDataURL: string | null = null;
   showReportWizard: boolean = false;
+  showReportContainer: boolean = false;
   numberOfTables: number = 0;
   tableSelectionRows: any[] = [];
-  tableSelections: { database: string, table: string, tables: string[] }[] = [];
+  tableSelections: { database: string; table: string; tables: string[] }[] = [];
   selectedDatabase: string = ''; // Holds the selected database
   selectedTables: string[] = []; // Holds the selected table
   selectedDatabaseTables: any[] = []; // Holds tables of the selected database
@@ -24,7 +28,8 @@ export class DesignViewComponent implements OnInit {
     private http: HttpClient,
     private dbService: DatabaseInfoService,
     private datentimeService: DatentimeService,
-    private connectionService: CheckConnectionService
+    private connectionService: CheckConnectionService,
+    private router: Router
   ) {}
 
   localCellFormatting: any;
@@ -42,6 +47,18 @@ export class DesignViewComponent implements OnInit {
       this.localCellFormatting = JSON.parse(
         localStorage.getItem('cellFormatting')!
       );
+      const storedReportData = localStorage.getItem('reportData');
+      const storedSelections = localStorage.getItem('tableSelections');
+      if (storedReportData && storedSelections) {
+        const parsedData = JSON.parse(storedReportData);
+        this.reportTitle = parsedData.reportTitle;
+        this.selectedLogo = parsedData.selectedLogo;
+        this.logoDataURL = parsedData.logoDataURL;
+        this.tableSelections = JSON.parse(storedSelections);
+        // If selections are present, directly show report container
+        this.showReportWizard = false;
+        this.showReportContainer = true;
+      }
     } else {
       this.fetchDbData().then(() => {
         this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
@@ -49,54 +66,134 @@ export class DesignViewComponent implements OnInit {
     }
   }
 
-  onDatabaseChange() {
-    this.selectedTables = []; // Reset selected table when database changes
-    const selectedDb = this.databaseInfo.databases.find((db:any) => db.name === this.selectedDatabase);
-    this.selectedDatabaseTables = selectedDb ? selectedDb.tables : [];
-  }
-
   toggleReportWizard() {
     this.showReportWizard = !this.showReportWizard;
   }
 
-  submitReport() {
-    console.log('Submitted report title:', this.reportTitle);
-    this.toggleReportWizard(); // Close the wizard after submission
+  onLogoSelected(event: any) {
+    this.selectedLogo = event.target.files[0];
+    this.loadLogoDataURL();
   }
 
-  cancelReport() {
-    this.toggleReportWizard(); // Close the wizard
-  }
-
-  generateTableSelectionRows() {
-    this.tableSelectionRows = Array.from({ length: this.numberOfTables }, (_, i) => i);
-    this.tableSelections = Array.from({ length: this.numberOfTables }, () => ({ database: '', table: '', tables: [] }));
-  }
-
-  fetchTablesDropdown(databaseName: string, index: number) {
-    const selectedDatabase = this.databaseInfo.databases.find((db: any) => db.name === databaseName);
-    if (selectedDatabase) {
-      this.tableSelections[index].table = ''; // Reset selected table
-      this.tableSelections[index].database = databaseName;
-      this.tableSelections[index].tables = selectedDatabase.tables.map((table: any) => table.name); // Assign table names for the selected database
+  loadLogoDataURL() {
+    if (this.selectedLogo) {
+      const reader = new FileReader();
+      reader.readAsDataURL(this.selectedLogo);
+      reader.onload = () => {
+        // Once the file is read, the result will be available as reader.result
+        // We need to cast it to a string as FileReader.result is of type 'string | null'
+        this.logoDataURL = reader.result as string;
+      };
     }
   }
 
-  private findSelectedTable(database: string, table: string): { data: any[] } | undefined {
-    const selectedDatabase = this.databaseInfo.databases.find((db: any) => db.name === database);
-    return selectedDatabase?.tables.find((tbl: any) => tbl.name === table);
+  submitReport() {
+    // Log the submitted report title
+    console.log('Submitted report title:', this.reportTitle);
+    // Close the report wizard after submission
+    this.toggleReportWizard();
+    // Show the report container after submission
+    this.showReportContainer = true;
+    const reportData = {
+      reportTitle: this.reportTitle,
+      selectedLogo: this.selectedLogo,
+      logoDataURL: this.logoDataURL,
+    };
+    localStorage.setItem('reportData', JSON.stringify(reportData));
+    localStorage.setItem(
+      'tableSelections',
+      JSON.stringify(this.tableSelections)
+    );
+  }
+
+  cancelReport() {
+    // Close the report wizard without submitting
+    this.toggleReportWizard();
+    // Hide the report container if canceled
+    this.showReportContainer = false;
+    localStorage.removeItem('reportData');
+    localStorage.removeItem('tableSelections');
+  }
+
+  addTable() {
+    this.numberOfTables++;
+    this.tableSelectionRows.push({});
+    this.tableSelections.push({ database: '', table: '', tables: [] });
+  }
+  
+  removeTable(index: number) {
+    this.numberOfTables--;
+    this.tableSelectionRows.splice(index, 1);
+    this.tableSelections.splice(index, 1);
+  }
+
+  generateTableSelectionRows() {
+    this.tableSelectionRows = Array.from(
+      { length: this.numberOfTables },
+      (_, i) => i
+    );
+    this.tableSelections = Array.from({ length: this.numberOfTables }, () => ({
+      database: '',
+      table: '',
+      tables: [],
+    }));
+  }
+
+  fetchTablesDropdown(databaseName: string, index: number) {
+    console.log('From fetch tables: ' + databaseName);
+    console.log(this.databaseInfo.databases);
+    const selectedDatabase = this.databaseInfo.databases.find(
+      (db: any) => db.name === databaseName
+    );
+    if (selectedDatabase) {
+      this.tableSelections[index].table = ''; // Reset selected table
+      this.tableSelections[index].database = databaseName;
+      this.tableSelections[index].tables = selectedDatabase.tables.map(
+        (table: any) => table.name
+      ); // Assign table names for the selected database
+    }
   }
 
   getTableData(database: string, table: string): any[] {
-    // Find the selected database in databaseInfo
-    const selectedTable = this.findSelectedTable(database, table);
-    return selectedTable ? selectedTable.data : [];
+    // Find the selected database in database info
+    const selectedDatabase = this.databaseInfo.databases.find(
+      (db: any) => db.name === database
+    );
+    if (selectedDatabase) {
+      // Find the selected table within the selected database
+      const selectedTable = selectedDatabase.tables.find(
+        (t: any) => t.name === table
+      );
+      if (selectedTable) {
+        const headers = this.getTableHeaders(database, table); // Get table headers
+        return selectedTable.data.map((row: any) => {
+          // Map data according to header order
+          return headers.map((header) => row[header]);
+        });
+      }
+      console.log(selectedTable.data);
+      return selectedTable ? selectedTable.data : [];
+    }
+
+    return [];
   }
-  
+
   getTableHeaders(database: string, table: string): string[] {
-    // Find the selected database in databaseInfo
-    const selectedTable = this.findSelectedTable(database, table);
-    return selectedTable && selectedTable.data.length > 0 ? Object.keys(selectedTable.data[0]) : [];
+    // Find the selected database in database info
+    const selectedDatabase = this.databaseInfo.databases.find(
+      (db: any) => db.name === database
+    );
+    if (selectedDatabase) {
+      // Find the selected table within the selected database
+      const selectedTable = selectedDatabase.tables.find(
+        (t: any) => t.name === table
+      );
+      console.log(Object.keys(selectedTable.data[0]));
+      return selectedTable && selectedTable.data.length > 0
+        ? Object.keys(selectedTable.data[0])
+        : [];
+    }
+    return [];
   }
 
   // Initialize cell formatting for table headers and cells
@@ -154,20 +251,23 @@ export class DesignViewComponent implements OnInit {
   }
 
   reloadDbData(): void {
-    this.connectionService.checkConnectionStatus().subscribe(
-      (response) => {
+    // this.connectionService.checkConnectionStatus().subscribe(
+      // (response) => {
         localStorage.removeItem('databaseInfo');
         localStorage.removeItem('cellFormatting');
         this.fetchDbData().then(() => {
           this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
         });
-      },
-      (error) => {
-        console.error('Error checking connection status:', error);
-        alert('Not Connected to Backend');
+      // },
+      // (error) => {
+        // console.error('Error checking connection status:', error);
+        // alert('Not Connected to Backend');
         // Handle errors here, e.g., show an error message
-      }
-    );
+      // }
+    // );
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      window.location.reload();
+    });
   }
 
   // Fetch data from the API and store it locally

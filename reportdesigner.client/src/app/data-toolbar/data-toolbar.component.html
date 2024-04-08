@@ -1,17 +1,7 @@
 <div class="data-toolbar-container">
-  <div cdkDrag cdkDragRootElement=".example-container">
-    <button cdkDragHandle>Textbox</button>
-  </div>
-
-  <div cdkDrag cdkDragRootElement=".example-container">
-    <button cdkDragHandle>Image</button>
-  </div>
-
-  <div cdkDrag cdkDragRootElement=".example-container">
-    <button cdkDragHandle>Table</button>
-  </div>
-
-  <div cdkDrag cdkDragRootElement=".example-container">
-    <!-- <button (click)="reloadDbData()">Reload Data</button> -->
-  </div>
+  <button (click)="resetReportData()">New Report</button><br>
+  <button (click)="saveReportState()">Save Report Data</button><br>
+  <input type="file" (change)="loadReportState($event)">
 </div>
+
+

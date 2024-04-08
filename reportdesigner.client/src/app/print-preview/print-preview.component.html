@@ -4,55 +4,41 @@
     <button (click)="exportDivToHtml()">Export as HTML</button>
   </div>
     <div class="report-container" id="printable-section" #exportedDiv>
-        <div class="top-section">
-          <!-- Image and title -->
-          <div class="image-and-title">
-            <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" alt="Image">
-            <h1>Title</h1>
-          </div>
-          <!-- Current date/time -->
-          <div class="date-time">
-            <p>{{currentDate}}</p>
-            <p>{{currentTime}}</p>
-          </div>
+      <div class="top-section">
+        <!-- Image and title -->
+        <div class="image-and-title">
+          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo"/>
+          <h1>{{reportTitle}}</h1>
         </div>
+        <!-- Current date/time -->
+        <div class="date-time">
+          <p>{{ currentDate }}</p>
+          <p>{{ currentTime }}</p>
+        </div>
+      </div>
         <div class="table-container">
-          <ng-container *ngFor="let db of databaseInfo.databases">
-            <h2>{{ db.name }}</h2>
-            <ng-container *ngFor="let table of db.tables">
-              <h3>{{ table.name }}</h3>
-              <table class="tbl-data">
-                <thead>
-                  <tr>
-                    <th>Sr.No.</th>
-                    <!-- Empty cell for numbering columns -->
-                    <th *ngFor="
-                        let header of table.data[0] | keyvalue;
-                        let z = index
-                      " [ngStyle]="
-                        applyStyle(
-                          -1,
-                          db.name + '-' + table.name + '-' + header.key
-                        )
-                      ">
-                      <div class="table-header">{{ header.key }}</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let row of table.data; let i = index">
-                    <td class="row-header">
-                      {{ i + 1 }}
-                    </td>
-                    <td *ngFor="let cell of row | keyvalue; let j = index" [ngStyle]="
-                        applyStyle(i, db.name + '-' + table.name + '-' + j)
-                      " class="cell-content" [attr.data-row]="i" [attr.data-col]="cell.key">
-                      {{ cell.value }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </ng-container>
+          <ng-container *ngFor="let tableSelection of tableSelections">
+            <h2>{{ tableSelection.database }}</h2>
+            <h3>{{ tableSelection.table }}</h3>
+            <!-- Include the table rendering code here -->
+            <table class="tbl-data">
+              <thead>
+                <tr>
+                  <!-- Include table headers here -->
+                  <th *ngFor="let header of getTableHeaders(tableSelection.database, tableSelection.table); let z = index">
+                    <div class="table-header">{{ header }}</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of getTableData(tableSelection.database, tableSelection.table); let i = index">
+                  <!-- Include table cells here -->
+                  <td *ngFor="let cell of row | keyvalue; let j = index" class="cell-content" [ngStyle]="applyStyle(i,tableSelection.database + '-' + tableSelection.table + '-' + j)" [attr.data-row]="i" [attr.data-col]="cell.key">
+                  {{ cell.value }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </ng-container>
         </div>
       </div>

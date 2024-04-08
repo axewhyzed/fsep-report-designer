@@ -4,24 +4,99 @@ import { DatentimeService } from '../datentime.service';
 @Component({
   selector: 'app-print-preview',
   templateUrl: './print-preview.component.html',
-  styleUrl: './print-preview.component.css'
+  styleUrl: './print-preview.component.css',
 })
 export class PrintPreviewComponent {
   databaseInfo: any = [];
+  reportTitle: string = '';
+  selectedLogo: File | null = null;
+  logoDataURL: string | null = null;
+  tableSelections: { database: string; table: string; tables: string[] }[] = [];
   @ViewChild('exportedDiv') exportedDiv!: ElementRef;
 
-  constructor(private datentimeService: DatentimeService, private renderer: Renderer2) { }
+  constructor(
+    private datentimeService: DatentimeService,
+    private renderer: Renderer2
+  ) {}
 
   ngOnInit(): void {
     const databaseInfoJson = localStorage.getItem('databaseInfo');
     if (databaseInfoJson) {
       this.databaseInfo = JSON.parse(databaseInfoJson);
     }
+    const storedReportData = localStorage.getItem('reportData');
+    const storedSelections = localStorage.getItem('tableSelections');
+    if (storedReportData && storedSelections) {
+      const parsedData = JSON.parse(storedReportData);
+      this.reportTitle = parsedData.reportTitle;
+      this.selectedLogo = parsedData.selectedLogo;
+      this.logoDataURL = parsedData.logoDataURL;
+      this.tableSelections = JSON.parse(storedSelections);
+    }
   }
 
   getColumnHeader(index: number): string {
     // Add 65 to convert the index to ASCII code for A, B, C, etc.
     return String.fromCharCode(65 + index);
+  }
+
+  onLogoSelected(event: any) {
+    this.selectedLogo = event.target.files[0];
+    this.loadLogoDataURL();
+  }
+
+  loadLogoDataURL() {
+    if (this.selectedLogo) {
+      const reader = new FileReader();
+      reader.readAsDataURL(this.selectedLogo);
+      reader.onload = () => {
+        // Once the file is read, the result will be available as reader.result
+        // We need to cast it to a string as FileReader.result is of type 'string | null'
+        this.logoDataURL = reader.result as string;
+      };
+    }
+  }
+
+  getTableData(database: string, table: string): any[] {
+    // Find the selected database in database info
+    const selectedDatabase = this.databaseInfo.databases.find(
+      (db: any) => db.name === database
+    );
+    if (selectedDatabase) {
+      // Find the selected table within the selected database
+      const selectedTable = selectedDatabase.tables.find(
+        (t: any) => t.name === table
+      );
+      if (selectedTable) {
+        const headers = this.getTableHeaders(database, table); // Get table headers
+        return selectedTable.data.map((row: any) => {
+          // Map data according to header order
+          return headers.map((header) => row[header]);
+        });
+      }
+      console.log(selectedTable.data);
+      return selectedTable ? selectedTable.data : [];
+    }
+
+    return [];
+  }
+
+  getTableHeaders(database: string, table: string): string[] {
+    // Find the selected database in database info
+    const selectedDatabase = this.databaseInfo.databases.find(
+      (db: any) => db.name === database
+    );
+    if (selectedDatabase) {
+      // Find the selected table within the selected database
+      const selectedTable = selectedDatabase.tables.find(
+        (t: any) => t.name === table
+      );
+      console.log(Object.keys(selectedTable.data[0]));
+      return selectedTable && selectedTable.data.length > 0
+        ? Object.keys(selectedTable.data[0])
+        : [];
+    }
+    return [];
   }
 
   applyStyle(row: number, column: string | any) {
@@ -80,8 +155,19 @@ export class PrintPreviewComponent {
   }
 
   exportDivToHtml() {
+    //Get Report Title
+    const reportDataString = localStorage.getItem('reportData');
+    if (!reportDataString) {
+      alert('No report data found to save');
+      return;
+    }
+    const savedReportData = JSON.parse(reportDataString);
+    const savedReportTitle = savedReportData.reportTitle;
+
     const divToExport = this.exportedDiv.nativeElement.innerHTML;
-    const exportDoc = document.implementation.createHTMLDocument('Exported HTML');
+    const exportDoc = document.implementation.createHTMLDocument(
+      `${savedReportTitle} - Report.html`
+    );
 
     // Create a div element to hold the exported content
     const exportDiv = exportDoc.createElement('div');
@@ -92,10 +178,15 @@ export class PrintPreviewComponent {
 
     // Inject CSS styles
     const styles = Array.from(document.styleSheets)
-      .filter(styleSheet => !styleSheet.href || !styleSheet.href.endsWith('styles.css')) // Exclude styles.css
-      .map(styleSheet => Array.from(styleSheet.cssRules)
-        .map(rule => rule.cssText)
-        .join('\n'))
+      .filter(
+        (styleSheet) =>
+          !styleSheet.href || !styleSheet.href.endsWith('styles.css')
+      ) // Exclude styles.css
+      .map((styleSheet) =>
+        Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join('\n')
+      )
       .join('\n');
     const styleElement = exportDoc.createElement('style');
     styleElement.textContent = styles;
@@ -109,7 +200,7 @@ export class PrintPreviewComponent {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'exported_content.html';
+    a.download = `${savedReportTitle} - Report.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
