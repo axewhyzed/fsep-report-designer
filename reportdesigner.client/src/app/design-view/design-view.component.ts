@@ -71,7 +71,17 @@ export class DesignViewComponent implements OnInit {
   }
 
   onLogoSelected(event: any) {
-    this.selectedLogo = event.target.files[0];
+    this.selectedLogo = event.target.files?.[0];
+    if(!this.selectedLogo){
+      alert('No Logo selected');
+      return;
+    }
+    const maxSize = 5 * 1024 * 1024; // 5 MB max file size
+    if(this.selectedLogo?.size > maxSize){
+      alert("Logo must be below 5 mb size");
+      event.target.value = null;
+      return;
+    }
     this.loadLogoDataURL();
   }
 

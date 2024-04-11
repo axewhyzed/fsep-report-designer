@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
 namespace ReportDesignerPrac.Server.Controllers
@@ -10,7 +11,14 @@ namespace ReportDesignerPrac.Server.Controllers
     [Route("[controller]")]
     public class DatabaseInfoController : ControllerBase
     {
-        private const string DefaultConnectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FSEP_DB;Integrated Security=True";
+        private readonly string _defaultConnectionString;
+
+        public DatabaseInfoController(IConfiguration configuration)
+        {
+            _defaultConnectionString = configuration.GetConnectionString("DefaultConnectionString");
+        }
+
+        //private const string DefaultConnectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=FSEP_DB;Integrated Security=True";
         private const string DatabaseQuery = "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb');";
 
         [HttpGet("databases")]
@@ -20,7 +28,7 @@ namespace ReportDesignerPrac.Server.Controllers
             {
                 List<string> databases = new List<string>();
 
-                using (SqlConnection connection = new SqlConnection(DefaultConnectionString))
+                using (SqlConnection connection = new SqlConnection(_defaultConnectionString))
                 {
                     SqlCommand command = new SqlCommand(DatabaseQuery, connection);
                     connection.Open();
@@ -52,7 +60,7 @@ namespace ReportDesignerPrac.Server.Controllers
 
                 string tableQuery = $"USE {databaseName}; SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';";
 
-                using (SqlConnection connection = new SqlConnection(DefaultConnectionString))
+                using (SqlConnection connection = new SqlConnection(_defaultConnectionString))
                 {
                     SqlCommand command = new SqlCommand(tableQuery, connection);
                     connection.Open();
@@ -84,7 +92,7 @@ namespace ReportDesignerPrac.Server.Controllers
 
                 string dataQuery = $"USE {databaseName}; SELECT * FROM {tableName};";
 
-                using (SqlConnection connection = new SqlConnection(DefaultConnectionString))
+                using (SqlConnection connection = new SqlConnection(_defaultConnectionString))
                 {
                     connection.Open();
                     using (SqlCommand command = new SqlCommand(dataQuery, connection))
