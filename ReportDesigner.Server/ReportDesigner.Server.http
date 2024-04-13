@@ -4,3 +4,8 @@ GET {{ReportDesigner.Server_HostAddress}}/databaseinfo/
 Accept: application/json
 
 ###
+
+GET {{ReportDesigner.Server_HostAddress}}/reports/
+Accept: application/json
+
+###

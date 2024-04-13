@@ -250,14 +250,14 @@ namespace ReportDesigner.Server.Controllers
                                 RowIndex = Convert.ToInt32(reader["RowIndex"]),
                                 ColumnIndex = Convert.ToInt32(reader["ColumnIndex"]),
                                 CellValue = reader["CellValue"].ToString(),
-                                Bold = Convert.ToBoolean(reader["Bold"]),
-                                Italic = Convert.ToBoolean(reader["Italic"]),
-                                Underline = Convert.ToBoolean(reader["Underline"]),
-                                Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
-                                FontSize = Convert.ToInt32(reader["FontSize"]),
-                                FontFamily = reader["FontFamily"].ToString(),
-                                FontColor = reader["FontColor"].ToString(),
-                                BackgroundColor = reader["BackgroundColor"].ToString()
+                                // Bold = Convert.ToBoolean(reader["Bold"]),
+                                // Italic = Convert.ToBoolean(reader["Italic"]),
+                                // Underline = Convert.ToBoolean(reader["Underline"]),
+                                // Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
+                                // FontSize = Convert.ToInt32(reader["FontSize"]),
+                                // FontFamily = reader["FontFamily"].ToString(),
+                                //  = reader["FontColor"].ToString(),
+                                //  = reader["BackgroundColor"].ToString()
                                 // Add other properties as needed
                             };
 
@@ -302,14 +302,14 @@ namespace ReportDesigner.Server.Controllers
                                 RowIndex = Convert.ToInt32(reader["RowIndex"]),
                                 ColumnIndex = Convert.ToInt32(reader["ColumnIndex"]),
                                 CellValue = reader["CellValue"].ToString(),
-                                Bold = Convert.ToBoolean(reader["Bold"]),
-                                Italic = Convert.ToBoolean(reader["Italic"]),
-                                Underline = Convert.ToBoolean(reader["Underline"]),
-                                Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
-                                FontSize = Convert.ToInt32(reader["FontSize"]),
-                                FontFamily = reader["FontFamily"].ToString(),
-                                FontColor = reader["FontColor"].ToString(),
-                                BackgroundColor = reader["BackgroundColor"].ToString()
+                                // Bold = Convert.ToBoolean(reader["Bold"]),
+                                // Italic = Convert.ToBoolean(reader["Italic"]),
+                                // Underline = Convert.ToBoolean(reader["Underline"]),
+                                // Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
+                                // FontSize = Convert.ToInt32(reader["FontSize"]),
+                                // FontFamily = reader["FontFamily"].ToString(),
+                                //  = reader["FontColor"].ToString(),
+                                //  = reader["BackgroundColor"].ToString()
                                 // Add other properties as needed
                             };
 
@@ -335,23 +335,27 @@ namespace ReportDesigner.Server.Controllers
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue, Bold, Italic, Underline, Strikethrough, FontSize, FontFamily, FontColor, BackgroundColor) 
-                             VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue, @Bold, @Italic, @Underline, @Strikethrough, @FontSize, @FontFamily, @FontColor, @BackgroundColor);
+                    string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue) 
+                             VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue);
                              SELECT SCOPE_IDENTITY();";
+
+                    //, Bold, Italic, Underline, Strikethrough, FontSize, FontFamily, FontColor, BackgroundColor
+                    //, @Bold, @Italic, @Underline, @Strikethrough, @FontSize, @FontFamily, @FontColor, @BackgroundColor
+
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@ReportID", reportId);
                     command.Parameters.AddWithValue("@RowIndex", reportData.RowIndex);
                     command.Parameters.AddWithValue("@ColumnIndex", reportData.ColumnIndex);
                     command.Parameters.AddWithValue("@CellValue", reportData.CellValue);
-                    command.Parameters.AddWithValue("@Bold", reportData.Bold);
-                    command.Parameters.AddWithValue("@Italic", reportData.Italic);
-                    command.Parameters.AddWithValue("@Underline", reportData.Underline);
-                    command.Parameters.AddWithValue("@Strikethrough", reportData.Strikethrough);
-                    command.Parameters.AddWithValue("@FontSize", reportData.FontSize);
-                    command.Parameters.AddWithValue("@FontFamily", reportData.FontFamily);
-                    command.Parameters.AddWithValue("@FontColor", reportData.FontColor);
-                    command.Parameters.AddWithValue("@BackgroundColor", reportData.BackgroundColor);
+                    // command.Parameters.AddWithValue("@Bold", reportData.Bold);
+                    // command.Parameters.AddWithValue("@Italic", reportData.Italic);
+                    // command.Parameters.AddWithValue("@Underline", reportData.Underline);
+                    // command.Parameters.AddWithValue("@Strikethrough", reportData.Strikethrough);
+                    // command.Parameters.AddWithValue("@FontSize", reportData.FontSize);
+                    // command.Parameters.AddWithValue("@FontFamily", reportData.FontFamily);
+                    // command.Parameters.AddWithValue("@FontColor", reportData.FontColor);
+                    // command.Parameters.AddWithValue("@BackgroundColor", reportData.BackgroundColor);
 
                     await connection.OpenAsync();
 
@@ -372,53 +376,104 @@ namespace ReportDesigner.Server.Controllers
         }
 
 
-        // PUT: api/Reports/{reportId}/ReportData/{dataId}
-        [HttpPut("{reportId}/ReportData/{dataId}")]
-        public async Task<IActionResult> PutReportData(int reportId, int dataId, ReportData reportData)
+        // PUT: api/Reports/{reportId}/ReportData}
+        [HttpPut("{reportId}/ReportData")]
+        public async Task<IActionResult> PutReportData(int reportId, [FromBody] List<UpdateReportDataDto> updateDataDtos)
         {
             try
             {
+
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = @"UPDATE ReportData 
-                             SET RowIndex = @RowIndex,
-                                 ColumnIndex = @ColumnIndex,
-                                 CellValue = @CellValue,
-                                 Bold = @Bold,
-                                 Italic = @Italic,
-                                 Underline = @Underline,
-                                 Strikethrough = @Strikethrough,
-                                 FontSize = @FontSize,
-                                 FontFamily = @FontFamily,
-                                 FontColor = @FontColor,
-                                 BackgroundColor = @BackgroundColor
-                             WHERE DataID = @DataID AND ReportID = @ReportID";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@RowIndex", reportData.RowIndex);
-                    command.Parameters.AddWithValue("@ColumnIndex", reportData.ColumnIndex);
-                    command.Parameters.AddWithValue("@CellValue", reportData.CellValue);
-                    command.Parameters.AddWithValue("@Bold", reportData.Bold);
-                    command.Parameters.AddWithValue("@Italic", reportData.Italic);
-                    command.Parameters.AddWithValue("@Underline", reportData.Underline);
-                    command.Parameters.AddWithValue("@Strikethrough", reportData.Strikethrough);
-                    command.Parameters.AddWithValue("@FontSize", reportData.FontSize);
-                    command.Parameters.AddWithValue("@FontFamily", reportData.FontFamily);
-                    command.Parameters.AddWithValue("@FontColor", reportData.FontColor);
-                    command.Parameters.AddWithValue("@BackgroundColor", reportData.BackgroundColor);
-                    command.Parameters.AddWithValue("@DataID", dataId);
-                    command.Parameters.AddWithValue("@ReportID", reportId);
-
                     await connection.OpenAsync();
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected == 0)
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
-                        return NotFound();
-                    }
+                        try
+                        {
+                            foreach (var updateDataDto in updateDataDtos)
+                            {
+                                var reportFormatting = updateDataDto.ReportFormatting;
+                                var report = updateDataDto.Report;
 
-                    return NoContent();
+                                string reportDataQuery = @"UPDATE ReportFormatting SET";
+
+                                if (reportFormatting.Bold != null)
+                                    reportDataQuery += " Bold = @Bold,";
+
+                                if (reportFormatting.Italic != null)
+                                    reportDataQuery += " Italic = @Italic,";
+
+                                if (reportFormatting.Underline != null)
+                                    reportDataQuery += " Underline = @Underline,";
+
+                                if (reportFormatting.Strikethrough != null)
+                                    reportDataQuery += " Strikethrough = @Strikethrough,";
+
+                                if (reportFormatting.FontSize != null)
+                                    reportDataQuery += " FontSize = @FontSize,";
+
+                                if (reportFormatting.FontFamily != null)
+                                    reportDataQuery += " FontFamily = @FontFamily,";
+
+                                if (reportFormatting.FontColor != null)
+                                    reportDataQuery += " FontColor = @FontColor,";
+
+                                if (reportFormatting.BackgroundColor != null)
+                                    reportDataQuery += " BackgroundColor = @BackgroundColor,";
+
+                                reportDataQuery = reportDataQuery.TrimEnd(',') + " WHERE DataID = @DataID;";
+
+                                SqlCommand reportDataCommand = new SqlCommand(reportDataQuery, connection, transaction);
+
+                                if (reportFormatting.Bold != null)
+                                    reportDataCommand.Parameters.AddWithValue("@Bold", reportFormatting.Bold);
+
+                                if (reportFormatting.Italic != null)
+                                    reportDataCommand.Parameters.AddWithValue("@Italic", reportFormatting.Italic);
+
+                                if (reportFormatting.Underline != null)
+                                    reportDataCommand.Parameters.AddWithValue("@Underline", reportFormatting.Underline);
+
+                                if (reportFormatting.Strikethrough != null)
+                                    reportDataCommand.Parameters.AddWithValue("@Strikethrough", reportFormatting.Strikethrough);
+
+                                if (reportFormatting.FontSize != null)
+                                    reportDataCommand.Parameters.AddWithValue("@FontSize", reportFormatting.FontSize);
+
+                                if (reportFormatting.FontFamily != null)
+                                    reportDataCommand.Parameters.AddWithValue("@FontFamily", reportFormatting.FontFamily);
+
+                                if (reportFormatting.FontColor != null)
+                                    reportDataCommand.Parameters.AddWithValue("@FontColor", reportFormatting.FontColor);
+
+                                if (reportFormatting.BackgroundColor != null)
+                                    reportDataCommand.Parameters.AddWithValue("@BackgroundColor", reportFormatting.BackgroundColor);
+
+                                reportDataCommand.Parameters.AddWithValue("@DataID", reportFormatting.DataID);
+
+                                await reportDataCommand.ExecuteNonQueryAsync();
+                            }
+
+                            string reportQuery = @"UPDATE Reports SET LastModifiedDate = @LastModifiedDate
+                                    WHERE ReportID = @ReportID;";
+
+                            SqlCommand reportCommand = new SqlCommand(reportQuery, connection, transaction);
+                            reportCommand.Parameters.AddWithValue("@ReportID", reportId);
+                            reportCommand.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
+                            await reportCommand.ExecuteNonQueryAsync();
+
+                            // Commit the transaction
+                            transaction.Commit();
+
+                            return NoContent();
+                        }
+                        catch (Exception ex)
+                        {
+                            // Rollback the transaction if an error occurs
+                            transaction.Rollback();
+                            return StatusCode(500, $"An error occurred: {ex.Message}");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -426,39 +481,5 @@ namespace ReportDesigner.Server.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-        // DELETE: api/Reports/{reportId}/ReportData/{dataId}
-        [HttpDelete("{reportId}/ReportData/{dataId}")]
-        public async Task<IActionResult> DeleteReportData(int reportId, int dataId)
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    string query = @"DELETE FROM ReportData 
-                             WHERE DataID = @DataID AND ReportID = @ReportID";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@DataID", dataId);
-                    command.Parameters.AddWithValue("@ReportID", reportId);
-
-                    await connection.OpenAsync();
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected == 0)
-                    {
-                        return NotFound();
-                    }
-
-                    return NoContent();
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-
     }
 }

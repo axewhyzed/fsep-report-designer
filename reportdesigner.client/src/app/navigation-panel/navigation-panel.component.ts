@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Report } from '../../models/report.model';
+import { ReportsService } from '../reports.service';
 
 @Component({
   selector: 'app-navigation-panel',
@@ -10,20 +12,30 @@ export class NavigationPanelComponent implements OnInit{
   showPopup: boolean = false;
   popupTitle: string = '';
   popupData: any;
+  reports: Report[] = [];
 
-  constructor() { }
+  constructor(private reportsService: ReportsService) { }
   
   ngOnInit(): void {
     const databaseInfoJson = localStorage.getItem('databaseInfo');
     if (databaseInfoJson) {
       this.databaseInfo = JSON.parse(databaseInfoJson);
     }
+    this.loadReports();
   }
 
-  openPopup(title: string, data: any): void {
+  loadReports() {
+    this.reportsService.getReports().subscribe(reports => {
+      this.reports = reports;
+    });
+  }
+
+  openPopup(title: string, reportId: number): void {
     this.popupTitle = title;
-    this.popupData = data;
+    this.reportsService.getReportData(reportId).subscribe(reportData => {
+    this.popupData = reportData;
     this.showPopup = true;
+  });
   }
 
   closePopup(): void {

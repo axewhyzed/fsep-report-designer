@@ -2,15 +2,16 @@
 <div class="db-container">
   <div *ngIf="databaseInfo && databaseInfo.databases.length > 0">
     <h3>Databases</h3>
-    <div *ngFor="let database of databaseInfo.databases">
-      <h4><span class="material-icons">dataset</span> {{ database.name }}</h4>
+    <!-- <div *ngFor="let database of databaseInfo.databases"> --><div>
+      <!-- <h4><span class="material-icons">dataset</span> {{ database.name }}</h4> -->
       <div class="table-list">
-        <div *ngFor="let table of database.tables">
+        <!-- <div *ngFor="let table of database.tables"> --><div *ngFor="let report of reports">
           <div class="table-name-container">
             <h5>
-              <span class="material-icons">table_chart</span> {{ table.name }}
+              <!-- <span class="material-icons">table_chart</span> {{ table.name }} -->
+              {{ report.title }}
             </h5>
-            <button class="view-button" (click)="openPopup(table.name, table.data)">
+            <button class="view-button" (click)="openPopup(report.title, report.reportID)">
               View
             </button>
           </div>
