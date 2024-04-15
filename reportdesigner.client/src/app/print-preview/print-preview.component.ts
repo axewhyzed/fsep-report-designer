@@ -1,5 +1,5 @@
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
-import { DatentimeService } from '../datentime.service';
+import { DatentimeService } from '../shared/services/datentime.service';
 
 @Component({
   selector: 'app-print-preview',

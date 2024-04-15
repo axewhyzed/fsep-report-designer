@@ -25,20 +25,5 @@ export class AppComponent {
 
   constructor(private http: HttpClient) {}
 
-  // ngOnInit() {
-  //   this.getForecasts();
-  // }
-
-  // getForecasts() {
-  //   this.http.get<WeatherForecast[]>('/databaseinfo/databases').subscribe(
-  //     (result) => {
-  //       this.forecasts = result;
-  //     },
-  //     (error) => {
-  //       console.error(error);
-  //     }
-  //   );
-  // }
-
   title = 'reportdesignerprac.client';
 }

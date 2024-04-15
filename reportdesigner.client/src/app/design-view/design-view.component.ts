@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DatabaseInfoService } from '../database-info.service';
-import { DatentimeService } from '../datentime.service';
-import { CheckConnectionService } from '../check-connection.service';
+import { DatabaseInfoService } from '../shared/services/database-info.service';
+import { DatentimeService } from '../shared/services/datentime.service';
+import { CheckConnectionService } from '../shared/services/check-connection.service';
 import { Router } from '@angular/router';
 
 @Component({

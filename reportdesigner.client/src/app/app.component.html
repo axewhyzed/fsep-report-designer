@@ -1,19 +1,20 @@
 ﻿<main class="container">
   <div class="title-bar">Report Designer</div>
   <section class="ribbon-section">
-    <app-ribbon (toggleComponent)="toggleComponent($event)"></app-ribbon>
+    <app-ribbon></app-ribbon>
   </section>
   <div class="middle-section">
     <section class="navigation-panel-section">
       <app-navigation-panel></app-navigation-panel>
     </section>
     <section class="work-area-section">
-      <ng-container *ngIf="currentComponent === 'design-view'">
+      <router-outlet></router-outlet>
+      <!-- <ng-container *ngIf="currentComponent === 'design-view'">
         <app-design-view></app-design-view>
       </ng-container>
       <ng-container *ngIf="currentComponent === 'print-preview'">
         <app-print-preview></app-print-preview>
-      </ng-container>
+      </ng-container> -->
     </section>
     <section class="property-sheet-section">
       <app-data-toolbar></app-data-toolbar>

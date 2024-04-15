@@ -3,6 +3,7 @@
     public class ReportFormatting
     {
         public int DataID { get; set; }
+        public int ReportID { get; set; }
         public bool? Bold { get; set; }
         public bool? Italic { get; set; }
         public bool? Underline { get; set; }

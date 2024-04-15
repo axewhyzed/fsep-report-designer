@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DatabaseInfoService } from '../database-info.service';
+import { DatabaseInfoService } from '../shared/services/database-info.service';
 import { Router } from '@angular/router';
 
 @Component({

@@ -94,6 +94,48 @@ namespace ReportDesigner.Server.Controllers
             return report;
         }
 
+        // GET: api/Reports/Search
+        [HttpGet("Search")]
+        public async Task<ActionResult<IEnumerable<Report>>> SearchReports(string searchTerm)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = @"SELECT * FROM Reports WHERE Title LIKE @SearchTerm";
+
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@SearchTerm", $"%{searchTerm}%");
+
+                    await connection.OpenAsync();
+
+                    List<Report> searchResults = new List<Report>();
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            searchResults.Add(new Report
+                            {
+                                ReportID = Convert.ToInt32(reader["ReportID"]),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                LogoImage = reader.IsDBNull(reader.GetOrdinal("LogoImage")) ? null : (byte[])reader["LogoImage"],
+                                CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
+                                LastModifiedDate = reader.GetDateTime(reader.GetOrdinal("LastModifiedDate"))
+                                // Populate other properties as needed
+                            });
+                        }
+                    }
+
+                    return Ok(searchResults);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
         // POST: api/Reports
         [HttpPost]
         public async Task<ActionResult<Report>> PostReport(Report report)
@@ -199,21 +241,47 @@ namespace ReportDesigner.Server.Controllers
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = "DELETE FROM Reports WHERE ReportID = @ReportID";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@ReportID", id);
-
                     await connection.OpenAsync();
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected == 0)
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
-                        return NotFound();
-                    }
+                        try
+                        {   
+                            // Delete from ReportFormatting table
+                            string reportFormattingQuery = "DELETE FROM ReportFormatting WHERE ReportID = @ReportID";
+                            SqlCommand reportFormattingCommand = new SqlCommand(reportFormattingQuery, connection, transaction);
+                            reportFormattingCommand.Parameters.AddWithValue("@ReportID", id);
+                            await reportFormattingCommand.ExecuteNonQueryAsync();
 
-                    return NoContent();
+                            // Delete from ReportData table
+                            string reportDataQuery = "DELETE FROM ReportData WHERE ReportID = @ReportID";
+                            SqlCommand reportDataCommand = new SqlCommand(reportDataQuery, connection, transaction);
+                            reportDataCommand.Parameters.AddWithValue("@ReportID", id);
+                            await reportDataCommand.ExecuteNonQueryAsync();
+
+                            // Delete from Reports table
+                            string reportQuery = "DELETE FROM Reports WHERE ReportID = @ReportID";
+                            SqlCommand command = new SqlCommand(reportQuery, connection, transaction);
+                            command.Parameters.AddWithValue("@ReportID", id);
+
+                            int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                            if (rowsAffected == 0)
+                            {
+                                return NotFound();
+                            }
+
+                            // Commit the transaction
+                            transaction.Commit();
+
+                            return NoContent();
+                        }
+                        catch (Exception ex)
+                        {
+                            // Rollback the transaction if an error occurs
+                            transaction.Rollback();
+                            return StatusCode(500, $"An error occurred: {ex.Message}");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -221,6 +289,7 @@ namespace ReportDesigner.Server.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
 
         // GET: api/Reports/{reportId}/ReportData
         [HttpGet("{reportId}/ReportData")]
@@ -266,6 +335,55 @@ namespace ReportDesigner.Server.Controllers
                     }
 
                     return Ok(reportDataList);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        // GET: api/Reports/{reportId}/ReportFormatting
+        [HttpGet("{reportId}/ReportFormatting")]
+        public async Task<ActionResult<IEnumerable<ReportFormatting>>> GetReportFormatting(int reportId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = @"SELECT * FROM ReportFormatting WHERE ReportID = @ReportID";
+
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ReportID", reportId);
+
+                    await connection.OpenAsync();
+
+                    List<ReportFormatting> reportFormattingList = new List<ReportFormatting>();
+
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ReportFormatting reportFormatting = new ReportFormatting
+                            {
+                                DataID = Convert.ToInt32(reader["DataID"]),
+                                ReportID = Convert.ToInt32(reader["ReportID"]),
+                                Bold = Convert.ToBoolean(reader["Bold"]),
+                                Italic = Convert.ToBoolean(reader["Italic"]),
+                                Underline = Convert.ToBoolean(reader["Underline"]),
+                                Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
+                                FontSize = Convert.ToInt32(reader["FontSize"]),
+                                FontFamily = reader["FontFamily"].ToString(),
+                                FontColor  = reader["FontColor"].ToString(),
+                                BackgroundColor  = reader["BackgroundColor"].ToString()
+                                // Add other properties as needed
+                            };
+
+                            reportFormattingList.Add(reportFormatting);
+                        }
+                    }
+
+                    return Ok(reportFormattingList);
                 }
             }
             catch (Exception ex)
@@ -326,47 +444,46 @@ namespace ReportDesigner.Server.Controllers
             }
         }
 
-
-        // POST: api/Reports/{reportId}/ReportData
-        [HttpPost("{reportId}/ReportData")]
-        public async Task<ActionResult<ReportData>> PostReportData(int reportId, ReportData reportData)
+        // GET: api/Reports/{reportId}/ReportFormatting/{dataId}
+        [HttpGet("{reportId}/ReportFormatting/{dataId}")]
+        public async Task<ActionResult<ReportFormatting>> GetReportFormatting(int reportId, int dataId)
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue) 
-                             VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue);
-                             SELECT SCOPE_IDENTITY();";
-
-                    //, Bold, Italic, Underline, Strikethrough, FontSize, FontFamily, FontColor, BackgroundColor
-                    //, @Bold, @Italic, @Underline, @Strikethrough, @FontSize, @FontFamily, @FontColor, @BackgroundColor
-
+                    string query = @"SELECT * FROM ReportFormatting WHERE DataID = @DataID AND ReportID = @ReportID";
 
                     SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@DataID", dataId);
                     command.Parameters.AddWithValue("@ReportID", reportId);
-                    command.Parameters.AddWithValue("@RowIndex", reportData.RowIndex);
-                    command.Parameters.AddWithValue("@ColumnIndex", reportData.ColumnIndex);
-                    command.Parameters.AddWithValue("@CellValue", reportData.CellValue);
-                    // command.Parameters.AddWithValue("@Bold", reportData.Bold);
-                    // command.Parameters.AddWithValue("@Italic", reportData.Italic);
-                    // command.Parameters.AddWithValue("@Underline", reportData.Underline);
-                    // command.Parameters.AddWithValue("@Strikethrough", reportData.Strikethrough);
-                    // command.Parameters.AddWithValue("@FontSize", reportData.FontSize);
-                    // command.Parameters.AddWithValue("@FontFamily", reportData.FontFamily);
-                    // command.Parameters.AddWithValue("@FontColor", reportData.FontColor);
-                    // command.Parameters.AddWithValue("@BackgroundColor", reportData.BackgroundColor);
 
                     await connection.OpenAsync();
 
-                    // ExecuteScalarAsync returns the first column of the first row in the result set returned by the query
-                    // In this case, it returns the newly inserted DataID
-                    int newDataId = Convert.ToInt32(await command.ExecuteScalarAsync());
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            ReportFormatting reportFormatting = new ReportFormatting
+                            {
+                                DataID = Convert.ToInt32(reader["DataID"]),
+                                ReportID = Convert.ToInt32(reader["ReportID"]),
+                                Bold = Convert.ToBoolean(reader["Bold"]),
+                                Italic = Convert.ToBoolean(reader["Italic"]),
+                                Underline = Convert.ToBoolean(reader["Underline"]),
+                                Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
+                                FontSize = Convert.ToInt32(reader["FontSize"]),
+                                FontFamily = reader["FontFamily"].ToString(),
+                                FontColor  = reader["FontColor"].ToString(),
+                                BackgroundColor  = reader["BackgroundColor"].ToString()
+                                // Add other properties as needed
+                            };
 
-                    // Update the DataID of the reportData object with the newly generated ID
-                    reportData.DataID = newDataId;
+                            return Ok(reportFormatting);
+                        }
+                    }
 
-                    return CreatedAtAction(nameof(GetReportData), new { reportId, dataId = newDataId }, reportData);
+                    return NotFound();
                 }
             }
             catch (Exception ex)
@@ -376,9 +493,111 @@ namespace ReportDesigner.Server.Controllers
         }
 
 
-        // PUT: api/Reports/{reportId}/ReportData}
-        [HttpPut("{reportId}/ReportData")]
-        public async Task<IActionResult> PutReportData(int reportId, [FromBody] List<UpdateReportDataDto> updateDataDtos)
+        // POST: api/Reports/{reportId}/ReportData
+        [HttpPost("{reportId}/ReportData")]
+        public async Task<ActionResult<IEnumerable<ReportData>>> PostReportData(int reportId, IEnumerable<ReportData> reportDataList)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            foreach (var reportData in reportDataList)
+                            {
+                                string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue) 
+                                    VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue);
+                                    SELECT SCOPE_IDENTITY();";
+
+                                SqlCommand command = new SqlCommand(query, connection, transaction);
+                                command.Parameters.AddWithValue("@ReportID", reportId);
+                                command.Parameters.AddWithValue("@RowIndex", reportData.RowIndex);
+                                command.Parameters.AddWithValue("@ColumnIndex", reportData.ColumnIndex);
+                                command.Parameters.AddWithValue("@CellValue", reportData.CellValue);
+
+                                int newDataId = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+                                reportData.DataID = newDataId;
+                            }
+
+                            // Commit the transaction
+                            transaction.Commit();
+
+                            return CreatedAtAction(nameof(GetReportData), new { reportId }, reportDataList);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Rollback the transaction if an error occurs
+                            transaction.Rollback();
+                            return StatusCode(500, $"An error occurred: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("{reportId}/ReportFormatting")]
+        public async Task<ActionResult<IEnumerable<ReportFormatting>>> PostReportFormatting(int reportId, IEnumerable<ReportFormatting> reportFormattingList)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+                    using (SqlTransaction transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            foreach (var formatting in reportFormattingList)
+                            {
+                                string formattingQuery = @"INSERT INTO ReportFormatting (ReportID, DataID, Bold, Italic, Underline, Strikethrough, FontSize, FontFamily, FontColor, BackgroundColor) 
+                            VALUES (@ReportID, @DataID, @Bold, @Italic, @Underline, @Strikethrough, @FontSize, @FontFamily, @FontColor, @BackgroundColor);";
+
+                                SqlCommand formattingCommand = new SqlCommand(formattingQuery, connection, transaction);
+                                formattingCommand.Parameters.AddWithValue("@ReportID", reportId);
+                                formattingCommand.Parameters.AddWithValue("@DataID", formatting.DataID);
+                                formattingCommand.Parameters.AddWithValue("@Bold", formatting.Bold ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@Italic", formatting.Italic ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@Underline", formatting.Underline ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@Strikethrough", formatting.Strikethrough ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@FontSize", formatting.FontSize ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@FontFamily", formatting.FontFamily ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@FontColor", formatting.FontColor ?? (object)DBNull.Value);
+                                formattingCommand.Parameters.AddWithValue("@BackgroundColor", formatting.BackgroundColor ?? (object)DBNull.Value);
+
+                                await formattingCommand.ExecuteNonQueryAsync();
+                            }
+
+                            // Commit the transaction
+                            transaction.Commit();
+
+                            return CreatedAtAction(nameof(GetReportFormatting), new { reportId }, reportFormattingList);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Rollback the transaction if an error occurs
+                            transaction.Rollback();
+                            return StatusCode(500, $"An error occurred: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        // PUT: api/Reports/{reportId}/ReportFormatting}
+        [HttpPut("{reportId}/ReportFormatting")]
+        public async Task<IActionResult> PutReportFormatting(int reportId, [FromBody] List<UpdateReportDataDto> updateDataDtos)
         {
             try
             {

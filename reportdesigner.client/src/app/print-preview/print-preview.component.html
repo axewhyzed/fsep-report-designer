@@ -1,7 +1,16 @@
 <div class="print-preview-container">
   <div class="top-toolbar">
+    <div class="export-dropdown">
+      <button class="export-button">Export As</button>
+      <div class="export-dropdown-content">
+        <button (click)="exportDivToHtml()">HTML</button>
+        <button >PDF</button>
+        <button >Image</button>
+        <button >Email</button>
+      </div>
+    </div>
+    <br>
     <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br>
-    <button (click)="exportDivToHtml()">Export as HTML</button>
   </div>
     <div class="report-container" id="printable-section" #exportedDiv>
       <div class="top-section">

@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { PrintPreviewComponent } from './print-preview/print-preview.component';
 import { DataToolbarComponent } from './data-toolbar/data-toolbar.component';
 import {NgxPrintModule} from 'ngx-print';
+import { EditReportModalComponent } from './edit-report-modal/edit-report-modal.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import {NgxPrintModule} from 'ngx-print';
     NavigationPanelComponent,
     PrintPreviewComponent,
     DataToolbarComponent,
+    EditReportModalComponent,
   ],
   imports: [
     BrowserModule, HttpClientModule,

@@ -1,34 +1,59 @@
-<!-- database-info.component.html -->
+<!-- navigation-panel.component.html -->
 <div class="db-container">
-  <div *ngIf="databaseInfo && databaseInfo.databases.length > 0">
-    <h3>Databases</h3>
-    <!-- <div *ngFor="let database of databaseInfo.databases"> --><div>
-      <!-- <h4><span class="material-icons">dataset</span> {{ database.name }}</h4> -->
+
+  <!-- Search Section -->
+  <div class="search-container">
+    <input type="text" placeholder="Search reports" [(ngModel)]="searchTerm" (ngModelChange)="handleSearchChange()">
+  </div>
+
+  <!-- Search Results Section -->
+  <div *ngIf="isSearching">
+    <h3>Search Results</h3>
+    <div *ngIf="searchResults && searchResults.length > 0">
       <div class="table-list">
-        <!-- <div *ngFor="let table of database.tables"> --><div *ngFor="let report of reports">
+        <div *ngFor="let report of searchResults">
+          <div class="table-name-container">
+            <h5>{{ report.title }}</h5>
+            <div class="dropdown">
+              <button class="dropdown-btn material-icons">arrow_drop_down_circle</button>
+              <div class="dropdown-content">
+                <button (click)="openPopup(report.title, report.reportID, 'view-report')">View Details</button>
+                <button (click)="openPopup(report.title, report.reportID, 'view-report-data')">View Data</button>
+                <button (click)="openPopup(report.title, report.reportID, 'edit-report')">Edit</button>
+              </div>
+            </div>
+            <!-- <button class="view-button" (click)="openPopup(report.title, report.reportID)">View</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="searchResults && searchResults.length === 0">
+      <p>No reports found.</p>
+    </div>
+  </div>
+
+  <!-- Existing Report Titles Section -->
+  <div *ngIf="!isSearching && databaseInfo && databaseInfo.databases.length > 0">
+    <h3>Databases</h3>
+    <div>
+      <div class="table-list">
+        <div *ngFor="let report of reports">
           <div class="table-name-container">
             <h5>
-              <!-- <span class="material-icons">table_chart</span> {{ table.name }} -->
               {{ report.title }}
             </h5>
-            <button class="view-button" (click)="openPopup(report.title, report.reportID)">
+            <div class="dropdown">
+              <button class="dropdown-btn material-icons">arrow_drop_down_circle</button>
+              <div class="dropdown-content">
+                <button (click)="openPopup(report.title, report.reportID, 'view-report')">View Details</button>
+                <button (click)="openPopup(report.title, report.reportID, 'view-report-data')">View Data</button>
+                <button (click)="openPopup(report.title, report.reportID, 'edit-report')">Edit</button>
+              </div>
+            </div>
+            <!-- <button class="view-button" (click)="openPopup(report.title, report.reportID)">
               View
-            </button>
+            </button> -->
           </div>
-          <!-- <table>
-            <thead>
-              <tr>
-                <th *ngFor="let column of table.data[0] | keyvalue">
-                  {{ column.key }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of table.data">
-                <td *ngFor="let cell of row | keyvalue">{{ cell.value }}</td>
-              </tr>
-            </tbody>
-          </table> -->
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component} from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ribbon',
@@ -6,11 +7,9 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrl: './ribbon.component.css'
 })
 export class RibbonComponent {
-  @Output() toggleComponent = new EventEmitter<string>();
+  constructor(private router: Router) { }
 
-  constructor() { }
-
-  toggle(targetComponent: string) {
-    this.toggleComponent.emit(targetComponent);
+  navigateTo(targetRoute: string) {
+    this.router.navigate([targetRoute]);
   }
 }

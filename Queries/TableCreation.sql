@@ -7,8 +7,9 @@
     -- Add other formatting attributes as needed
 );
 
-CREATE TABLE CellFormatting (
+CREATE TABLE ReportFormatting (
     DataID INT PRIMARY KEY,
+    ReportID INT,
     Bold BIT,
     Italic BIT,
     Underline BIT,
