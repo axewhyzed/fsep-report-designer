@@ -8,12 +8,14 @@ import { ReportsService } from '../shared/services/reports.service';
   styleUrl: './navigation-panel.component.css'
 })
 export class NavigationPanelComponent implements OnInit{
-  databaseInfo: any;
+  reportDetails: any;
   showPopup: boolean = false;
   popupTitle: string = '';
   popupData: any;
   reports: Report[] = [];
   showEditPopup: boolean = false;
+  showDeletePopup: boolean = false;
+  currentReportId!: number;
   editingReport: Report = {} as Report; // Initialize with an empty object
   currentLogoImage: string | ArrayBuffer | null = null; // Hold the Base64 string of the current logo image
   selectedFile: File | null = null; // Hold the selected file
@@ -21,9 +23,9 @@ export class NavigationPanelComponent implements OnInit{
   constructor(private reportsService: ReportsService) { }
   
   ngOnInit(): void {
-    const databaseInfoJson = localStorage.getItem('databaseInfo');
-    if (databaseInfoJson) {
-      this.databaseInfo = JSON.parse(databaseInfoJson);
+    const reportDetailsJson = localStorage.getItem('reportDetails');
+    if (reportDetailsJson) {
+      this.reportDetails = JSON.parse(reportDetailsJson);
     }
     this.loadReports();
   }
@@ -31,6 +33,7 @@ export class NavigationPanelComponent implements OnInit{
   loadReports() {
     this.reportsService.getReports().subscribe((reports:any) => {
       this.reports = reports;
+      console.log(this.reports);
     });
   }
 
@@ -89,6 +92,10 @@ export class NavigationPanelComponent implements OnInit{
         this.showEditPopup = true;
       });
       break;
+    case 'delete-report':
+        this.showDeletePopup = true;
+        this.currentReportId = reportId;
+      break;
     default:
       console.log("No suitable function to handle this ");
       break;
@@ -120,6 +127,16 @@ export class NavigationPanelComponent implements OnInit{
     this.showEditPopup = true;
   }
 
+  submitDelete(reportId : number):void{
+    this.reportsService.deleteReport(this.currentReportId).subscribe((report: Report) => {
+      const delReport = this.reports.find(report => report.reportID === reportId);
+      const delReportIndex = this.reports.findIndex(report => report.reportID === reportId);
+      const reportTitle = delReport ? delReport.title : 'Unknown Title';
+      this.reports.splice(delReportIndex, 1);
+      alert('Report name: ' + reportTitle + ' has been deleted');
+    });
+  }
+
   submitEdit(): void {
     const editedReport: Partial<Report> = {};
     // Check if a new logo image is selected
@@ -147,6 +164,12 @@ export class NavigationPanelComponent implements OnInit{
       // Call the updateReport function here with the edited report details
       this.reportsService.updateReport(this.editingReport.reportID, this.editingReport).subscribe(() => {
         console.log("Report updated successfully");
+        this.reports.forEach(report => {
+          if (report.reportID === this.editingReport.reportID) {
+            report.title = editedReport.title!;
+            console.log(report.title);
+          }
+        });
         this.showEditPopup = false;
         // Optionally, you can reload or update the data displayed in your component after the report is updated
       }, error => {
@@ -160,5 +183,6 @@ export class NavigationPanelComponent implements OnInit{
   closePopup(): void {
     this.showPopup = false;
     this.showEditPopup = false;
+    this.showDeletePopup = false;
   }
 }

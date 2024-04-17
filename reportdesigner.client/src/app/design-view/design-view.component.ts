@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DatabaseInfoService } from '../shared/services/database-info.service';
 import { DatentimeService } from '../shared/services/datentime.service';
-import { CheckConnectionService } from '../shared/services/check-connection.service';
 import { Router } from '@angular/router';
 import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
@@ -26,7 +24,6 @@ export class DesignViewComponent implements OnInit {
   showReportContainer: boolean = false;
   numberOfTables: number = 0;
   tableSelectionRows: any[] = [];
-  tableSelections: { database: string; table: string; tables: string[] }[] = [];
   selectedDatabase: string = ''; // Holds the selected database
   selectedTables: string[] = []; // Holds the selected table
   selectedDatabaseTables: any[] = []; // Holds tables of the selected database
@@ -37,9 +34,7 @@ export class DesignViewComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private dbService: DatabaseInfoService,
     private datentimeService: DatentimeService,
-    private connectionService: CheckConnectionService,
     private router: Router,
     private reportsService: ReportsService
   ) {}
@@ -172,11 +167,16 @@ export class DesignViewComponent implements OnInit {
 
   openSelectedReport() {
     if (this.selectedReportId) {
+      // Log the submitted report title
+    console.log('Submitted report title:', this.reportTitle);
+    // Close the report wizard after submission
       // Store the selected report ID in sessionStorage or localStorage
       localStorage.setItem(
         'selectedReportId',
         this.selectedReportId.toString()
       );
+      this.toggleReportWizard();
+      this.showReportContainer = true;
       // Perform further actions, e.g., navigate to a different page or load the selected report
     }
   }
@@ -228,10 +228,6 @@ export class DesignViewComponent implements OnInit {
       logoDataURL: this.logoDataURL,
     };
     localStorage.setItem('reportData', JSON.stringify(reportData));
-    localStorage.setItem(
-      'tableSelections',
-      JSON.stringify(this.tableSelections)
-    );
   }
 
   cancelReport() {
@@ -240,88 +236,6 @@ export class DesignViewComponent implements OnInit {
     // Hide the report container if canceled
     this.showReportContainer = false;
     localStorage.removeItem('reportData');
-    localStorage.removeItem('tableSelections');
-  }
-
-  addTable() {
-    this.numberOfTables++;
-    this.tableSelectionRows.push({});
-    this.tableSelections.push({ database: '', table: '', tables: [] });
-  }
-
-  removeTable(index: number) {
-    this.numberOfTables--;
-    this.tableSelectionRows.splice(index, 1);
-    this.tableSelections.splice(index, 1);
-  }
-
-  generateTableSelectionRows() {
-    this.tableSelectionRows = Array.from(
-      { length: this.numberOfTables },
-      (_, i) => i
-    );
-    this.tableSelections = Array.from({ length: this.numberOfTables }, () => ({
-      database: '',
-      table: '',
-      tables: [],
-    }));
-  }
-
-  fetchTablesDropdown(databaseName: string, index: number) {
-    console.log('From fetch tables: ' + databaseName);
-    console.log(this.databaseInfo.databases);
-    const selectedDatabase = this.databaseInfo.databases.find(
-      (db: any) => db.name === databaseName
-    );
-    if (selectedDatabase) {
-      this.tableSelections[index].table = ''; // Reset selected table
-      this.tableSelections[index].database = databaseName;
-      this.tableSelections[index].tables = selectedDatabase.tables.map(
-        (table: any) => table.name
-      ); // Assign table names for the selected database
-    }
-  }
-
-  getTableData(database: string, table: string): any[] {
-    // Find the selected database in database info
-    const selectedDatabase = this.databaseInfo.databases.find(
-      (db: any) => db.name === database
-    );
-    if (selectedDatabase) {
-      // Find the selected table within the selected database
-      const selectedTable = selectedDatabase.tables.find(
-        (t: any) => t.name === table
-      );
-      if (selectedTable) {
-        const headers = this.getTableHeaders(database, table); // Get table headers
-        return selectedTable.data.map((row: any) => {
-          // Map data according to header order
-          return headers.map((header) => row[header]);
-        });
-      }
-      console.log(selectedTable.data);
-      return selectedTable ? selectedTable.data : [];
-    }
-
-    return [];
-  }
-
-  getTableHeaders(database: string, table: string): string[] {
-    // Find the selected database in database info
-    const selectedDatabase = this.databaseInfo.databases.find(
-      (db: any) => db.name === database
-    );
-    if (selectedDatabase) {
-      // Find the selected table within the selected database
-      const selectedTable = selectedDatabase.tables.find(
-        (t: any) => t.name === table
-      );
-      console.log(Object.keys(selectedTable.data[0]));
-      return selectedTable && selectedTable.data.length > 0
-        ? Object.keys(selectedTable.data[0])
-        : [];
-    }
-    return [];
   }
 
   // Initialize cell formatting for table headers and cells
@@ -378,67 +292,8 @@ export class DesignViewComponent implements OnInit {
     localStorage.setItem('cellFormatting', JSON.stringify(cellFormatting));
   }
 
-  reloadDbData(): void {
-    // this.connectionService.checkConnectionStatus().subscribe(
-    // (response) => {
-    localStorage.removeItem('databaseInfo');
-    localStorage.removeItem('cellFormatting');
-    this.fetchDbData().then(() => {
-      this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
-    });
-    // },
-    // (error) => {
-    // console.error('Error checking connection status:', error);
-    // alert('Not Connected to Backend');
-    // Handle errors here, e.g., show an error message
-    // }
-    // );
-    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-      window.location.reload();
-    });
-  }
-
-  // Fetch data from the API and store it locally
-  fetchDbData(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.databaseInfo = { databases: [] }; // Clear existing data
-      this.dbService.getDatabases().subscribe((databases) => {
-        databases.forEach((database) => {
-          const dbObject: any = {
-            name: database,
-            tables: [],
-          };
-
-          this.dbService.getTables(database).subscribe((tables) => {
-            const tableDataPromises = tables.map((table) => {
-              return this.dbService.getTableData(database, table).toPromise();
-            });
-
-            Promise.all(tableDataPromises).then((tableDataArray) => {
-              tables.forEach((table, index) => {
-                const tableObject: any = {
-                  name: table,
-                  data: tableDataArray[index],
-                };
-                dbObject.tables.push(tableObject);
-              });
-
-              this.databaseInfo.databases.push(dbObject);
-
-              // Store databaseInfo in local storage after all tables are fetched for the database
-              localStorage.setItem(
-                'databaseInfo',
-                JSON.stringify(this.databaseInfo)
-              );
-              console.log(this.databaseInfo);
-
-              resolve(); // Resolve the Promise after data fetching is complete
-            });
-          });
-        });
-      });
-    });
-  }
+  // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+  //     window.location.reload();
 
   selectedCells: Set<string> = new Set<string>();
 
@@ -692,8 +547,8 @@ export class DesignViewComponent implements OnInit {
         if (formatting.italic) style['font-style'] = 'italic';
         if (formatting.underline) style['text-decoration'] = 'underline';
         if (formatting.strikethrough)
-          style['text-decoration-line'] = 'line-through';
-        style['font-size'] = formatting.fontSize;
+        style['text-decoration-line'] = 'line-through';
+        style['font-size'] = formatting.fontSize + 'px';
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
@@ -711,7 +566,7 @@ export class DesignViewComponent implements OnInit {
       italic: false,
       underline: false,
       strikethrough: false,
-      fontSize: '12px',
+      fontSize: 14,
       fontColor: '#000000',
       fontFamily: 'Times New Roman',
       backgroundColor: '#ffffff',
@@ -720,7 +575,7 @@ export class DesignViewComponent implements OnInit {
     return JSON.stringify(style) === JSON.stringify(defaultStyle);
   }
 
-  // Apply formatting to the selected cell in HTML
+  // Apply formatting to the selected cell in localStorage
   applyFormatting(
     rowIndex: number,
     columnName: number,
@@ -731,6 +586,8 @@ export class DesignViewComponent implements OnInit {
       '.selected-cell'
     ) as HTMLTableCellElement;
     if (selectedCell) {
+      console.log(property);
+      console.log(value);
       selectedCell.style[property as any] = value;
     }
   }

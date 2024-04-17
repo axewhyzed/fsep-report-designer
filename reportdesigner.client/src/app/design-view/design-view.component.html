@@ -133,7 +133,6 @@
       />
     </div>
     <button
-      (click)="reloadDbData()"
       class="material-icons-outlined reload_btn"
       title="Reload Data"
     >
@@ -211,7 +210,7 @@
         <div class="image-and-title">
           <img *ngIf="reportDetails.logoImage" [src]="reportDetails.logoImage" alt="Report Logo" class="report-logo"/>
           <input *ngIf="!reportDetails.logoImage" type="file" id="reportLogo" (change)="onLogoSelected($event)" accept="image/*" /><br><br />
-          <h1 (click)="toggleCellSelection(0,0)" [ngClass]="{'selected-cell': isSelected(0, 0)}">{{reportTitle}}</h1>
+          <h1 (click)="toggleCellSelection(selectedReportId,0)" [ngClass]="{'selected-cell': isSelected(selectedReportId, 0)}" [ngStyle]="applyStyle(selectedReportId, 0)">{{reportTitle}}</h1>
         </div>
         <!-- Current date/time -->
         <div class="date-time">
@@ -221,6 +220,8 @@
       </div>
 
       <div *ngIf="tableHeaders.length > 0">
+        <div class="table-container">
+          <!-- Include the table rendering code here -->
           <table class="tbl-data">
             <thead>
               <tr>
@@ -250,55 +251,7 @@
               </tr>
             </tbody>
           </table>
-      </div>
-
-      <div class="table-container">
-        <ng-container *ngFor="let tableSelection of tableSelections">
-          <h2>{{ tableSelection.database }}</h2>
-          <h3>{{ tableSelection.table }}</h3>
-          <!-- Include the table rendering code here -->
-          <table class="tbl-data">
-            <thead>
-              <tr>
-                <th></th>
-                <th *ngFor="
-                          let header of getTableHeaders(tableSelection.database, tableSelection.table);
-                          let i = index
-                        " (click)="
-                          toggleCellSelection(
-                            'column-header' + '|' + i,
-                            tableSelection.database + '|' + tableSelection.table + '|' + header
-                          )
-                        ">
-                  <div class="column-header">{{ getColumnHeader(i) }}</div>
-                </th>
-              </tr>
-              <tr>
-                <th></th>
-                <!-- Include table headers here -->
-                <th *ngFor="let header of getTableHeaders(tableSelection.database, tableSelection.table); let z = index" (click)="toggleCellSelection(-1, tableSelection.database + '-' + tableSelection.table + '-' + header)" [ngClass]="{'selected-cell': isSelected(-1,tableSelection.database + '-' + tableSelection.table + '-' + header)}">
-                  <div class="table-header">{{ header }}</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of getTableData(tableSelection.database, tableSelection.table); let i = index">
-                <td class="row-header" (click)="
-                      toggleCellSelection(
-                        'row-header' + '|' + i,
-                        tableSelection.database + '|' + tableSelection.table
-                      )
-                    ">
-              {{ i + 1 }}
-            </td>
-                <!-- Include table cells here -->
-                <td *ngFor="let cell of row | keyvalue; let j = index" class="cell-content" (click)="toggleCellSelection( i, tableSelection.database + '-' + tableSelection.table + '-' + j)" [ngClass]="{'selected-cell': isSelected(i,tableSelection.database + '-' + tableSelection.table + '-' + j)}" [ngStyle]="applyStyle(i,tableSelection.database + '-' + tableSelection.table + '-' + j)" [attr.data-row]="i" [attr.data-col]="cell.key">
-                {{ cell.value }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </ng-container>
+        </div>
       </div>
     </div>
   </div>
