@@ -42,22 +42,22 @@
       <select
         class="select-box"
         #fontSizeSelect
-        (change)="changeFontSize(fontSizeSelect.value)"
+        (change)="changeFontSize($any($event.target).value)"
       >
-        <option value="10px">10px</option>
-        <option value="12px">12px</option>
-        <option value="14px">14px</option>
-        <option value="16px">16px</option>
-        <option value="18px">18px</option>
-        <option value="20px">20px</option>
-        <option value="24px">24px</option>
-        <option value="32px">32px</option>
-        <option value="48px">48px</option>
-        <option value="56px">56px</option>
-        <option value="64px">64px</option>
-        <option value="72px">72px</option>
-        <option value="84px">84px</option>
-        <option value="96px">96px</option>
+        <option value="10">10px</option>
+        <option value="12">12px</option>
+        <option value="14">14px</option>
+        <option value="16">16px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+        <option value="24">24px</option>
+        <option value="32">32px</option>
+        <option value="48">48px</option>
+        <option value="56">56px</option>
+        <option value="64">64px</option>
+        <option value="72">72px</option>
+        <option value="84">84px</option>
+        <option value="96">96px</option>
         <!-- Add more font sizes as needed -->
       </select>
 
@@ -142,7 +142,8 @@
   </div>
 
   <!-- Start Report Wizard button -->
-  <button *ngIf="!showReportWizard && !showReportContainer" class="start-wizard-button" (click)="toggleReportWizard()">Start Report Wizard</button>
+  <button *ngIf="!showReportWizard && !showReportContainer" class="start-wizard-button" (click)="toggleReportWizard()">Create New Report</button><br>
+  <button *ngIf="!showReportWizard && !showReportContainer" class="start-wizard-button" (click)="toggleReportWizard()">Open Existing Report</button>
 
   <!-- Popup/modal for the report wizard -->
   <div class="report-wizard-popup" *ngIf="showReportWizard && !showReportContainer">
@@ -156,25 +157,48 @@
       <input type="file" id="reportLogo" (change)="onLogoSelected($event)" accept="image/*" /><br><br />
       <!-- Add other input fields for logo selection, database, and table selection -->
 
-      <div>
-        <label for="numberOfTables">Number of Tables:</label>
-        <button (click)="addTable()">+</button>
-        <!-- <input type="number" id="numberOfTables" [(ngModel)]="numberOfTables" (change)="generateTableSelectionRows()" /> -->
-      </div><br />
-      <div *ngFor="let tableSelectionRow of tableSelectionRows; let i = index">
-        <label for="database{{i}}">Database:</label>
-        <select id="database{{i}}" [(ngModel)]="tableSelections[i].database" (change)="fetchTablesDropdown($any($event.target).value, i)">
-          <option *ngFor="let database of databaseInfo.databases" [value]="database.name">{{ database.name }}</option>
-        </select>
-        <label for="table{{i}}">Table:</label>
-        <select id="table{{i}}" [(ngModel)]="tableSelections[i].table">
-          <option *ngFor="let table of tableSelections[i].tables" [value]="table">{{ table }}</option>
-        </select>
-        <button (click)="removeTable(i)" *ngIf="numberOfTables > 1">-</button>
-      </div><br />
-
       <div class="button-container">
         <button (click)="submitReport()">Submit</button>
+        <button (click)="cancelReport()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-wizard-popup" *ngIf="showReportWizard && !showReportContainer">
+    <div class="popup-content">
+      <h2>Open Existing Report</h2>
+      <!-- Search Section -->
+  <div class="search-container">
+    <input type="text" placeholder="Search reports" [(ngModel)]="searchTerm" (ngModelChange)="handleSearchChange()">
+  </div>
+      <!-- Search Results Section -->
+  <div *ngIf="isSearching">
+    <h3>Search Results</h3>
+    <div *ngIf="searchResults && searchResults.length > 0">
+      <div class="table-list">
+        <div *ngFor="let report of searchResults">
+          <div class="table-name-container">
+            <h5>{{ report.title }}</h5>
+            <!-- <button class="view-button" (click)="openPopup(report.title, report.reportID)">View</button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="searchResults && searchResults.length === 0">
+      <p>No reports found.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!isSearching">
+    <label for="selectReportDropdown">Select Report:</label>
+      <select id="selectReportDropdown" [(ngModel)]="selectedReportId">
+        <option *ngFor="let report of reports" [value]="report.reportID">{{ report.title }}</option>
+      </select>
+      <button (click)="openSelectedReport()">Open Report</button>
+  </div>
+
+      <div class="button-container">
+        <button (click)="submitReport()">Open Report</button>
         <button (click)="cancelReport()">Cancel</button>
       </div>
     </div>
@@ -185,14 +209,47 @@
       <div class="top-section">
         <!-- Image and title -->
         <div class="image-and-title">
-          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo"/>
-          <h1>{{reportTitle}}</h1>
+          <img *ngIf="reportDetails.logoImage" [src]="reportDetails.logoImage" alt="Report Logo" class="report-logo"/>
+          <input *ngIf="!reportDetails.logoImage" type="file" id="reportLogo" (change)="onLogoSelected($event)" accept="image/*" /><br><br />
+          <h1 (click)="toggleCellSelection(0,0)" [ngClass]="{'selected-cell': isSelected(0, 0)}">{{reportTitle}}</h1>
         </div>
         <!-- Current date/time -->
         <div class="date-time">
           <p>{{ currentDate }}</p>
           <p>{{ currentTime }}</p>
         </div>
+      </div>
+
+      <div *ngIf="tableHeaders.length > 0">
+          <table class="tbl-data">
+            <thead>
+              <tr>
+                <th></th>
+                <th *ngFor="let header of tableHeaders; let i = index" (click)="toggleCellSelection(i, 'column-header')">
+                  <div class="column-header">{{ getColumnHeader(i) }}</div>
+                </th>
+              </tr>
+              <tr>
+                <th></th>
+                <!-- Include table headers here -->
+                <th *ngFor="let header of tableHeaders; let z = index" (click)="toggleCellSelection(header.reportID, header.dataID)" [ngClass]="{'selected-cell': isSelected(header.reportID, header.dataID)}" [ngStyle]="applyStyle(header.reportID, header.dataID)">
+                  <div class="table-header">{{ header.cellValue }}</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rowData of tableData; let i = index">
+                <script>console.log(rowData);</script>
+                <td class="row-header" (click)="toggleCellSelection(i, 'row-header')">
+                  {{ i + 1 }}
+                </td>
+                <!-- Include table cells here -->
+                <td *ngFor="let cell of rowData; let j = index" class="cell-content" (click)="toggleCellSelection(cell.reportID, cell.dataID)" [ngClass]="{'selected-cell': isSelected(cell.reportID, cell.dataID)}" [ngStyle]="applyStyle(cell.reportID, cell.dataID)" [attr.data-row]="i" [attr.data-col]="j">
+                  {{ cell.cellValue }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
       </div>
 
       <div class="table-container">

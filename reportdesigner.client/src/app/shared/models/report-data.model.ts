@@ -3,7 +3,7 @@
 export interface ReportData {
   dataID: number;
   reportID: number;
-  rowIndex?: number;
-  columnIndex?: number;
-  cellValue?: string;
+  rowIndex: number;
+  columnIndex: number;
+  cellValue: string;
 }

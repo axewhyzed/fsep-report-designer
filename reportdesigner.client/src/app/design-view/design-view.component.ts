@@ -4,6 +4,10 @@ import { DatabaseInfoService } from '../shared/services/database-info.service';
 import { DatentimeService } from '../shared/services/datentime.service';
 import { CheckConnectionService } from '../shared/services/check-connection.service';
 import { Router } from '@angular/router';
+import { ReportsService } from '../shared/services/reports.service';
+import { Report } from '../shared/models/report.model';
+import { ReportData } from '../shared/models/report-data.model';
+import { ReportFormatting } from '../shared/models/report-formatting.model';
 
 @Component({
   selector: 'app-design-view',
@@ -12,6 +16,9 @@ import { Router } from '@angular/router';
 })
 export class DesignViewComponent implements OnInit {
   databaseInfo: any = [];
+  reports: Report[] = [];
+  reportDetails!: Report;
+  reportData: ReportData[] = [];
   reportTitle: string = '';
   selectedLogo: File | null = null;
   logoDataURL: string | null = null;
@@ -23,62 +30,166 @@ export class DesignViewComponent implements OnInit {
   selectedDatabase: string = ''; // Holds the selected database
   selectedTables: string[] = []; // Holds the selected table
   selectedDatabaseTables: any[] = []; // Holds tables of the selected database
+  // Define properties for headers and table data
+  tableHeaders: ReportData[] = [];
+  tableData: ReportData[][] = [];
+  localCellFormatting: { [key: string]: ReportFormatting } = {};
 
   constructor(
     private http: HttpClient,
     private dbService: DatabaseInfoService,
     private datentimeService: DatentimeService,
     private connectionService: CheckConnectionService,
-    private router: Router
+    private router: Router,
+    private reportsService: ReportsService
   ) {}
 
-  localCellFormatting: any;
+  // localCellFormatting: any;
 
   // Initialize component data and fetch data if not already stored locally
   ngOnInit(): void {
     const storedDatabaseInfo = localStorage.getItem('databaseInfo');
-    if (storedDatabaseInfo) {
-      // this.data = JSON.parse(storedDatabaseInfo);
-      this.databaseInfo = JSON.parse(storedDatabaseInfo);
-      // Modify initialization of cellFormatting based on databaseInfo structure
-      if (!localStorage.getItem('cellFormatting')) {
-        this.initializeCellFormatting();
-      }
-      this.localCellFormatting = JSON.parse(
-        localStorage.getItem('cellFormatting')!
+    const ReportId = localStorage.getItem('selectedReportId');
+    if (ReportId) {
+      this.selectedReportId = JSON.parse(ReportId);
+      this.getReportTitle(this.selectedReportId);
+      this.showReportWizard = false;
+      this.showReportContainer = true;
+      this.reportsService.getReportData(this.selectedReportId).subscribe(
+        (data: ReportData[]) => {
+          this.reportData = data;
+          this.tableHeaders = this.reportData.filter(
+            (item) => item.rowIndex === 0
+          );
+          console.log(this.tableHeaders);
+          this.tableData = this.groupDataByRows(
+            this.reportData.filter((item) => item.rowIndex !== 0)
+          );
+          console.log(this.reportData);
+        },
+        (error) => {
+          console.error('Error fetching report data:', error);
+        }
       );
-      const storedReportData = localStorage.getItem('reportData');
-      const storedSelections = localStorage.getItem('tableSelections');
-      if (storedReportData && storedSelections) {
-        const parsedData = JSON.parse(storedReportData);
-        this.reportTitle = parsedData.reportTitle;
-        this.selectedLogo = parsedData.selectedLogo;
-        this.logoDataURL = parsedData.logoDataURL;
-        this.tableSelections = JSON.parse(storedSelections);
-        // If selections are present, directly show report container
-        this.showReportWizard = false;
-        this.showReportContainer = true;
+      const repDet = localStorage.getItem('reportDetails');
+      if(repDet){
+        this.reportDetails = JSON.parse(repDet);
       }
-    } else {
-      this.fetchDbData().then(() => {
-        this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
-      });
+      else{
+        this.reportsService.getReport(this.selectedReportId).subscribe(
+          (data: Report) => {
+            this.reportDetails = data;
+            localStorage.setItem('reportDetails', JSON.stringify(this.reportDetails));
+          },
+          (error) => {
+            console.error('Error fetching report data:', error);
+          }
+        );
+      }
+
+      this.reportsService.getReportFormatting(this.selectedReportId).subscribe(
+        (formatting: ReportFormatting[]) => {
+          formatting.forEach((format: ReportFormatting) => {
+            const key = `${format.reportID}|${format.dataID}`;
+            this.localCellFormatting[key] = format;
+          });
+          // Once formatting data is fetched, store it in localStorage
+          localStorage.setItem('cellFormatting', JSON.stringify(this.localCellFormatting));
+          // localStorage.setItem(`reportFormatting_${this.selectedReportId}`, JSON.stringify(formatting));
+        },
+        error => {
+          console.error('Error fetching report formatting:', error);
+        }
+      );
     }
+    // Fetch all reports for the dropdown
+    this.reportsService.getReports().subscribe(
+      (data: Report[]) => {
+        this.reports = data;
+        this.getReportTitle(this.selectedReportId);
+      },
+      (error) => {
+        console.error('Error fetching reports:', error);
+      }
+    );
+  }
+
+  getReportTitle(reportId:number):void{
+    const report = this.reports.find(report => report.reportID === reportId);
+    if(report){
+      this.reportTitle = report.title;
+    }
+  }
+
+  // Helper function to group data by rows
+  private groupDataByRows(data: ReportData[]): ReportData[][] {
+    const groupedData: ReportData[][] = [];
+    data.forEach((item) => {
+      if (!groupedData[item.rowIndex]) {
+        groupedData[item.rowIndex] = [];
+      }
+      groupedData[item.rowIndex].push(item);
+    });
+    return groupedData.filter((row) => row.length > 0);
   }
 
   toggleReportWizard() {
     this.showReportWizard = !this.showReportWizard;
   }
 
+  searchTerm: string = '';
+  searchResults: Report[] = [];
+  isSearching: boolean = false;
+
+  searchFunc(): void {
+    if (this.searchTerm) {
+      this.isSearching = true; // Set isSearching to true when performing a search
+      this.reportsService.searchReports(this.searchTerm).subscribe(
+        (reports: Report[]) => {
+          this.searchResults = reports;
+        },
+        (error) => {
+          console.error('Error searching reports:', error);
+        }
+      );
+    } else {
+      // Handle empty search term
+      this.isSearching = false; // Set isSearching to false when the search term is empty
+      this.searchResults = []; // Clear search results when search term is empty
+    }
+  }
+
+  handleSearchChange(): void {
+    this.isSearching = !!this.searchTerm.trim(); // Set isSearching based on whether the search term is empty
+    if (this.isSearching) {
+      this.searchFunc(); // Trigger search when there's text in the search box
+    } else {
+      this.searchResults = []; // Clear search results when the search box is empty
+    }
+  }
+
+  selectedReportId!: number;
+
+  openSelectedReport() {
+    if (this.selectedReportId) {
+      // Store the selected report ID in sessionStorage or localStorage
+      localStorage.setItem(
+        'selectedReportId',
+        this.selectedReportId.toString()
+      );
+      // Perform further actions, e.g., navigate to a different page or load the selected report
+    }
+  }
+
   onLogoSelected(event: any) {
     this.selectedLogo = event.target.files?.[0];
-    if(!this.selectedLogo){
+    if (!this.selectedLogo) {
       alert('No Logo selected');
       return;
     }
     const maxSize = 5 * 1024 * 1024; // 5 MB max file size
-    if(this.selectedLogo?.size > maxSize){
-      alert("Logo must be below 5 mb size");
+    if (this.selectedLogo?.size > maxSize) {
+      alert('Logo must be below 5 mb size');
       event.target.value = null;
       return;
     }
@@ -93,6 +204,13 @@ export class DesignViewComponent implements OnInit {
         // Once the file is read, the result will be available as reader.result
         // We need to cast it to a string as FileReader.result is of type 'string | null'
         this.logoDataURL = reader.result as string;
+        // Update logoImage field in reportDetails in local storage
+      const storedReportDetails = localStorage.getItem('reportDetails');
+      if (storedReportDetails) {
+        const reportDetails = JSON.parse(storedReportDetails);
+        reportDetails.logoImage = this.logoDataURL;
+        localStorage.setItem('reportDetails', JSON.stringify(reportDetails));
+      }
       };
     }
   }
@@ -130,7 +248,7 @@ export class DesignViewComponent implements OnInit {
     this.tableSelectionRows.push({});
     this.tableSelections.push({ database: '', table: '', tables: [] });
   }
-  
+
   removeTable(index: number) {
     this.numberOfTables--;
     this.tableSelectionRows.splice(index, 1);
@@ -262,18 +380,18 @@ export class DesignViewComponent implements OnInit {
 
   reloadDbData(): void {
     // this.connectionService.checkConnectionStatus().subscribe(
-      // (response) => {
-        localStorage.removeItem('databaseInfo');
-        localStorage.removeItem('cellFormatting');
-        this.fetchDbData().then(() => {
-          this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
-        });
-      // },
-      // (error) => {
-        // console.error('Error checking connection status:', error);
-        // alert('Not Connected to Backend');
-        // Handle errors here, e.g., show an error message
-      // }
+    // (response) => {
+    localStorage.removeItem('databaseInfo');
+    localStorage.removeItem('cellFormatting');
+    this.fetchDbData().then(() => {
+      this.initializeCellFormatting(); // Call initializeCellFormatting() after fetching data
+    });
+    // },
+    // (error) => {
+    // console.error('Error checking connection status:', error);
+    // alert('Not Connected to Backend');
+    // Handle errors here, e.g., show an error message
+    // }
     // );
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       window.location.reload();
@@ -335,54 +453,31 @@ export class DesignViewComponent implements OnInit {
     columnName: string | any
   ): void {
     const cellKey = `${rowIndex}|${columnName}`; // Unique identifier for the cell
-    // Treat row headers differently
-    if (typeof rowIndex == 'string') {
-      const [rwClass, rwIndex] = rowIndex.split('|');
-      if (rwClass === 'row-header') {
-        this.selectedCells.clear(); // Clear previous selections
-        const [dbName, tbName] = columnName.split('|');
-        // Select entire row
-        for (let database of this.databaseInfo.databases) {
-          if (database.name == dbName) {
-            for (let table of database.tables) {
-              if (table.name === tbName) {
-                const selCols = Object.keys(table.data[0]).length;
-                for (let i = 0; i < selCols; i++) {
-                  this.selectedCells.add(`${rwIndex}|${dbName}-${tbName}-${i}`);
-                  console.log(`${rwIndex}|${dbName}-${tbName}-${i}`);
-                }
-              }
-            }
-          }
-        }
-        return;
-      } else if (rwClass === 'column-header') {
-        console.log(cellKey);
-        this.selectedCells.clear();
-        const [dbName, tbName, clName] = columnName.split('|');
-        // Select entire column
-        console.log(dbName + ' ' + tbName + ' ' + clName + ' unga');
-        for (let database of this.databaseInfo.databases) {
-          if (database.name == dbName) {
-            for (let table of database.tables) {
-              if (table.name === tbName) {
-                this.selectedCells.add(`-1|${dbName}-${tbName}-${clName}`);
-                console.log(table.data.length);
-                for (let i = 0; i < table.data.length; i++) {
-                  this.selectedCells.add(`${i}|${dbName}-${tbName}-${rwIndex}`);
-                  console.log(`${i}|${dbName}-${tbName}-${rwIndex}`);
-                }
-              }
-            }
-          }
-        }
-        return;
-      } else {
-        console.log(cellKey);
-        this.selectedCells.clear();
-        this.selectedCells.add(cellKey);
+    // For column-header
+    if (columnName === 'column-header') {
+      this.selectedCells.clear();
+      // Adding the table header
+      const colHeader = this.tableHeaders[rowIndex as number];
+      this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`)
+      for (const rowData of this.tableData) {
+        const cell = rowData[rowIndex as number];
+        const newCellKey = `${cell.reportID}|${cell.dataID}`;
+        this.selectedCells.add(`${newCellKey}`);
       }
-    } else {
+    }
+
+    //For row-header
+    else if (columnName === 'row-header') {
+      this.selectedCells.clear();
+      const rowData = this.tableData[rowIndex as number];
+      for (const cell of rowData) {
+        const newCellKey = `${cell.reportID}|${cell.dataID}`;
+        console.log(newCellKey);
+        this.selectedCells.add(`${newCellKey}`);
+      }
+    }
+
+    else {
       // For normal cells
       console.log(cellKey);
       this.selectedCells.clear(); // Clear previous selections
@@ -403,9 +498,26 @@ export class DesignViewComponent implements OnInit {
     if (this.selectedCells.size === 0) return; // No cells selected
     // Update the formatting of the selected cell and the corresponding entry in the cellFormatting object
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
+
+      // Check if the cell exists in localCellFormatting, if not, initialize it with default values
+    if (!this.localCellFormatting[cellFormattingKey]) {
+      this.localCellFormatting[cellFormattingKey] = {
+        dataID: dataIdNumber,
+        reportID: reportIdNumber,
+        bold: false,
+        italic: false,
+        underline: false,
+        strikethrough: false,
+        fontSize: 16,
+        fontFamily: 'Times New Roman',
+        fontColor: '#000000',
+        backgroundColor: '#ffffff',
+      };
+    }
 
       // Update the formatting based on the button clicked
       switch (format) {
@@ -413,8 +525,8 @@ export class DesignViewComponent implements OnInit {
           this.localCellFormatting[cellFormattingKey].bold =
             !this.localCellFormatting[cellFormattingKey].bold;
           this.applyFormatting(
-            rowIndexNumber,
-            columnName,
+            reportIdNumber,
+            dataIdNumber,
             'fontWeight',
             this.localCellFormatting[cellFormattingKey].bold ? 'bold' : 'normal'
           );
@@ -423,8 +535,8 @@ export class DesignViewComponent implements OnInit {
           this.localCellFormatting[cellFormattingKey].italic =
             !this.localCellFormatting[cellFormattingKey].italic;
           this.applyFormatting(
-            rowIndexNumber,
-            columnName,
+            reportIdNumber,
+            dataIdNumber,
             'fontStyle',
             this.localCellFormatting[cellFormattingKey].italic
               ? 'italic'
@@ -437,8 +549,8 @@ export class DesignViewComponent implements OnInit {
           if (this.localCellFormatting[cellFormattingKey].strikethrough) {
             // If strikethrough is active, concatenate underline with it
             this.applyFormatting(
-              rowIndexNumber,
-              columnName,
+              reportIdNumber,
+              dataIdNumber,
               'textDecoration',
               this.localCellFormatting[cellFormattingKey].underline
                 ? 'line-through underline'
@@ -447,8 +559,8 @@ export class DesignViewComponent implements OnInit {
           } else {
             // Otherwise, apply underline alone
             this.applyFormatting(
-              rowIndexNumber,
-              columnName,
+              reportIdNumber,
+              dataIdNumber,
               'textDecoration',
               this.localCellFormatting[cellFormattingKey].underline
                 ? 'underline'
@@ -462,8 +574,8 @@ export class DesignViewComponent implements OnInit {
           if (this.localCellFormatting[cellFormattingKey].underline) {
             // If underline is active, concatenate strikethrough with it
             this.applyFormatting(
-              rowIndexNumber,
-              columnName,
+              reportIdNumber,
+              dataIdNumber,
               'textDecoration',
               this.localCellFormatting[cellFormattingKey].strikethrough
                 ? 'line-through underline'
@@ -472,8 +584,8 @@ export class DesignViewComponent implements OnInit {
           } else {
             // Otherwise, apply strikethrough alone
             this.applyFormatting(
-              rowIndexNumber,
-              columnName,
+              reportIdNumber,
+              dataIdNumber,
               'textDecoration',
               this.localCellFormatting[cellFormattingKey].strikethrough
                 ? 'line-through'
@@ -494,16 +606,20 @@ export class DesignViewComponent implements OnInit {
     if (this.selectedCells.size === 0) return; // No cells selected
     // Loop through selected cells and reset formatting to initial state
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
 
       // Reset formatting to initial state
       this.localCellFormatting[cellFormattingKey] = {
+        dataID: dataIdNumber,
+        reportID: reportIdNumber,
         bold: false,
         italic: false,
         underline: false,
         strikethrough: false,
-        fontSize: '16px',
+        fontSize: 16,
         fontColor: '#000000',
         fontFamily: 'Times New Roman',
         backgroundColor: '#ffffff',
@@ -511,44 +627,44 @@ export class DesignViewComponent implements OnInit {
 
       // Apply the initial formatting to the cell
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'fontWeight',
         'normal'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'fontStyle',
         'normal'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'textDecoration',
         'none'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'fontSize',
         '16px'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'color',
         '#000000'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'fontFamily',
         'Times New Roman'
       );
       this.applyFormatting(
-        parseInt(rowIndex, 10),
-        columnName,
+        reportIdNumber,
+        dataIdNumber,
         'backgroundColor',
         '#ffffff'
       );
@@ -604,10 +720,10 @@ export class DesignViewComponent implements OnInit {
     return JSON.stringify(style) === JSON.stringify(defaultStyle);
   }
 
-  // Apply formatting to the selected cell
+  // Apply formatting to the selected cell in HTML
   applyFormatting(
     rowIndex: number,
-    columnName: string,
+    columnName: number,
     property: keyof CSSStyleDeclaration,
     value: string
   ): void {
@@ -620,51 +736,99 @@ export class DesignViewComponent implements OnInit {
   }
 
   // Change the text color to the specified color
-  changeTextColor(color: string): void {
+  changeTextColor(txtcolor: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
 
-      this.localCellFormatting[cellFormattingKey].fontColor = color;
-      console.log(color);
+      if (!this.localCellFormatting[cellFormattingKey]) {
+        this.localCellFormatting[cellFormattingKey] = {
+          dataID: dataIdNumber,
+          reportID: reportIdNumber,
+          bold: false,
+          italic: false,
+          underline: false,
+          strikethrough: false,
+          fontSize: 16,
+          fontFamily: 'Times New Roman',
+          fontColor: '#000000',
+          backgroundColor: '#ffffff',
+        };
+      }
+
+      // Update the fontColor property of the cellFormatting
+      this.localCellFormatting[cellFormattingKey].fontColor = txtcolor;
       localStorage.setItem(
         'cellFormatting',
         JSON.stringify(this.localCellFormatting)
       );
+      console.log(txtcolor);
     });
-    // document.execCommand('foreColor', false, color);
   }
 
   // Change the background color to the specified color
-  changeBackgroundColor(color: string): void {
+  changeBackgroundColor(bgfcolor: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
 
-      this.localCellFormatting[cellFormattingKey].backgroundColor = color;
-      console.log(color);
+      if (!this.localCellFormatting[cellFormattingKey]) {
+        this.localCellFormatting[cellFormattingKey] = {
+          dataID: dataIdNumber,
+          reportID: reportIdNumber,
+          bold: false,
+          italic: false,
+          underline: false,
+          strikethrough: false,
+          fontSize: 16,
+          fontFamily: 'Times New Roman',
+          fontColor: '#000000',
+          backgroundColor: '#ffffff',
+        };
+      }
+
+      this.localCellFormatting[cellFormattingKey].backgroundColor = bgfcolor;
       localStorage.setItem(
         'cellFormatting',
         JSON.stringify(this.localCellFormatting)
       );
+      console.log(bgfcolor);
     });
-    document.execCommand('hiliteColor', false, color);
   }
 
   // Change the font size to the specified size
-  changeFontSize(fontSize: string): void {
+  changeFontSize(fontSize: number): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
+
+      if (!this.localCellFormatting[cellFormattingKey]) {
+        this.localCellFormatting[cellFormattingKey] = {
+          dataID: dataIdNumber,
+          reportID: reportIdNumber,
+          bold: false,
+          italic: false,
+          underline: false,
+          strikethrough: false,
+          fontSize: 16,
+          fontFamily: 'Times New Roman',
+          fontColor: '#000000',
+          backgroundColor: '#ffffff',
+        };
+      }
 
       this.localCellFormatting[cellFormattingKey].fontSize = fontSize;
       localStorage.setItem(
         'cellFormatting',
         JSON.stringify(this.localCellFormatting)
       );
+      console.log(fontSize);
     });
     // document.execCommand('fontSize', false, fontSize);
   }
@@ -672,15 +836,32 @@ export class DesignViewComponent implements OnInit {
   // Change the font family to the specified font
   changeFontFamily(fontFamily: string): void {
     this.selectedCells.forEach((cellKey) => {
-      const [rowIndex, columnName] = cellKey.split('|');
-      const rowIndexNumber = parseInt(rowIndex, 10);
-      const cellFormattingKey = `${rowIndex}|${columnName}`;
+      const [reportId, dataId] = cellKey.split('|');
+      const reportIdNumber = parseInt(reportId, 10);
+      const dataIdNumber = parseInt(dataId, 10);
+      const cellFormattingKey = `${reportId}|${dataId}`;
+
+      if (!this.localCellFormatting[cellFormattingKey]) {
+        this.localCellFormatting[cellFormattingKey] = {
+          dataID: dataIdNumber,
+          reportID: reportIdNumber,
+          bold: false,
+          italic: false,
+          underline: false,
+          strikethrough: false,
+          fontSize: 16,
+          fontFamily: 'Times New Roman',
+          fontColor: '#000000',
+          backgroundColor: '#ffffff',
+        };
+      }
 
       this.localCellFormatting[cellFormattingKey].fontFamily = fontFamily;
       localStorage.setItem(
-        'cellFormatting',
-        JSON.stringify(this.localCellFormatting)
-      );
+      'cellFormatting',
+      JSON.stringify(this.localCellFormatting)
+    );
+      console.log(fontFamily);
     });
     // document.execCommand('fontName', false, fontFamily);
   }

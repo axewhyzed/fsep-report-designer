@@ -243,3 +243,42 @@ tr:hover {
 .dropdown-content button:hover {
   background-color: #ddd;
 }
+
+
+/* Edit Report Details form */
+/* Add these styles to your CSS file */
+
+/* Form container */
+.edit-form-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Form inputs */
+.edit-form-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Form labels */
+.edit-form-container label {
+  font-weight: bold;
+}
+
+/* Form submit button */
+.edit-form-container button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-form-container button[type="submit"]:hover {
+  background-color: #0056b3;
+}

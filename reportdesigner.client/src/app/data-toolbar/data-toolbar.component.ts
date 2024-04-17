@@ -56,6 +56,7 @@ export class DataToolbarComponent {
     localStorage.removeItem('cellFormatting');
     localStorage.removeItem('reportData');
     localStorage.removeItem('tableSelections');
+    localStorage.removeItem('selectedReportId')
     alert('New Report Initiated');
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       window.location.reload();

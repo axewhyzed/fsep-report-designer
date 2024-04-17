@@ -34,7 +34,7 @@
 
   <!-- Existing Report Titles Section -->
   <div *ngIf="!isSearching && databaseInfo && databaseInfo.databases.length > 0">
-    <h3>Databases</h3>
+    <h3>Reports</h3>
     <div>
       <div class="table-list">
         <div *ngFor="let report of reports">
@@ -60,12 +60,13 @@
   </div>
 
   <!-- Popup Section -->
-  <div class="popup-overlay" *ngIf="showPopup">
+  <div class="popup-overlay" *ngIf="showPopup || showEditPopup">
     <div class="popup">
       <div class="popup-header">
         <h3>{{ popupTitle }}</h3>
         <button class="material-icons-round close-button" (click)="closePopup()">close</button>
       </div>
+      <ng-container *ngIf="!showEditPopup; else editForm">
       <table>
         <thead>
           <tr>
@@ -80,6 +81,22 @@
           </tr>
         </tbody>
       </table>
+      <!-- <button class="edit-button" (click)="showEditForm()">Edit</button> -->
+    </ng-container>
+    <ng-template #editForm>
+      <div class="edit-form-container">
+      <form (submit)="submitEdit()">
+        <label>Title</label>
+        <input type="text" [(ngModel)]="editingReport.title" name="title"><br>
+        <label>Logo Image</label>
+        <img *ngIf="currentLogoImage" [src]="currentLogoImage" alt="Current Logo Image" style="max-width: 200px;"><br>
+        <label for="newLogo">New Logo Image</label>
+        <input type="file" id="newLogo" (change)="onFileSelected($event)"><br>
+        <!-- Input for logo image, you can customize this based on your requirements -->
+        <button type="submit">Save</button>
+      </form>
+    </div>
+    </ng-template>
     </div>
   </div>
 </div>
