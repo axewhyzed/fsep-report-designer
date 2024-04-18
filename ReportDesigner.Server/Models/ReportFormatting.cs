@@ -8,7 +8,7 @@
         public bool? Italic { get; set; }
         public bool? Underline { get; set; }
         public bool? Strikethrough { get; set; }
-        public int? FontSize { get; set; }
+        public string? FontSize { get; set; }
         public string? FontFamily { get; set; }
         public string? FontColor { get; set; }
         public string? BackgroundColor { get; set; }

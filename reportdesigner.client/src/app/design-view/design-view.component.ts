@@ -18,6 +18,7 @@ export class DesignViewComponent implements OnInit {
   reportDetails!: Report;
   reportData: ReportData[] = [];
   reportTitle: string = '';
+  titleData: ReportData | undefined;
   selectedLogo: File | null = null;
   logoDataURL: string | null = null;
   showReportWizard: boolean = false;
@@ -31,6 +32,19 @@ export class DesignViewComponent implements OnInit {
   tableHeaders: ReportData[] = [];
   tableData: ReportData[][] = [];
   localCellFormatting: { [key: string]: ReportFormatting } = {};
+  // Define a new variable to track updated cells
+  updatedCells: Set<string> = new Set<string>();
+
+  defaultStyle = {
+    bold: false,
+    italic: false,
+    underline: false,
+    strikethrough: false,
+    fontSize: "14px",
+    fontColor: '#000000',
+    fontFamily: 'Arial',
+    backgroundColor: '#ffffff',
+  };
 
   constructor(
     private http: HttpClient,
@@ -50,6 +64,18 @@ export class DesignViewComponent implements OnInit {
       this.getReportTitle(this.selectedReportId);
       this.showReportWizard = false;
       this.showReportContainer = true;
+
+      // Fetch all reports for the dropdown
+      this.reportsService.getReports().subscribe(
+        (data: Report[]) => {
+          this.reports = data;
+          this.getReportTitle(this.selectedReportId);
+        },
+        (error) => {
+          console.error('Error fetching reports:', error);
+        }
+      );
+
       this.reportsService.getReportData(this.selectedReportId).subscribe(
         (data: ReportData[]) => {
           this.reportData = data;
@@ -58,8 +84,14 @@ export class DesignViewComponent implements OnInit {
           );
           console.log(this.tableHeaders);
           this.tableData = this.groupDataByRows(
-            this.reportData.filter((item) => item.rowIndex !== 0)
+            this.reportData.filter(
+              (item) => item.rowIndex !== 0 && item.isTitle !== true
+            )
           );
+          this.titleData = this.reportData.find(
+            (data) => data.isTitle && data.cellValue === this.reportTitle
+          );
+          console.log(this.tableData);
           console.log(this.reportData);
         },
         (error) => {
@@ -67,14 +99,16 @@ export class DesignViewComponent implements OnInit {
         }
       );
       const repDet = localStorage.getItem('reportDetails');
-      if(repDet){
+      if (repDet) {
         this.reportDetails = JSON.parse(repDet);
-      }
-      else{
+      } else {
         this.reportsService.getReport(this.selectedReportId).subscribe(
           (data: Report) => {
             this.reportDetails = data;
-            localStorage.setItem('reportDetails', JSON.stringify(this.reportDetails));
+            localStorage.setItem(
+              'reportDetails',
+              JSON.stringify(this.reportDetails)
+            );
           },
           (error) => {
             console.error('Error fetching report data:', error);
@@ -87,31 +121,30 @@ export class DesignViewComponent implements OnInit {
           formatting.forEach((format: ReportFormatting) => {
             const key = `${format.reportID}|${format.dataID}`;
             this.localCellFormatting[key] = format;
+            console.log(this.localCellFormatting);
           });
           // Once formatting data is fetched, store it in localStorage
-          localStorage.setItem('cellFormatting', JSON.stringify(this.localCellFormatting));
+          localStorage.setItem(
+            'cellFormatting',
+            JSON.stringify(this.localCellFormatting)
+          );
           // localStorage.setItem(`reportFormatting_${this.selectedReportId}`, JSON.stringify(formatting));
         },
-        error => {
+        (error) => {
           console.error('Error fetching report formatting:', error);
         }
       );
     }
-    // Fetch all reports for the dropdown
-    this.reportsService.getReports().subscribe(
-      (data: Report[]) => {
-        this.reports = data;
-        this.getReportTitle(this.selectedReportId);
-      },
-      (error) => {
-        console.error('Error fetching reports:', error);
-      }
-    );
+
+    const updatedCellsJSON = localStorage.getItem('updatedCells');
+    if (updatedCellsJSON) {
+      this.updatedCells = new Set<string>(JSON.parse(updatedCellsJSON));
+    }
   }
 
-  getReportTitle(reportId:number):void{
-    const report = this.reports.find(report => report.reportID === reportId);
-    if(report){
+  getReportTitle(reportId: number): void {
+    const report = this.reports.find((report) => report.reportID === reportId);
+    if (report) {
       this.reportTitle = report.title;
     }
   }
@@ -168,8 +201,8 @@ export class DesignViewComponent implements OnInit {
   openSelectedReport() {
     if (this.selectedReportId) {
       // Log the submitted report title
-    console.log('Submitted report title:', this.reportTitle);
-    // Close the report wizard after submission
+      console.log('Submitted report title:', this.reportTitle);
+      // Close the report wizard after submission
       // Store the selected report ID in sessionStorage or localStorage
       localStorage.setItem(
         'selectedReportId',
@@ -205,12 +238,12 @@ export class DesignViewComponent implements OnInit {
         // We need to cast it to a string as FileReader.result is of type 'string | null'
         this.logoDataURL = reader.result as string;
         // Update logoImage field in reportDetails in local storage
-      const storedReportDetails = localStorage.getItem('reportDetails');
-      if (storedReportDetails) {
-        const reportDetails = JSON.parse(storedReportDetails);
-        reportDetails.logoImage = this.logoDataURL;
-        localStorage.setItem('reportDetails', JSON.stringify(reportDetails));
-      }
+        const storedReportDetails = localStorage.getItem('reportDetails');
+        if (storedReportDetails) {
+          const reportDetails = JSON.parse(storedReportDetails);
+          reportDetails.logoImage = this.logoDataURL;
+          localStorage.setItem('reportDetails', JSON.stringify(reportDetails));
+        }
       };
     }
   }
@@ -257,9 +290,9 @@ export class DesignViewComponent implements OnInit {
             italic: false,
             underline: false,
             strikethrough: false,
-            fontSize: '16px',
+            fontSize: '14px',
             fontColor: '#000000',
-            fontFamily: 'Times New Roman',
+            fontFamily: 'Arial',
             backgroundColor: '#ffffff',
           };
         }
@@ -279,9 +312,9 @@ export class DesignViewComponent implements OnInit {
               italic: false,
               underline: false,
               strikethrough: false,
-              fontSize: '16px',
+              fontSize: '14px',
               fontColor: '#000000',
-              fontFamily: 'Times New Roman',
+              fontFamily: 'Arial',
               backgroundColor: '#ffffff',
             };
           }
@@ -313,7 +346,7 @@ export class DesignViewComponent implements OnInit {
       this.selectedCells.clear();
       // Adding the table header
       const colHeader = this.tableHeaders[rowIndex as number];
-      this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`)
+      this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`);
       for (const rowData of this.tableData) {
         const cell = rowData[rowIndex as number];
         const newCellKey = `${cell.reportID}|${cell.dataID}`;
@@ -330,9 +363,7 @@ export class DesignViewComponent implements OnInit {
         console.log(newCellKey);
         this.selectedCells.add(`${newCellKey}`);
       }
-    }
-
-    else {
+    } else {
       // For normal cells
       console.log(cellKey);
       this.selectedCells.clear(); // Clear previous selections
@@ -351,6 +382,9 @@ export class DesignViewComponent implements OnInit {
   // Toggle the specified text formatting
   toggleFormat(format: string): void {
     if (this.selectedCells.size === 0) return; // No cells selected
+
+    // Create a set to store cell keys that need to be removed from updatedCells
+    const keysToRemove: Set<string> = new Set<string>();
     // Update the formatting of the selected cell and the corresponding entry in the cellFormatting object
     this.selectedCells.forEach((cellKey) => {
       const [reportId, dataId] = cellKey.split('|');
@@ -359,20 +393,20 @@ export class DesignViewComponent implements OnInit {
       const cellFormattingKey = `${reportId}|${dataId}`;
 
       // Check if the cell exists in localCellFormatting, if not, initialize it with default values
-    if (!this.localCellFormatting[cellFormattingKey]) {
-      this.localCellFormatting[cellFormattingKey] = {
-        dataID: dataIdNumber,
-        reportID: reportIdNumber,
-        bold: false,
-        italic: false,
-        underline: false,
-        strikethrough: false,
-        fontSize: 16,
-        fontFamily: 'Times New Roman',
-        fontColor: '#000000',
-        backgroundColor: '#ffffff',
-      };
-    }
+      if (!this.localCellFormatting[cellFormattingKey]) {
+        this.localCellFormatting[cellFormattingKey] = {
+          dataID: dataIdNumber,
+          reportID: reportIdNumber,
+          bold: false,
+          italic: false,
+          underline: false,
+          strikethrough: false,
+          fontSize: "14px",
+          fontFamily: 'Arial',
+          fontColor: '#000000',
+          backgroundColor: '#ffffff',
+        };
+      }
 
       // Update the formatting based on the button clicked
       switch (format) {
@@ -449,16 +483,35 @@ export class DesignViewComponent implements OnInit {
           }
           break;
       }
+
+      // If the formatting is reverted back to normal, add the cell key to keysToRemove set
+      if (this.isDefaultStyle(this.localCellFormatting[cellFormattingKey])) {
+        keysToRemove.add(cellFormattingKey);
+      }
+        this.updatedCells.add(cellFormattingKey);
+    });
+
+    // Remove cell keys from updatedCells set
+    keysToRemove.forEach((key) => {
+      this.updatedCells.delete(key);
     });
 
     localStorage.setItem(
       'cellFormatting',
       JSON.stringify(this.localCellFormatting)
     );
+    localStorage.setItem(
+      'updatedCells',
+      JSON.stringify(Array.from(this.updatedCells))
+    );
   }
 
   removeFormatting(): void {
     if (this.selectedCells.size === 0) return; // No cells selected
+
+    // Create a set to store cell keys that need to be removed from updatedCells
+    const keysToRemove: Set<string> = new Set<string>();
+
     // Loop through selected cells and reset formatting to initial state
     this.selectedCells.forEach((cellKey) => {
       const [reportId, dataId] = cellKey.split('|');
@@ -474,9 +527,9 @@ export class DesignViewComponent implements OnInit {
         italic: false,
         underline: false,
         strikethrough: false,
-        fontSize: 16,
+        fontSize: "14px",
         fontColor: '#000000',
-        fontFamily: 'Times New Roman',
+        fontFamily: 'Arial',
         backgroundColor: '#ffffff',
       };
 
@@ -487,35 +540,20 @@ export class DesignViewComponent implements OnInit {
         'fontWeight',
         'normal'
       );
-      this.applyFormatting(
-        reportIdNumber,
-        dataIdNumber,
-        'fontStyle',
-        'normal'
-      );
+      this.applyFormatting(reportIdNumber, dataIdNumber, 'fontStyle', 'normal');
       this.applyFormatting(
         reportIdNumber,
         dataIdNumber,
         'textDecoration',
         'none'
       );
-      this.applyFormatting(
-        reportIdNumber,
-        dataIdNumber,
-        'fontSize',
-        '16px'
-      );
-      this.applyFormatting(
-        reportIdNumber,
-        dataIdNumber,
-        'color',
-        '#000000'
-      );
+      this.applyFormatting(reportIdNumber, dataIdNumber, 'fontSize', '14px');
+      this.applyFormatting(reportIdNumber, dataIdNumber, 'color', '#000000');
       this.applyFormatting(
         reportIdNumber,
         dataIdNumber,
         'fontFamily',
-        'Times New Roman'
+        'Arial'
       );
       this.applyFormatting(
         reportIdNumber,
@@ -523,12 +561,29 @@ export class DesignViewComponent implements OnInit {
         'backgroundColor',
         '#ffffff'
       );
+
+      // If the formatting is reverted back to normal, add the cell key to keysToRemove set
+      if (this.isDefaultStyle(this.localCellFormatting[cellFormattingKey])) {
+        keysToRemove.add(cellFormattingKey);
+      }
+
+      // Add the cell key to updatedCells
+      this.updatedCells.add(cellFormattingKey);
+    });
+
+    // Remove cell keys from updatedCells set
+    keysToRemove.forEach((key) => {
+      this.updatedCells.delete(key);
     });
 
     // Save the updated cell formatting to local storage
     localStorage.setItem(
       'cellFormatting',
       JSON.stringify(this.localCellFormatting)
+    );
+    localStorage.setItem(
+      'updatedCells',
+      JSON.stringify(Array.from(this.updatedCells))
     );
   }
 
@@ -547,8 +602,8 @@ export class DesignViewComponent implements OnInit {
         if (formatting.italic) style['font-style'] = 'italic';
         if (formatting.underline) style['text-decoration'] = 'underline';
         if (formatting.strikethrough)
-        style['text-decoration-line'] = 'line-through';
-        style['font-size'] = formatting.fontSize + 'px';
+          style['text-decoration-line'] = 'line-through';
+        style['font-size'] = formatting.fontSize;
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
@@ -556,23 +611,23 @@ export class DesignViewComponent implements OnInit {
         return style;
       }
     }
-    return {}; // Default empty style object
+    return this.defaultStyle; // Default empty style object
   }
 
   // Function to check if a style is default
   isDefaultStyle(style: any) {
-    const defaultStyle = {
-      bold: false,
-      italic: false,
-      underline: false,
-      strikethrough: false,
-      fontSize: 14,
-      fontColor: '#000000',
-      fontFamily: 'Times New Roman',
-      backgroundColor: '#ffffff',
-    };
+    // List of properties to ignore during comparison
+    const ignoreProperties = ['reportID', 'dataID'];
 
-    return JSON.stringify(style) === JSON.stringify(defaultStyle);
+    for (const key in this.defaultStyle) {
+      if (this.defaultStyle.hasOwnProperty(key) && !ignoreProperties.includes(key)) {
+        if ((style as any)[key] !== (this.defaultStyle as any)[key]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   // Apply formatting to the selected cell in localStorage
@@ -608,8 +663,8 @@ export class DesignViewComponent implements OnInit {
           italic: false,
           underline: false,
           strikethrough: false,
-          fontSize: 16,
-          fontFamily: 'Times New Roman',
+          fontSize: "14px",
+          fontFamily: 'Arial',
           fontColor: '#000000',
           backgroundColor: '#ffffff',
         };
@@ -641,8 +696,8 @@ export class DesignViewComponent implements OnInit {
           italic: false,
           underline: false,
           strikethrough: false,
-          fontSize: 16,
-          fontFamily: 'Times New Roman',
+          fontSize: "14px",
+          fontFamily: 'Arial',
           fontColor: '#000000',
           backgroundColor: '#ffffff',
         };
@@ -658,7 +713,7 @@ export class DesignViewComponent implements OnInit {
   }
 
   // Change the font size to the specified size
-  changeFontSize(fontSize: number): void {
+  changeFontSize(fontSize: string): void {
     this.selectedCells.forEach((cellKey) => {
       const [reportId, dataId] = cellKey.split('|');
       const reportIdNumber = parseInt(reportId, 10);
@@ -673,8 +728,8 @@ export class DesignViewComponent implements OnInit {
           italic: false,
           underline: false,
           strikethrough: false,
-          fontSize: 16,
-          fontFamily: 'Times New Roman',
+          fontSize: "14px",
+          fontFamily: 'Arial',
           fontColor: '#000000',
           backgroundColor: '#ffffff',
         };
@@ -706,8 +761,8 @@ export class DesignViewComponent implements OnInit {
           italic: false,
           underline: false,
           strikethrough: false,
-          fontSize: 16,
-          fontFamily: 'Times New Roman',
+          fontSize: "14px",
+          fontFamily: 'Arial',
           fontColor: '#000000',
           backgroundColor: '#ffffff',
         };
@@ -715,9 +770,9 @@ export class DesignViewComponent implements OnInit {
 
       this.localCellFormatting[cellFormattingKey].fontFamily = fontFamily;
       localStorage.setItem(
-      'cellFormatting',
-      JSON.stringify(this.localCellFormatting)
-    );
+        'cellFormatting',
+        JSON.stringify(this.localCellFormatting)
+      );
       console.log(fontFamily);
     });
     // document.execCommand('fontName', false, fontFamily);

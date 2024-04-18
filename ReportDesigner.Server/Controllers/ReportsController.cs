@@ -319,6 +319,7 @@ namespace ReportDesigner.Server.Controllers
                                 RowIndex = Convert.ToInt32(reader["RowIndex"]),
                                 ColumnIndex = Convert.ToInt32(reader["ColumnIndex"]),
                                 CellValue = reader["CellValue"].ToString(),
+                                isTitle = Convert.ToBoolean(reader["isTitle"]),
                                 // Bold = Convert.ToBoolean(reader["Bold"]),
                                 // Italic = Convert.ToBoolean(reader["Italic"]),
                                 // Underline = Convert.ToBoolean(reader["Underline"]),
@@ -372,7 +373,7 @@ namespace ReportDesigner.Server.Controllers
                                 Italic = Convert.ToBoolean(reader["Italic"]),
                                 Underline = Convert.ToBoolean(reader["Underline"]),
                                 Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
-                                FontSize = Convert.ToInt32(reader["FontSize"]),
+                                FontSize = reader["FontSize"].ToString(),
                                 FontFamily = reader["FontFamily"].ToString(),
                                 FontColor  = reader["FontColor"].ToString(),
                                 BackgroundColor  = reader["BackgroundColor"].ToString()
@@ -420,6 +421,7 @@ namespace ReportDesigner.Server.Controllers
                                 RowIndex = Convert.ToInt32(reader["RowIndex"]),
                                 ColumnIndex = Convert.ToInt32(reader["ColumnIndex"]),
                                 CellValue = reader["CellValue"].ToString(),
+                                isTitle = Convert.ToBoolean(reader["isTitle"]),
                                 // Bold = Convert.ToBoolean(reader["Bold"]),
                                 // Italic = Convert.ToBoolean(reader["Italic"]),
                                 // Underline = Convert.ToBoolean(reader["Underline"]),
@@ -472,7 +474,7 @@ namespace ReportDesigner.Server.Controllers
                                 Italic = Convert.ToBoolean(reader["Italic"]),
                                 Underline = Convert.ToBoolean(reader["Underline"]),
                                 Strikethrough = Convert.ToBoolean(reader["Strikethrough"]),
-                                FontSize = Convert.ToInt32(reader["FontSize"]),
+                                FontSize = reader["FontSize"].ToString(),
                                 FontFamily = reader["FontFamily"].ToString(),
                                 FontColor  = reader["FontColor"].ToString(),
                                 BackgroundColor  = reader["BackgroundColor"].ToString()
@@ -508,8 +510,8 @@ namespace ReportDesigner.Server.Controllers
                         {
                             foreach (var reportData in reportDataList)
                             {
-                                string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue) 
-                                    VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue);
+                                string query = @"INSERT INTO ReportData (ReportID, RowIndex, ColumnIndex, CellValue, isTitle) 
+                                    VALUES (@ReportID, @RowIndex, @ColumnIndex, @CellValue, @isTitle);
                                     SELECT SCOPE_IDENTITY();";
 
                                 SqlCommand command = new SqlCommand(query, connection, transaction);
@@ -517,6 +519,7 @@ namespace ReportDesigner.Server.Controllers
                                 command.Parameters.AddWithValue("@RowIndex", reportData.RowIndex);
                                 command.Parameters.AddWithValue("@ColumnIndex", reportData.ColumnIndex);
                                 command.Parameters.AddWithValue("@CellValue", reportData.CellValue);
+                                command.Parameters.AddWithValue("@isTitle", reportData.isTitle);
 
                                 int newDataId = Convert.ToInt32(await command.ExecuteScalarAsync());
 

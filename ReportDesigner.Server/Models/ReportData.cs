@@ -7,5 +7,6 @@
         public int ?RowIndex { get; set; }
         public int ?ColumnIndex { get; set; }
         public string? CellValue { get; set; }
+        public bool? isTitle { get; set; }
     }
 }

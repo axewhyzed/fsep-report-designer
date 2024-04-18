@@ -7,7 +7,7 @@ export interface ReportFormatting {
     italic?: boolean;
     underline?: boolean;
     strikethrough?: boolean;
-    fontSize?: number;
+    fontSize?: string;
     fontFamily?: string;
     fontColor?: string;
     backgroundColor?: string;
