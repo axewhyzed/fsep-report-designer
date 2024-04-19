@@ -6,7 +6,7 @@ It is a full stack application created using the following technologies: <br/><b
   -   Angular 17 <br/>
 - **Backend**
   -  ASP.NET Core with .NET 8.0 ( Using Controllers and Open API Support ) <br/>
-- **Database**  *( Yet to be configured )*
+- **Database**
   - MS-SQL Server 2019 <br/>
 - **Code Editor Used**
   - Visual Studio 2022
