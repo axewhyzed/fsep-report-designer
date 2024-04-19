@@ -170,6 +170,14 @@ export class NavigationPanelComponent implements OnInit{
             console.log(report.title);
           }
         });
+
+        this.searchResults.forEach(report => {
+          if (report.reportID === this.editingReport.reportID) {
+            report.title = editedReport.title!;
+            console.log(report.title);
+          }
+        });
+
         this.showEditPopup = false;
         // Optionally, you can reload or update the data displayed in your component after the report is updated
       }, error => {

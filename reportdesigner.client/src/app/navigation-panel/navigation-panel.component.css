@@ -35,7 +35,7 @@ table {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.table-list {
+.report-list {
   margin-left: 20px; /* Adjust spacing */
 }
 
@@ -58,7 +58,7 @@ tr:hover {
   background-color: #f0f0f0;
 }
 
-.table-name-container {
+.report-name-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -97,6 +97,7 @@ tr:hover {
 .popup {
   background-color: white;
   padding: 20px;
+  height: 60%;
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   max-width: 80%;
@@ -221,7 +222,7 @@ tr:hover {
   z-index: 1;
 }
 
-/* Show the dropdown content when the dropdown button is clicked */
+/* Show the dropdown content when the dropdown button is hovered upon */
 .dropdown:hover .dropdown-content {
   display: block;
 }

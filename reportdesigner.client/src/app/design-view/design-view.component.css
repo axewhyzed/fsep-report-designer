@@ -151,11 +151,13 @@ table, th, td{
 
 .color-container {
   align-items: center;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .color-label {
   margin:0 10px;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .custom-color-input {
@@ -181,10 +183,10 @@ table, th, td{
   margin-right: 20px;
 }
 
-.reload_btn{
+.save_btn{
   border: none;
   background-color: #f8f9fa;
-  font-size: 30px;
+  font-size: 34px;
   cursor: pointer;
 }
 
@@ -207,7 +209,7 @@ table, th, td{
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .start-wizard-button {
@@ -245,4 +247,146 @@ table, th, td{
 
 .report-wizard-popup.ng-leave.ng-leave-active {
   opacity: 0;
+}
+
+.report-modal-title{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* For Search Results */
+
+/* CSS for Search Textbox */
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-results-header{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.search-container input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+.search-container input[type="text"]:focus {
+  border-color: #007bff; /* Highlight border color on focus */
+}
+
+/* CSS for Report Dropdown */
+#selectReportDropdown {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+#selectReportDropdown:focus {
+  border: 2px solid;
+  border-color: #007bff; /* Highlight border color on focus */
+}
+
+/* Style for dropdown options */
+#selectReportDropdown option {
+  padding: 10px;
+  font-size: 16px;
+  background-color: white;
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+#selectReportDropdown option:hover {
+  background-color: #f0f8ff; /* Light blue background on hover */
+}
+
+.report-list {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 10px; /* Adjust spacing */
+}
+
+.report-item {
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.report-item:last-child {
+  border-bottom: none; /* Remove border from the last item */
+}
+
+.report-item:hover {
+  background-color: #f0f8ff; /* Light blue background on hover */
+}
+
+.report-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.report-actions {
+  display: flex;
+  align-items: center;
+}
+
+.report-actions button {
+  padding: 6px 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff; /* Blue button background */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition for button background color */
+}
+
+.report-actions button:hover {
+  background-color: #0056b3; /* Darker blue button background on hover */
+}
+
+.report-form-btn-container{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.report-form-btn-container button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.report-form-btn-container button:hover {
+  background-color: #007bff; /* Darker blue on hover */
+  color: white;
+}
+
+/* Cancel Button */
+.report-form-btn-container .cancel-button {
+  background-color: #ccc; /* Light gray */
+}
+
+.report-form-btn-container .cancel-button:hover {
+  background-color: #999; /* Darker gray on hover */
+}
+
+/* No Reports Found Message */
+.no-reports-message {
+  margin-top: 20px;
+  color: #999; /* Light gray text color */
 }

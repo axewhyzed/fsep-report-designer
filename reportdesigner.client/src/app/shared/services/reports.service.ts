@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { Report } from '../models/report.model';  // Define the Report model as per your requirements
 import { ReportData } from '../models/report-data.model'; // Define the ReportData model as per your requirements
 import { ReportFormatting } from '../models/report-formatting.model';
+import { UpdateDataDto } from '../models/update-data-dto.model';
 
 @Injectable({
   providedIn: 'root'
@@ -97,8 +98,8 @@ export class ReportsService {
       );
   }
 
-  updateReportFormatting(reportId: number, reportFormatting: ReportFormatting): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${reportId}/ReportFormatting`, reportFormatting)
+  updateReportFormatting(reportId: number, updateDataDtos: UpdateDataDto[]): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${reportId}/ReportFormatting`, updateDataDtos)
       .pipe(
         catchError(this.handleError)
       );
