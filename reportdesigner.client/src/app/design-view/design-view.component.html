@@ -167,7 +167,7 @@
       <div class="top-section">
         <!-- Image and title -->
         <div class="image-and-title">
-          <img *ngIf="reportDetails.logoImage" [src]="reportDetails.logoImage" alt="Report Logo" class="report-logo" />
+          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
           <input *ngIf="!reportDetails.logoImage" type="file" id="reportLogo" (change)="onLogoSelected($event)"
             accept="image/*" /><br><br />
           <h1 style="cursor: pointer;" (click)="toggleCellSelection(selectedReportId,titleData?.dataID)"

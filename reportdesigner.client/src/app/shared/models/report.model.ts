@@ -3,7 +3,7 @@
 export interface Report {
   reportID: number;
   title: string;
-  logoImage: Uint8Array;
+  logoImage: File | null;
   createdDate: Date;
   lastModifiedDate: Date;
 }

@@ -130,6 +130,8 @@ export class DesignViewComponent implements OnInit {
           console.error('Error fetching report formatting:', error);
         }
       );
+
+      this.fetchReportLogo();
     }
 
     const updatedCellsJSON = localStorage.getItem('updatedCells');
@@ -152,7 +154,25 @@ export class DesignViewComponent implements OnInit {
     }
   }
 
-  saveFormatting():void{
+  fetchReportLogo(): void {
+    const reportId = this.selectedReportId;
+    this.reportsService.getReportLogo(reportId).subscribe(
+      (logoBlob: Blob) => {
+        // Convert the logo blob to a data URL
+        const reader = new FileReader();
+        reader.readAsDataURL(logoBlob);
+        reader.onloadend = () => {
+          // Once the file is read, set the logoDataURL property
+          this.logoDataURL = reader.result as string;
+        };
+      },
+      (error) => {
+        console.error('Error fetching report logo:', error);
+      }
+    );
+  }
+
+  saveFormatting(): void {
     const updatedCellKeys: string[] = Array.from(this.updatedCells);
     const updateDataDtos: UpdateDataDto[] = [];
     updatedCellKeys.forEach((cellKey) => {
@@ -161,45 +181,50 @@ export class DesignViewComponent implements OnInit {
       const dataIdNumber = parseInt(dataId, 10);
 
       // Fetch cell formatting from localCellFormatting variable
-    const cellFormatting = this.localCellFormatting[cellKey];
-      
+      const cellFormatting = this.localCellFormatting[cellKey];
+
       // Construct the ReportFormatting object based on the fetched cell formatting
-    const reportFormatting: ReportFormatting = {
-      reportID: reportIdNumber,
-      dataID: dataIdNumber,
-      bold: cellFormatting.bold,
-      italic: cellFormatting.italic,
-      underline: cellFormatting.underline,
-      strikethrough: cellFormatting.strikethrough,
-      fontSize: cellFormatting.fontSize,
-      fontFamily: cellFormatting.fontFamily,
-      fontColor: cellFormatting.fontColor,
-      backgroundColor: cellFormatting.backgroundColor
-    };
+      const reportFormatting: ReportFormatting = {
+        reportID: reportIdNumber,
+        dataID: dataIdNumber,
+        bold: cellFormatting.bold,
+        italic: cellFormatting.italic,
+        underline: cellFormatting.underline,
+        strikethrough: cellFormatting.strikethrough,
+        fontSize: cellFormatting.fontSize,
+        fontFamily: cellFormatting.fontFamily,
+        fontColor: cellFormatting.fontColor,
+        backgroundColor: cellFormatting.backgroundColor,
+      };
 
-    // Create an UpdateDataDto object with reportFormatting
-    const updateDataDto: UpdateDataDto = {
-      reportFormatting
-    };
+      // Create an UpdateDataDto object with reportFormatting
+      const updateDataDto: UpdateDataDto = {
+        reportFormatting,
+      };
 
-    // Push the updateDataDto object into the array
-    updateDataDtos.push(updateDataDto);
-  });
-  
-      // Call the updateReportFormatting method with the array of reportFormatting objects
-  this.reportsService.updateReportFormatting(this.selectedReportId, updateDataDtos).subscribe(
-    (response) => {
-      alert('Saved changes successfully');
-      console.log('Report formatting updated successfully');
-      // Optionally, you can perform any actions after successful update
-      this.updatedCells.clear();
-      localStorage.setItem('updatedCells', JSON.stringify(Array.from(this.updatedCells)));
-    },
-    (error) => {
-      console.error('Error updating report formatting', error);
-      // Optionally, handle the error
-    }
-  );
+      // Push the updateDataDto object into the array
+      updateDataDtos.push(updateDataDto);
+    });
+
+    // Call the updateReportFormatting method with the array of reportFormatting objects
+    this.reportsService
+      .updateReportFormatting(this.selectedReportId, updateDataDtos)
+      .subscribe(
+        (response) => {
+          alert('Saved changes successfully');
+          console.log('Report formatting updated successfully');
+          // Optionally, you can perform any actions after successful update
+          this.updatedCells.clear();
+          localStorage.setItem(
+            'updatedCells',
+            JSON.stringify(Array.from(this.updatedCells))
+          );
+        },
+        (error) => {
+          console.error('Error updating report formatting', error);
+          // Optionally, handle the error
+        }
+      );
   }
 
   // Helper function to group data by rows
@@ -271,26 +296,31 @@ export class DesignViewComponent implements OnInit {
   }
 
   submitReport(modalName: string) {
-    // Log the submitted report title
-    if (this.selectedReportId) {
-      console.log('Submitted report title:', this.reportTitle);
-      localStorage.setItem(
-        'selectedReportId',
-        this.selectedReportId.toString()
-      );
-      this.toggleReportWizard(modalName);
-      this.showReportContainer = true;
-      // Perform further actions, e.g., navigate to a different page or load the selected report
+    if (modalName === 'existingReport') {
+      // Log the submitted report title
+      if (this.selectedReportId) {
+        console.log('Submitted report title:', this.reportTitle);
+        localStorage.setItem(
+          'selectedReportId',
+          this.selectedReportId.toString()
+        );
+        this.toggleReportWizard(modalName);
+        this.showReportContainer = true;
+        // Perform further actions, e.g., navigate to a different page or load the selected report
+      }
+      const reportData = {
+        reportTitle: this.reportTitle,
+        selectedLogo: this.selectedLogo,
+        logoDataURL: this.logoDataURL,
+      };
+      localStorage.setItem('reportData', JSON.stringify(reportData));
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        window.location.reload();
+      });
     }
-    const reportData = {
-      reportTitle: this.reportTitle,
-      selectedLogo: this.selectedLogo,
-      logoDataURL: this.logoDataURL,
-    };
-    localStorage.setItem('reportData', JSON.stringify(reportData));
-    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-      window.location.reload();
-    });
+    else if(modalName === 'newReport'){
+      
+    }
   }
 
   onLogoSelected(event: any) {
@@ -560,7 +590,10 @@ export class DesignViewComponent implements OnInit {
       }
 
       // If the formatting is reverted back to normal, add the cell key to keysToRemove set
-      if (!this.isSpecialCell(reportIdNumber, dataIdNumber) && this.isDefaultStyle(this.localCellFormatting[cellFormattingKey])) {
+      if (
+        !this.isSpecialCell(reportIdNumber, dataIdNumber) &&
+        this.isDefaultStyle(this.localCellFormatting[cellFormattingKey])
+      ) {
         keysToRemove.add(cellFormattingKey);
       }
       this.updatedCells.add(cellFormattingKey);

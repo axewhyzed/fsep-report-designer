@@ -31,6 +31,14 @@ export class ReportsService {
     );
   }
 
+  // Fetch the logo image for a report
+  getReportLogo(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/logo`, { responseType: 'blob' })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   createReport(report: Report): Observable<Report> {
     return this.http.post<Report>(`${this.baseUrl}`, report)
     .pipe(

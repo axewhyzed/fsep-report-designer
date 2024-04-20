@@ -5,9 +5,9 @@ import { ReportsService } from '../shared/services/reports.service';
 @Component({
   selector: 'app-navigation-panel',
   templateUrl: './navigation-panel.component.html',
-  styleUrl: './navigation-panel.component.css'
+  styleUrl: './navigation-panel.component.css',
 })
-export class NavigationPanelComponent implements OnInit{
+export class NavigationPanelComponent implements OnInit {
   reportDetails: any;
   showPopup: boolean = false;
   popupTitle: string = '';
@@ -17,11 +17,11 @@ export class NavigationPanelComponent implements OnInit{
   showDeletePopup: boolean = false;
   currentReportId!: number;
   editingReport: Report = {} as Report; // Initialize with an empty object
-  currentLogoImage: string | ArrayBuffer | null = null; // Hold the Base64 string of the current logo image
-  selectedFile: File | null = null; // Hold the selected file
+  currentLogoImage: string | null = null; // Hold the Base64 string of the current logo image
+  selectedFile!: File | undefined; // Hold the selected file
 
-  constructor(private reportsService: ReportsService) { }
-  
+  constructor(private reportsService: ReportsService) {}
+
   ngOnInit(): void {
     const reportDetailsJson = localStorage.getItem('reportDetails');
     if (reportDetailsJson) {
@@ -31,13 +31,13 @@ export class NavigationPanelComponent implements OnInit{
   }
 
   loadReports() {
-    this.reportsService.getReports().subscribe((reports:any) => {
+    this.reportsService.getReports().subscribe((reports: any) => {
       this.reports = reports;
       console.log(this.reports);
     });
   }
 
-  searchTerm: string = "";
+  searchTerm: string = '';
   searchResults: Report[] = [];
   isSearching: boolean = false;
 
@@ -70,48 +70,51 @@ export class NavigationPanelComponent implements OnInit{
 
   openPopup(title: string, reportId: number, action: string): void {
     // Customize the title and ID based on your requirements
-  this.popupTitle = title;
-  
-  // Determine the action to perform based on the provided parameter
-  switch(action) {
-    case 'view-report':
-      this.reportsService.getReport(reportId).subscribe((report:any) => {
-        this.popupData = Object.entries(report);
-        this.showPopup = true;
-      });
-      break;
-    case 'view-report-data':
-      this.reportsService.getReportData(reportId).subscribe((report:any) => {
-        this.popupData = report;
-        this.showPopup = true;
-      });
-      break;
-    case 'edit-report':
-      this.reportsService.getReport(reportId).subscribe((report: Report) => {
-        this.editingReport = { ...report }; // Create a copy of the report to avoid directly modifying the original
-        this.showEditPopup = true;
-      });
-      break;
-    case 'delete-report':
+    this.popupTitle = title;
+
+    // Determine the action to perform based on the provided parameter
+    switch (action) {
+      case 'view-report':
+        this.reportsService.getReport(reportId).subscribe((report: any) => {
+          this.popupData = Object.entries(report);
+          this.showPopup = true;
+        });
+        break;
+      case 'view-report-data':
+        this.reportsService.getReportData(reportId).subscribe((report: any) => {
+          this.popupData = report;
+          this.showPopup = true;
+        });
+        break;
+      case 'edit-report':
+        this.reportsService.getReport(reportId).subscribe((report: Report) => {
+          this.editingReport = { ...report }; // Create a copy of the report to avoid directly modifying the original
+          this.showEditPopup = true;
+        });
+        break;
+      case 'delete-report':
         this.showDeletePopup = true;
         this.currentReportId = reportId;
-      break;
-    default:
-      console.log("No suitable function to handle this ");
-      break;
-  } 
+        break;
+      default:
+        console.log('No suitable function to handle this ');
+        break;
+    }
   }
 
   onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-    if (this.selectedFile) {
-      // Convert the selected file to Uint8Array and update the currentLogoImage
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(this.selectedFile);
-      reader.onload = () => {
-        this.currentLogoImage = reader.result;
-      };
+    const file: File | undefined = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      // Update currentLogoImage directly with the selected file
+      // Create a temporary URL for the selected file
+      this.currentLogoImage = URL.createObjectURL(file);
+      console.log(this.currentLogoImage);
     }
+  }
+
+  getLogoUrl(file: File): string {
+    return URL.createObjectURL(file);
   }
 
   // Convert Uint8Array to Base64 string
@@ -127,66 +130,62 @@ export class NavigationPanelComponent implements OnInit{
     this.showEditPopup = true;
   }
 
-  submitDelete(reportId : number):void{
-    this.reportsService.deleteReport(this.currentReportId).subscribe((report: Report) => {
-      const delReport = this.reports.find(report => report.reportID === reportId);
-      const delReportIndex = this.reports.findIndex(report => report.reportID === reportId);
-      const reportTitle = delReport ? delReport.title : 'Unknown Title';
-      this.reports.splice(delReportIndex, 1);
-      alert('Report name: ' + reportTitle + ' has been deleted');
-    });
+  submitDelete(reportId: number): void {
+    this.reportsService
+      .deleteReport(this.currentReportId)
+      .subscribe((report: Report) => {
+        const delReport = this.reports.find(
+          (report) => report.reportID === reportId
+        );
+        const delReportIndex = this.reports.findIndex(
+          (report) => report.reportID === reportId
+        );
+        const reportTitle = delReport ? delReport.title : 'Unknown Title';
+        this.reports.splice(delReportIndex, 1);
+        alert('Report name: ' + reportTitle + ' has been deleted');
+      });
   }
 
   submitEdit(): void {
-    const editedReport: Partial<Report> = {};
-    // Check if a new logo image is selected
-    editedReport.title = this.editingReport.title;
+    // Create FormData object to construct the multipart/form-data request
+    const formData = new FormData();
+
+    // Append the title field to the FormData
+    formData.append('Title', this.editingReport.title || '');
+
+    // Append the logoImage field to the FormData if it exists
     if (this.selectedFile) {
-      // Convert the selected file to Uint8Array
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(this.selectedFile);
-      reader.onload = () => {
-        // Update the logo image of the editingReport with the new image data
-        editedReport.logoImage = new Uint8Array(reader.result as ArrayBuffer);
-        // Call the updateReport function here with the edited report details
-        console.log(editedReport);
-        this.reportsService.updateReport(this.editingReport.reportID, editedReport).subscribe(() => {
-          console.log("Report updated successfully");
-          this.showEditPopup = false;
-          // Optionally, you can reload or update the data displayed in your component after the report is updated
-        }, error => {
-          console.error("Error updating report:", error);
-          // Handle error if necessary
-        });
-      };
-    } else {
-      // If no new logo image is selected, update the report without changing the logo image, but still updating the title
-      // Call the updateReport function here with the edited report details
-      this.reportsService.updateReport(this.editingReport.reportID, this.editingReport).subscribe(() => {
-        console.log("Report updated successfully");
-        this.reports.forEach(report => {
-          if (report.reportID === this.editingReport.reportID) {
-            report.title = editedReport.title!;
-            console.log(report.title);
-          }
-        });
-
-        this.searchResults.forEach(report => {
-          if (report.reportID === this.editingReport.reportID) {
-            report.title = editedReport.title!;
-            console.log(report.title);
-          }
-        });
-
-        this.showEditPopup = false;
-        // Optionally, you can reload or update the data displayed in your component after the report is updated
-      }, error => {
-        console.error("Error updating report:", error);
-        // Handle error if necessary
-      });
+      formData.append('LogoImage', this.selectedFile, this.selectedFile.name);
     }
+
+    // Call the updateReport function here with the edited report details
+    this.reportsService
+      .updateReport(this.editingReport.reportID, formData)
+      .subscribe(
+        () => {
+          console.log('Report updated successfully');
+          this.reports.forEach((report) => {
+            if (report.reportID === this.editingReport.reportID) {
+              report.title = this.editingReport.title!;
+              console.log(report.title);
+            }
+          });
+
+          this.searchResults.forEach((report) => {
+            if (report.reportID === this.editingReport.reportID) {
+              report.title = this.editingReport.title!;
+              console.log(report.title);
+            }
+          });
+          // Optionally, you can reload or update the data displayed in your component after the report is updated
+          this.showEditPopup = false;
+        },
+        (error) => {
+          console.error('Error updating report:', error);
+          // Handle error if necessary
+        }
+      );
   }
-  
 
   closePopup(): void {
     this.showPopup = false;

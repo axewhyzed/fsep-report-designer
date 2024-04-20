@@ -54,6 +54,7 @@ export class DataToolbarComponent {
   resetReportData(){
     localStorage.removeItem('cellFormatting');
     localStorage.removeItem('reportData');
+    localStorage.removeItem('reportDetails');
     localStorage.removeItem('tableSelections');
     localStorage.removeItem('selectedReportId')
     alert('New Report Initiated');

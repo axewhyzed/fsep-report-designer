@@ -6,5 +6,5 @@ export interface ReportData {
   rowIndex: number;
   columnIndex: number;
   cellValue: string;
-  isTitle?: boolean;
+  isTitle: boolean;
 }

@@ -42,7 +42,8 @@ namespace ReportDesigner.Server.Controllers
                         {
                             ReportID = Convert.ToInt32(reader["ReportID"]),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
-                            LogoImage = reader.IsDBNull(reader.GetOrdinal("LogoImage")) ? null : (byte[])reader["LogoImage"],
+                            // Do not include LogoImage here
+                            //LogoImage = reader.IsDBNull(reader.GetOrdinal("LogoImage")) ? null : (byte[])reader["LogoImage"],
                             CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
                             LastModifiedDate = reader.GetDateTime(reader.GetOrdinal("LastModifiedDate"))
                             // Populate other properties as needed
@@ -77,7 +78,8 @@ namespace ReportDesigner.Server.Controllers
                         {
                             ReportID = Convert.ToInt32(reader["ReportID"]),
                             Title = reader.GetString(reader.GetOrdinal("Title")),
-                            LogoImage = reader.IsDBNull(reader.GetOrdinal("LogoImage")) ? null : (byte[])reader["LogoImage"],
+                            // Do not include LogoImage here
+                            //LogoImage = reader.IsDBNull(reader.GetOrdinal("LogoImage")) ? null : (byte[])reader["LogoImage"],
                             CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
                             LastModifiedDate = reader.GetDateTime(reader.GetOrdinal("LastModifiedDate"))
                             // Populate other properties as needed
@@ -92,6 +94,40 @@ namespace ReportDesigner.Server.Controllers
             }
 
             return report;
+        }
+
+        // GET: api/Reports/{id}/logo
+        [HttpGet("{id}/logo")]
+        public async Task<IActionResult> GetReportLogo(int id)
+        {
+            try
+            {
+                byte[] logoImage;
+
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    string query = "SELECT LogoImage FROM Reports WHERE ReportID = @ReportID";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ReportID", id);
+
+                    await connection.OpenAsync();
+
+                    object result = await command.ExecuteScalarAsync();
+                    if (result != DBNull.Value)
+                    {
+                        logoImage = (byte[])result;
+                        return File(logoImage, "image/jpeg"); // Adjust the content type based on your image type
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
         // GET: api/Reports/Search
@@ -138,7 +174,7 @@ namespace ReportDesigner.Server.Controllers
 
         // POST: api/Reports
         [HttpPost]
-        public async Task<ActionResult<Report>> PostReport(Report report)
+        public async Task<ActionResult<Report>> PostReport([FromForm] Report report, IFormFile logoImage)
         {
             try
             {
@@ -160,6 +196,9 @@ namespace ReportDesigner.Server.Controllers
                     // In this case, it returns the newly inserted ReportID
                     int newReportId = Convert.ToInt32(await command.ExecuteScalarAsync());
 
+                    // Modify the response to include the reportId
+                    report.ReportID = newReportId;
+
                     Console.WriteLine("Report object contents:");
                     Console.WriteLine($"Title: {report.Title}");
                     Console.WriteLine($"Logo: {report.LogoImage}");
@@ -176,7 +215,7 @@ namespace ReportDesigner.Server.Controllers
 
         // PUT: api/Reports/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutReport(int id, Report report)
+        public async Task<IActionResult> PutReport(int id, [FromForm] ReportUpdateDto reportUpdateDto)
         {
             try
             {
@@ -186,13 +225,13 @@ namespace ReportDesigner.Server.Controllers
                              SET LastModifiedDate = @LastModifiedDate";
 
                     // Check if Title is provided
-                    if (report.Title != null)
+                    if (reportUpdateDto.Title != null)
                     {
                         query += ", Title = @Title";
                     }
 
                     // Check if LogoImage is provided
-                    if (report.LogoImage != null)
+                    if (reportUpdateDto.LogoImage != null)
                     {
                         query += ", LogoImage = @LogoImage";
                     }
@@ -204,14 +243,20 @@ namespace ReportDesigner.Server.Controllers
                     command.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
 
                     // Add parameters if provided
-                    if (report.Title != null)
+                    if (reportUpdateDto.Title != null)
                     {
-                        command.Parameters.AddWithValue("@Title", report.Title);
+                        command.Parameters.AddWithValue("@Title", reportUpdateDto.Title);
                     }
 
-                    if (report.LogoImage != null)
+                    if (reportUpdateDto.LogoImage != null)
                     {
-                        command.Parameters.AddWithValue("@LogoImage", report.LogoImage);
+                        byte[] logoImageBytes;
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await reportUpdateDto.LogoImage.CopyToAsync(memoryStream);
+                            logoImageBytes = memoryStream.ToArray();
+                        }
+                        command.Parameters.AddWithValue("@LogoImage", logoImageBytes);
                     }
 
                     await connection.OpenAsync();
@@ -600,7 +645,7 @@ namespace ReportDesigner.Server.Controllers
 
         // PUT: api/Reports/{reportId}/ReportFormatting}
         [HttpPut("{reportId}/ReportFormatting")]
-        public async Task<IActionResult> PutReportFormatting(int reportId, [FromBody] List<UpdateReportDataDto> updateDataDtos)
+        public async Task<IActionResult> PutReportFormatting(int reportId, [FromBody] List<UpdateFormatDataDto> updateDataDtos)
         {
             try
             {
