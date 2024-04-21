@@ -168,8 +168,7 @@
         <!-- Image and title -->
         <div class="image-and-title">
           <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
-          <input *ngIf="!reportDetails.logoImage" type="file" id="reportLogo" (change)="onLogoSelected($event)"
-            accept="image/*" /><br><br />
+          <p *ngIf="!logoDataURL">No Logo</p>
           <h1 style="cursor: pointer;" (click)="toggleCellSelection(selectedReportId,titleData?.dataID)"
             [ngClass]="{'selected-cell': isSelected(selectedReportId, titleData?.dataID)}"
             [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">

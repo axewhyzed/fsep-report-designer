@@ -117,15 +117,6 @@ export class NavigationPanelComponent implements OnInit {
     return URL.createObjectURL(file);
   }
 
-  // Convert Uint8Array to Base64 string
-  arrayBufferToBase64(buffer: Uint8Array): string {
-    let binary = '';
-    buffer.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    return 'data:image/png;base64,' + btoa(binary);
-  }
-
   showEditForm(): void {
     this.showEditPopup = true;
   }

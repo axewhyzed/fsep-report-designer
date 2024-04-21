@@ -39,11 +39,16 @@ export class ReportsService {
       );
   }
 
-  createReport(report: Report): Observable<Report> {
-    return this.http.post<Report>(`${this.baseUrl}`, report)
-    .pipe(
-      catchError(this.handleError)
-    );
+  createReport(report: any, logoImage: File | null): Observable<any> {
+    const formData = new FormData();
+    formData.append('title', report.title);
+    if (logoImage) {
+      formData.append('logoImage', logoImage, logoImage.name);
+    }
+    return this.http.post(`${this.baseUrl}`, formData)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   searchReports(searchTerm: string): Observable<Report[]> {
@@ -83,8 +88,8 @@ export class ReportsService {
     );
   }
 
-  createReportData(reportId: number, reportData: ReportData): Observable<ReportData> {
-    return this.http.post<ReportData>(`${this.baseUrl}/${reportId}/ReportData`, reportData)
+  createReportData(reportId: number, reportData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${reportId}/ReportData`, reportData)
     .pipe(
       catchError(this.handleError)
     );

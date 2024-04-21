@@ -186,7 +186,22 @@ namespace ReportDesigner.Server.Controllers
 
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Title", report.Title);
-                    command.Parameters.AddWithValue("@LogoImage", report.LogoImage);
+                    // Check if LogoImage is provided
+                    if (logoImage != null)
+                    {
+                        byte[] logoImageBytes;
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await logoImage.CopyToAsync(memoryStream);
+                            logoImageBytes = memoryStream.ToArray();
+                        }
+                        command.Parameters.AddWithValue("@LogoImage", logoImageBytes);
+                    }
+                    else
+                    {
+                        // Set LogoImage to NULL if not provided
+                        command.Parameters.AddWithValue("@LogoImage", DBNull.Value);
+                    }
                     command.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
                     command.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
 
@@ -221,54 +236,68 @@ namespace ReportDesigner.Server.Controllers
             {
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
-                    string query = @"UPDATE Reports 
-                             SET LastModifiedDate = @LastModifiedDate";
-
-                    // Check if Title is provided
-                    if (reportUpdateDto.Title != null)
-                    {
-                        query += ", Title = @Title";
-                    }
-
-                    // Check if LogoImage is provided
-                    if (reportUpdateDto.LogoImage != null)
-                    {
-                        query += ", LogoImage = @LogoImage";
-                    }
-
-                    query += " WHERE ReportID = @ReportID";
-
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@ReportID", id);
-                    command.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
-
-                    // Add parameters if provided
-                    if (reportUpdateDto.Title != null)
-                    {
-                        command.Parameters.AddWithValue("@Title", reportUpdateDto.Title);
-                    }
-
-                    if (reportUpdateDto.LogoImage != null)
-                    {
-                        byte[] logoImageBytes;
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            await reportUpdateDto.LogoImage.CopyToAsync(memoryStream);
-                            logoImageBytes = memoryStream.ToArray();
-                        }
-                        command.Parameters.AddWithValue("@LogoImage", logoImageBytes);
-                    }
-
                     await connection.OpenAsync();
-
-                    int rowsAffected = await command.ExecuteNonQueryAsync();
-
-                    if (rowsAffected == 0)
+                    using (SqlTransaction transaction = connection.BeginTransaction())
                     {
-                        return NotFound();
-                    }
+                        string reportUpdateQuery = @"UPDATE Reports SET LastModifiedDate = @LastModifiedDate";
 
-                    return NoContent();
+                        // Check if Title is provided
+                        if (reportUpdateDto.Title != null)
+                        {
+                            reportUpdateQuery += ", Title = @Title";
+                        }
+
+                        // Check if LogoImage is provided
+                        if (reportUpdateDto.LogoImage != null)
+                        {
+                            reportUpdateQuery += ", LogoImage = @LogoImage";
+                        }
+
+                        reportUpdateQuery += " WHERE ReportID = @ReportID";
+
+                        SqlCommand reportUpdateCommand = new SqlCommand(reportUpdateQuery, connection, transaction);
+                        reportUpdateCommand.Parameters.AddWithValue("@ReportID", id);
+                        reportUpdateCommand.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
+
+                        // Add parameters if provided
+                        if (reportUpdateDto.Title != null)
+                        {
+                            reportUpdateCommand.Parameters.AddWithValue("@Title", reportUpdateDto.Title);
+                        }
+
+                        if (reportUpdateDto.LogoImage != null)
+                        {
+                            byte[] logoImageBytes;
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                await reportUpdateDto.LogoImage.CopyToAsync(memoryStream);
+                                logoImageBytes = memoryStream.ToArray();
+                            }
+                            reportUpdateCommand.Parameters.AddWithValue("@LogoImage", logoImageBytes);
+                        }
+                        int rowsAffected = await reportUpdateCommand.ExecuteNonQueryAsync();
+                        if (rowsAffected == 0)
+                        {
+                            return NotFound();
+                        }
+
+                        // Update ReportData table if Title is provided
+                        if (reportUpdateDto.Title != null)
+                        {
+                            string reportDataUpdateQuery = @"UPDATE ReportData 
+                                                     SET CellValue = @CellValue
+                                                     WHERE ReportID = @ReportID AND IsTitle = 1";
+
+                            SqlCommand reportDataUpdateCommand = new SqlCommand(reportDataUpdateQuery, connection, transaction);
+                            reportDataUpdateCommand.Parameters.AddWithValue("@ReportID", id);
+                            reportDataUpdateCommand.Parameters.AddWithValue("@CellValue", reportUpdateDto.Title);
+
+                            await reportDataUpdateCommand.ExecuteNonQueryAsync();
+                        }
+
+                        transaction.Commit();
+                        return NoContent();
+                    }
                 }
             }
             catch (Exception ex)

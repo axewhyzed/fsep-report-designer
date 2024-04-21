@@ -1,9 +1,17 @@
-﻿CREATE TABLE ReportData (
+﻿CREATE TABLE Reports (
+    ReportID INT PRIMARY KEY IDENTITY(1,1),
+    Title NVARCHAR(255),
+    LogoImage VARBINARY(MAX),
+    CreatedDate DATETIME,
+    LastModifiedDate DATETIME
+);
+
+CREATE TABLE ReportData (
     DataID INT PRIMARY KEY IDENTITY(1,1),
     ReportID INT FOREIGN KEY REFERENCES Reports(ReportID),
     RowIndex INT,
     ColumnIndex INT,
-    CellValue NVARCHAR(MAX)
+    CellValue NVARCHAR(MAX),
     -- Add other formatting attributes as needed
 );
 
