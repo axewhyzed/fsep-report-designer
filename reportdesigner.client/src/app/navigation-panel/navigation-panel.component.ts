@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Report } from '../shared/models/report.model';
 import { ReportsService } from '../shared/services/reports.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navigation-panel',
@@ -20,7 +21,7 @@ export class NavigationPanelComponent implements OnInit {
   currentLogoImage: string | null = null; // Hold the Base64 string of the current logo image
   selectedFile!: File | undefined; // Hold the selected file
 
-  constructor(private reportsService: ReportsService) {}
+  constructor(private reportsService: ReportsService, private router: Router) {}
 
   ngOnInit(): void {
     const reportDetailsJson = localStorage.getItem('reportDetails');
@@ -131,8 +132,18 @@ export class NavigationPanelComponent implements OnInit {
         const delReportIndex = this.reports.findIndex(
           (report) => report.reportID === reportId
         );
+        const currentRep = localStorage.getItem('selectedReportId');
+        if (currentRep === String(reportId)) {
+          this.router
+            .navigateByUrl('/', { skipLocationChange: true })
+            .then(() => {
+              window.location.reload();
+            });
+          localStorage.removeItem('selectedReportId');
+        }
         const reportTitle = delReport ? delReport.title : 'Unknown Title';
         this.reports.splice(delReportIndex, 1);
+        this.showDeletePopup = false;
         alert('Report name: ' + reportTitle + ' has been deleted');
       });
   }

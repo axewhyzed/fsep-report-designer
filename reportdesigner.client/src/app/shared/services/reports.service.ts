@@ -88,7 +88,7 @@ export class ReportsService {
     );
   }
 
-  createReportData(reportId: number, reportData: any): Observable<any> {
+  createReportData(reportId: number, reportData: ReportData[]): Observable<any> {
     return this.http.post(`${this.baseUrl}/${reportId}/ReportData`, reportData)
     .pipe(
       catchError(this.handleError)

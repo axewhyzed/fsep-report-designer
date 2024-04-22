@@ -113,6 +113,12 @@
       <input type="file" id="reportLogo" (change)="onLogoSelected($event)" accept="image/*" /><br><br />
       <!-- Add other input fields for logo selection, database, and table selection -->
 
+      <label for="selectApiDropdown">Select Data Source:</label>
+      <select id="selectApiDropdown" [(ngModel)]="selectedApi" (change)="onChangeApi()">
+        <option value="api1">Users API</option>
+        <option value="api2">Products API</option>
+      </select>
+
       <div class="report-form-btn-container">
         <button (click)="submitReport('newReport')">Submit</button>
         <button (click)="toggleReportWizard('newReport')">Cancel</button>
