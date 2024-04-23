@@ -21,8 +21,8 @@
         </div>
         <!-- Current date/time -->
         <div class="date-time">
-          <p>{{ currentDate }}</p>
-          <p>{{ currentTime }}</p>
+          <p>{{ currentDateTime | date: 'longDate' }}</p>
+          <p>{{ currentDateTime | date: 'mediumTime' }}</p>
         </div>
       </div>
         <div class="table-container">

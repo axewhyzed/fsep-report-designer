@@ -1,5 +1,4 @@
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
-import { DatentimeService } from '../shared/services/datentime.service';
 
 @Component({
   selector: 'app-print-preview',
@@ -13,13 +12,17 @@ export class PrintPreviewComponent {
   logoDataURL: string | null = null;
   tableSelections: { database: string; table: string; tables: string[] }[] = [];
   @ViewChild('exportedDiv') exportedDiv!: ElementRef;
+  currentDateTime: string = '';
 
   constructor(
-    private datentimeService: DatentimeService,
     private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
+    setInterval(() => {
+      this.currentDateTime = new Date().toLocaleString();
+    }, 1000);
+
     const databaseInfoJson = localStorage.getItem('databaseInfo');
     if (databaseInfoJson) {
       this.databaseInfo = JSON.parse(databaseInfoJson);
@@ -140,18 +143,6 @@ export class PrintPreviewComponent {
     };
 
     return JSON.stringify(style) === JSON.stringify(defaultStyle);
-  }
-
-  get currentDateTime(): string {
-    return this.datentimeService.currentDateTime;
-  }
-
-  get currentDate(): string {
-    return this.datentimeService.currentDate;
-  }
-
-  get currentTime(): string {
-    return this.datentimeService.currentTime;
   }
 
   exportDivToHtml() {

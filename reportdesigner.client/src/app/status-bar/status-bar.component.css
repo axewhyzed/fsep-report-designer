@@ -1,11 +1,20 @@
 .status-bar-content {
   height: 4vh;
   width: 100vw;
-  padding: 0 10px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: bold;
+}
+
+
+.status-bar-content div {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 .view-buttons-section{
@@ -14,44 +23,7 @@
   cursor: pointer;
 }
 
-.icon-left-scroll,
-.icon-right-scroll {
-  font-size: 28px;
-  color: black;
-}
-
-.icon-left-scroll:hover,
-.icon-right-scroll:hover {
-  background-color: lightgray;
-  cursor: pointer;
-}
-
-.icon-add {
-  color: #a63d41;
-  width: 40px;
-}
-
-.icon-add:hover {
-  cursor: pointer;
-  transform: scale(1.2);
-}
-
-.views-btn{
-  padding: 0 10px;
-}
-
-/* .sheet-tab {
-  border-bottom: 4px solid #a63d41;
-  padding: 0 10px;
-  width: 80px;
-  border-right: 1px solid lightgray;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 500;
-} */
-
-.sheet-tab:hover {
-  cursor: default;
+.view-buttons-section span {
+  padding: 0 40px;
+  font-weight: bold; /* Make the text bold */
 }

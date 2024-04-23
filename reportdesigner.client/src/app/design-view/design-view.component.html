@@ -143,8 +143,8 @@
             <div class="report-title" style="display: flex;">
               <h5>{{ report.title }}</h5>
               <div class="report-actions">
-              <button (click)="selectReport('existingReport', report.reportID)">Open Report</button>
-            </div>
+                <button (click)="selectReport('existingReport', report.reportID)">Open Report</button>
+              </div>
             </div>
           </div>
 
@@ -170,6 +170,7 @@
   <!-- Main Report Area -->
   <div class="edit-container" #editableDiv>
     <div class="report-container" *ngIf="showReportContainer">
+      <!-- Header Section -->
       <div class="top-section">
         <!-- Image and title -->
         <div class="image-and-title">
@@ -183,11 +184,12 @@
         </div>
         <!-- Current date/time -->
         <div class="date-time">
-          <p>{{ currentDate }}</p>
-          <p>{{ currentTime }}</p>
+          <p>{{ currentDateTime | date: 'longDate' }}</p>
+          <p>{{ currentDateTime | date: 'mediumTime' }}</p>
         </div>
       </div>
 
+      <!-- Body Section -->
       <div *ngIf="tableHeaders.length > 0">
         <div class="table-container">
           <!-- Include the table rendering code here -->
@@ -228,6 +230,11 @@
             </tbody>
           </table>
         </div>
+      </div>
+      <!-- Bottom Section (Footer) -->
+      <div class="bottom-section">
+        <!-- Add footer content here if needed -->
+        Footer Content here
       </div>
     </div>
   </div>

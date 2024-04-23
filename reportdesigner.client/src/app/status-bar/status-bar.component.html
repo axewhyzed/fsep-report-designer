@@ -1,8 +1,12 @@
 <div class="status-bar-content">
-    <div class="view-name">
-      {{ viewName }}
-    </div>
-    <div class="view-buttons-section">
-      <span [style]="'margin-right: 10px'">{{ currentDateTime }}</span>
-    </div>
+  <div *ngIf="currentRoute === 'design-view'">
+    Design View
   </div>
+
+  <div *ngIf="currentRoute === 'print-preview'">
+    Print Preview
+  </div>
+  <div class="view-buttons-section">
+    <span class="datetime">{{ currentDateTime | date : 'medium' }}</span>
+  </div>
+</div>

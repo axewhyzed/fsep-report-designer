@@ -6,7 +6,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { DatentimeService } from '../shared/services/datentime.service';
 import { Router } from '@angular/router';
 import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
@@ -43,10 +42,10 @@ export class DesignViewComponent implements OnInit {
   localCellFormatting: { [key: string]: ReportFormatting } = {};
   // Define a new variable to track updated cells
   updatedCells: Set<string> = new Set<string>();
+  currentDateTime : string = '';
 
   constructor(
     private http: HttpClient,
-    private datentimeService: DatentimeService,
     private router: Router,
     private reportsService: ReportsService
   ) {}
@@ -55,6 +54,10 @@ export class DesignViewComponent implements OnInit {
 
   // Initialize component data and fetch data if not already stored locally
   ngOnInit(): void {
+    setInterval(() => {
+      this.currentDateTime = new Date().toLocaleString();
+    }, 1000);
+
     const storedDatabaseInfo = localStorage.getItem('databaseInfo');
     const ReportId = localStorage.getItem('selectedReportId');
 
@@ -126,6 +129,7 @@ export class DesignViewComponent implements OnInit {
   beforeUnloadHandler(event: any) {
     if (this.updatedCells.size > 0) {
       event.returnValue = true; // Required for Chrome
+      localStorage.removeItem('updatedCells');
     }
   }
 
@@ -1115,18 +1119,6 @@ export class DesignViewComponent implements OnInit {
       JSON.stringify(Array.from(this.updatedCells))
     );
     // document.execCommand('fontName', false, fontFamily);
-  }
-
-  get currentDateTime(): string {
-    return this.datentimeService.currentDateTime;
-  }
-
-  get currentDate(): string {
-    return this.datentimeService.currentDate;
-  }
-
-  get currentTime(): string {
-    return this.datentimeService.currentTime;
   }
 
   // updateCellStyle(property: keyof CSSStyleDeclaration, value: string): void {

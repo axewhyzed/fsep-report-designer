@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DatentimeService } from '../shared/services/datentime.service';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-status-bar',
@@ -7,31 +7,23 @@ import { DatentimeService } from '../shared/services/datentime.service';
   styleUrl: './status-bar.component.css'
 })
 export class StatusBarComponent implements OnInit{
+  currentRoute : string = '';
+  currentDateTime: string = '';
 
-  constructor(private datentimeService: DatentimeService) { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {  
       // Update the current time every second
       setInterval(() => {
-        this.datentimeService.updateCurrentTime();
+        this.currentDateTime = new Date().toLocaleString();
       }, 1000);
-  }
 
-  get currentDateTime(): string {
-    return this.datentimeService.currentDateTime;
-  }
-
-  get currentDate(): string {
-    return this.datentimeService.currentDate;
-  }
-
-  get currentTime(): string {
-    return this.datentimeService.currentTime;
-  }
-
-  viewNameArr: string[] = ['Report View', 'Print Preview', 'Layout View', 'Design View'];
-  viewName: string = 'Report View';
-  updateViewName(newView: string) {
-    this.viewName = newView;
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          // Extract the current route from the URL
+          this.currentRoute = event.urlAfterRedirects.substring(1);
+          console.log(this.currentRoute);
+        }
+      });
   }
 }

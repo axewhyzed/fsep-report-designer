@@ -1,7 +1,14 @@
 <div class="data-toolbar-container">
-  <button (click)="resetReportData()">New Report</button><br>
-  <button (click)="saveReportState()">Save Report Data</button><br>
-  <input type="file" (change)="loadReportState($event)">
+  <div class="report-details-container">
+    <h5 class="details-heading">Report Details</h5>
+    <div *ngIf="report">
+      <p>Last Modified: {{ report.lastModifiedDate | date : 'medium'}}</p>
+      <p>Created Date: {{ report.createdDate | date : 'medium' }}</p>
+    </div>
+    <!-- <p *ngIf="!report">{{ errorMessage }}</p> -->
+  </div>
+
+  <button (click)="resetReportData()" class="dt-btn">New Report</button><br>
+  <!-- <button (click)="saveReportState()">Save Report Data</button><br> -->
+  <!-- <input type="file" (change)="loadReportState($event)"> -->
 </div>
-
-
