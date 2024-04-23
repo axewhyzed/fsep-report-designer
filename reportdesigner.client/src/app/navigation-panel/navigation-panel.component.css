@@ -176,6 +176,11 @@ tr:hover {
   transition: border-bottom-color 0.3s ease; /* Smooth transition for border color */
 }
 
+.search-container:hover {
+  color: #1E3A5F; /* Darker text color on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Shadow effect on hover */
+}
+
 .search-container input:focus {
   border-bottom-color: #007bff; /* Highlighted bottom border on focus */
 }

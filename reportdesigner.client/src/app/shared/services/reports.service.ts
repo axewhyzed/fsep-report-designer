@@ -88,8 +88,8 @@ export class ReportsService {
     );
   }
 
-  createReportData(reportId: number, reportData: ReportData[]): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${reportId}/ReportData`, reportData)
+  createReportData(reportId: number, reportData: ReportData[]): Observable<ReportData[]> {
+    return this.http.post<ReportData[]>(`${this.baseUrl}/${reportId}/ReportData`, reportData)
     .pipe(
       catchError(this.handleError)
     );
@@ -104,8 +104,8 @@ export class ReportsService {
       );
   }
 
-  createReportFormatting(reportId: number, reportFormatting: ReportFormatting): Observable<ReportFormatting> {
-    return this.http.post<ReportFormatting>(`${this.baseUrl}/${reportId}/ReportFormatting`, reportFormatting)
+  createReportFormatting(reportId: number, reportFormatting: ReportFormatting[]): Observable<ReportFormatting[]> {
+    return this.http.post<ReportFormatting[]>(`${this.baseUrl}/${reportId}/ReportFormatting`, reportFormatting)
       .pipe(
         catchError(this.handleError)
       );

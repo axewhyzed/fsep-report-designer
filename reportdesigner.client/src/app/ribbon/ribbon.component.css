@@ -4,4 +4,22 @@
   justify-content: center;
   height: 35px;
   background-color: rgb(241, 241, 241);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-view-bar button {
+  padding: 10px 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: bolder;
+  color: #315F90; /* Text color */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.toggle-view-bar button:hover {
+  color: #1E3A5F; /* Darker text color on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); /* Shadow effect on hover */
 }

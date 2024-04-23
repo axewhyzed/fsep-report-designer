@@ -140,13 +140,14 @@ table, th, td{
   border: none;
   border-radius: 4px;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .format-button:hover {
-  background-color: #005a9e; /* Darker blue on hover */
+  background-color: #284976; /* Darker blue on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .color-container {
@@ -156,8 +157,8 @@ table, th, td{
 
 .color-label {
   margin:0 10px;
-  font-size: 12px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
 }
 
 .custom-color-input {
@@ -217,14 +218,18 @@ table, th, td{
   background-color: #007bff;
   color: white;
   border: none;
+  font-family: Roboto, sans-serif;
+  font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
   display: block;
   margin: 60px auto;
+  transition: all 0.3s;
 }
 
 .start-wizard-button:hover {
-  background-color: #0056b3;
+  background-color: #284976;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* Ensure the popup is visible when showReportWizard is true */
