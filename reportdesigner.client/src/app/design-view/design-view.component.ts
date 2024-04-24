@@ -20,7 +20,6 @@ import { flatMap, mergeMap } from 'rxjs';
   styleUrl: './design-view.component.css',
 })
 export class DesignViewComponent implements OnInit {
-  databaseInfo: any = [];
   reports: Report[] = [];
   reportDetails!: Report;
   reportData: ReportData[] = [];
@@ -58,7 +57,6 @@ export class DesignViewComponent implements OnInit {
       this.currentDateTime = new Date().toLocaleString();
     }, 1000);
 
-    const storedDatabaseInfo = localStorage.getItem('databaseInfo');
     const ReportId = localStorage.getItem('selectedReportId');
 
     // Fetch all reports for the dropdown

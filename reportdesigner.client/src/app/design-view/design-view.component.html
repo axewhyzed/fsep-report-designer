@@ -142,9 +142,9 @@
           <div *ngFor="let report of searchResults" class="report-item">
             <div class="report-title" style="display: flex;">
               <h5>{{ report.title }}</h5>
-              <div class="report-actions">
-                <button (click)="selectReport('existingReport', report.reportID)">Open Report</button>
-              </div>
+            </div>
+            <div class="report-actions">
+              <button (click)="selectReport('existingReport', report.reportID)">Open Report</button>
             </div>
           </div>
 

@@ -68,6 +68,7 @@ h2, h3 {
   flex-direction: column;
   align-items: center;
   overflow: auto;
+  margin-top: 20px;
 }
 
 .column-header {
@@ -121,7 +122,7 @@ table, th, td{
   display: flex;
   justify-content: space-between; /* Space elements evenly */
   align-items: center;
-  padding: 8px;
+  padding: 6px;
   background-color: #f8f9fa; /* Light gray background */
   border-bottom: 1px solid #ccc; /* Light border */
 }
@@ -157,20 +158,24 @@ table, th, td{
 
 .color-container {
   align-items: center;
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .color-label {
-  margin:0 10px;
-  font-size: 14px;
+  margin:0 6px;
+  font-size: 12px;
   font-family: Roboto, sans-serif;
 }
 
 .custom-color-input {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 40px;
+  height: 30px;
+  /* border-radius: 50%; */
   cursor: pointer;
+}
+
+.custom-color-input:hover{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .select-box {
@@ -184,6 +189,10 @@ table, th, td{
   outline: none;
 }
 
+.select-box:hover{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* Optionally, you can style the font family select box separately for better visual separation */
 .font-family-select-box {
   margin-right: 20px;
@@ -191,9 +200,16 @@ table, th, td{
 
 .save_btn{
   border: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 40%;
   background-color: #f8f9fa;
   font-size: 34px;
   cursor: pointer;
+}
+
+.save_btn:hover{
+  box-shadow: 0 2px 4px rgba(0.2, 0.2, 0.2, 0.2);
 }
 
 /* CSS for Report Wizard */

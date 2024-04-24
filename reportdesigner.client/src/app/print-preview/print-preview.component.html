@@ -4,20 +4,23 @@
       <button class="export-button">Export As</button>
       <div class="export-dropdown-content">
         <button (click)="exportDivToHtml()">HTML</button>
-        <button >PDF</button>
-        <button >Image</button>
-        <button >Email</button>
+        <button (click)="generatePDF()">PDF</button>
+        <button >Excel</button>
+        <button styleSheetFile="assets/styleForPrint.css" printSectionId="printable-section" ngxPrint>Print</button>
       </div>
     </div>
     <br>
-    <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br>
+    <!-- <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br> -->
   </div>
     <div class="report-container" id="printable-section" #exportedDiv>
       <div class="top-section">
         <!-- Image and title -->
         <div class="image-and-title">
-          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo"/>
-          <h1>{{reportTitle}}</h1>
+          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
+          <p *ngIf="!logoDataURL">No Logo</p>
+          <h1 style="cursor: pointer;" [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">
+            {{reportTitle}}
+          </h1>
         </div>
         <!-- Current date/time -->
         <div class="date-time">
@@ -25,30 +28,37 @@
           <p>{{ currentDateTime | date: 'mediumTime' }}</p>
         </div>
       </div>
+        <!-- Body Section -->
+      <div *ngIf="tableHeaders.length > 0">
         <div class="table-container">
-          <ng-container *ngFor="let tableSelection of tableSelections">
-            <h2>{{ tableSelection.database }}</h2>
-            <h3>{{ tableSelection.table }}</h3>
-            <!-- Include the table rendering code here -->
-            <table class="tbl-data">
-              <thead>
-                <tr>
-                  <!-- Include table headers here -->
-                  <th *ngFor="let header of getTableHeaders(tableSelection.database, tableSelection.table); let z = index">
-                    <div class="table-header">{{ header }}</div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let row of getTableData(tableSelection.database, tableSelection.table); let i = index">
-                  <!-- Include table cells here -->
-                  <td *ngFor="let cell of row | keyvalue; let j = index" class="cell-content" [ngStyle]="applyStyle(i,tableSelection.database + '-' + tableSelection.table + '-' + j)" [attr.data-row]="i" [attr.data-col]="cell.key">
-                  {{ cell.value }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </ng-container>
+          <!-- Include the table rendering code here -->
+          <table class="tbl-data">
+            <thead>
+              <tr>
+                <!-- Include table headers here -->
+                <th *ngFor="let header of tableHeaders; let z = index"
+                  [ngStyle]="applyStyle(header.reportID, header.dataID)">
+                  <div class="table-header">{{ header.cellValue }}</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rowData of tableData; let i = index">
+                <script>console.log(rowData);</script>
+                <!-- Include table cells here -->
+                <td *ngFor="let cell of rowData; let j = index" class="cell-content"
+                  [ngStyle]="applyStyle(cell.reportID, cell.dataID)" [attr.data-row]="i" [attr.data-col]="j">
+                  {{ cell.cellValue }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
+      <!-- Bottom Section (Footer) -->
+      <div class="bottom-section">
+        <!-- Add footer content here if needed -->
+        Footer Content here
+      </div>
       </div>
 </div>
