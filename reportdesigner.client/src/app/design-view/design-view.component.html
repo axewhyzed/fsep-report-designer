@@ -171,11 +171,10 @@
   <div class="edit-container" #editableDiv>
     <div class="report-container" *ngIf="showReportContainer">
       <!-- Header Section -->
-      <div class="top-section">
+      <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
         <!-- Image and title -->
         <div class="image-and-title">
           <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
-          <p *ngIf="!logoDataURL">No Logo</p>
           <h1 style="cursor: pointer;" (click)="toggleCellSelection(selectedReportId,titleData?.dataID)"
             [ngClass]="{'selected-cell': isSelected(selectedReportId, titleData?.dataID)}"
             [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">
@@ -190,7 +189,7 @@
       </div>
 
       <!-- Body Section -->
-      <div *ngIf="tableHeaders.length > 0">
+      <div *ngIf="tableHeaders.length > 0" class="body-section" [ngStyle]="{'background-color': reportCustomization.bodyBGColor}">
         <div class="table-container">
           <!-- Include the table rendering code here -->
           <table class="tbl-data">
@@ -232,9 +231,9 @@
         </div>
       </div>
       <!-- Bottom Section (Footer) -->
-      <div class="bottom-section">
+      <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
         <!-- Add footer content here if needed -->
-        Footer Content here
+        <input type="text" class="foo-text" [(ngModel)]="footerText">
       </div>
     </div>
   </div>

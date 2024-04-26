@@ -6,6 +6,7 @@ import { Report } from '../models/report.model';  // Define the Report model as 
 import { ReportData } from '../models/report-data.model'; // Define the ReportData model as per your requirements
 import { ReportFormatting } from '../models/report-formatting.model';
 import { UpdateDataDto } from '../models/update-data-dto.model';
+import { ReportCustomization } from '../models/report-customization.model';
 
 @Injectable({
   providedIn: 'root'
@@ -95,7 +96,7 @@ export class ReportsService {
     );
   }
 
-   // Methods for ReportData Endpoints
+   // Methods for ReportFormatting Endpoints
 
    getReportFormatting(reportId: number): Observable<ReportFormatting[]> {
     return this.http.get<ReportFormatting[]>(`${this.baseUrl}/${reportId}/ReportFormatting`)
@@ -123,6 +124,23 @@ export class ReportsService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  // Methods for Report Customizations
+
+  // GET request to fetch report customization by ID
+  getReportCustomization(id: number): Observable<ReportCustomization> {
+    return this.http.get<ReportCustomization>(`${this.baseUrl}/${id}/ReportCustomize`);
+  }
+
+  // POST request to add report customization
+  addReportCustomization(id: number, reportCustomization: ReportCustomization): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${id}/ReportCustomize`, reportCustomization);
+  }
+
+  // PUT request to update report customization
+  updateReportCustomization(id: number, reportCustomization: ReportCustomization): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${id}/ReportCustomize`, reportCustomization);
   }
 
    // Method for Error handling

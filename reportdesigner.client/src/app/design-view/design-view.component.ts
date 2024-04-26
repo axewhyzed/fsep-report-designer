@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   HostListener,
@@ -12,14 +13,15 @@ import { Report } from '../shared/models/report.model';
 import { ReportData } from '../shared/models/report-data.model';
 import { ReportFormatting } from '../shared/models/report-formatting.model';
 import { UpdateDataDto } from '../shared/models/update-data-dto.model';
-import { flatMap, mergeMap } from 'rxjs';
+import { flatMap, map, mergeMap } from 'rxjs';
+import { ReportCustomization } from '../shared/models/report-customization.model';
 
 @Component({
   selector: 'app-design-view',
   templateUrl: './design-view.component.html',
   styleUrl: './design-view.component.css',
 })
-export class DesignViewComponent implements OnInit {
+export class DesignViewComponent implements OnInit, AfterViewInit {
   reports: Report[] = [];
   reportDetails!: Report;
   reportData: ReportData[] = [];
@@ -41,7 +43,8 @@ export class DesignViewComponent implements OnInit {
   localCellFormatting: { [key: string]: ReportFormatting } = {};
   // Define a new variable to track updated cells
   updatedCells: Set<string> = new Set<string>();
-  currentDateTime : string = '';
+  currentDateTime: string = '';
+  footerText: string = 'Footer content here';
 
   constructor(
     private http: HttpClient,
@@ -115,12 +118,17 @@ export class DesignViewComponent implements OnInit {
       );
 
       this.fetchReportLogo();
+      this.getReportCustomizationDetails(this.selectedReportId);
     }
 
     const updatedCellsJSON = localStorage.getItem('updatedCells');
     if (updatedCellsJSON) {
       this.updatedCells = new Set<string>(JSON.parse(updatedCellsJSON));
     }
+  }
+
+  ngAfterViewInit(): void {
+      this.applyCustomization();
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -249,6 +257,32 @@ export class DesignViewComponent implements OnInit {
       this.showNewReportForm = !this.showNewReportForm;
     } else if (modalName === 'existingReport') {
       this.showExistingReportForm = !this.showExistingReportForm;
+    }
+  }
+
+  reportCustomization!: ReportCustomization;
+
+  getReportCustomizationDetails(reportID : number) {
+    this.reportsService.getReportCustomization(reportID)
+      .subscribe(
+        (data: ReportCustomization) => {
+          this.reportCustomization = data;
+          console.log(data);
+          // Apply the fetched customization to HTML elements
+          this.applyCustomization();
+        },
+        error => {
+          console.error('Error fetching report customization:', error);
+        }
+      );
+  }
+
+  applyCustomization() {
+    // Apply fetched customization to HTML elements
+    if (this.reportCustomization) {
+      // Apply footer content
+      this.footerText = this.reportCustomization.footerContent;
+      console.log(this.footerText);
     }
   }
 
@@ -432,53 +466,85 @@ export class DesignViewComponent implements OnInit {
         logoImage: null,
       };
 
-      this.reportsService.createReport(newReport, this.selectedLogo).pipe(
-        mergeMap((createdReport) => {
-          console.log('Report created:', createdReport);
-          const reportID = createdReport.reportID; // Extract reportID from the created report
-          localStorage.setItem('selectedReportId', reportID.toString());
-    
-          const reportData: ReportData[] = this.formatDataSource(this.apiData);
-          console.log(reportData);
-          
-          // Create report data
-      return this.reportsService.createReportData(reportID, reportData).pipe(
-        mergeMap((createdData) => {
-          console.log('Report data created successfully:', createdData);
+      this.reportsService
+        .createReport(newReport, this.selectedLogo)
+        .pipe(
+          mergeMap((createdReport) => {
+            console.log('Report created:', createdReport);
+            this.selectedReportId = createdReport.reportID;
+            const reportID = createdReport.reportID; // Extract reportID from the created report
+            localStorage.setItem('selectedReportId', reportID.toString());
 
-          // Generate report formatting for each report data
-          const reportFormatting: ReportFormatting[] = createdData.map(data => ({
-            dataID: data.dataID,
-            reportID: reportID, // Set bold to true only if rowIndex is 0
-            bold: data.rowIndex === 0 || data.cellValue === this.reportTitle, // Example formatting, adjust as needed
-            italic: false,
-            underline: false,
-            strikethrough: false,
-            fontSize: data.cellValue === this.reportTitle ? '24px' : '14px',
-            fontFamily: 'Arial',
-            fontColor: '#000000',
-            backgroundColor: '#FFFFFF'
-          }));
+            const reportData: ReportData[] = this.formatDataSource(
+              this.apiData
+            );
+            console.log(reportData);
 
-          // Create report formatting
-          return this.reportsService.createReportFormatting(reportID, reportFormatting);
-        })
-      );
-    })
-  ).subscribe(
-        () => {
-          console.log('Report created and data added successfully');
-          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-            window.location.reload();
-          });
-          // Handle success, e.g., navigate to a different page or show a success message
-          this.toggleReportWizard(modalName);
-        },
-        (error) => {
-          console.error('Error creating report or report data:', error);
-          // Handle error, e.g., show an error message to the user
-        }
-      );
+            // Create report data
+            return this.reportsService
+              .createReportData(reportID, reportData)
+              .pipe(
+                mergeMap((createdData) => {
+                  console.log('Report data created successfully:', createdData);
+
+                  // Generate report formatting for each report data
+                  const reportFormatting: ReportFormatting[] = createdData.map(
+                    (data) => ({
+                      dataID: data.dataID,
+                      reportID: reportID, // Set bold to true only if rowIndex is 0
+                      bold:
+                        data.rowIndex === 0 ||
+                        data.cellValue === this.reportTitle, // Example formatting, adjust as needed
+                      italic: false,
+                      underline: false,
+                      strikethrough: false,
+                      fontSize:
+                        data.cellValue === this.reportTitle ? '24px' : '14px',
+                      fontFamily: 'Arial',
+                      fontColor: '#000000',
+                      backgroundColor: data.cellValue === this.reportTitle ? '' : '#FFFFFF',
+                    })
+                  );
+
+                  // Create report formatting
+                  return this.reportsService.createReportFormatting(
+                    reportID,
+                    reportFormatting
+                  );
+                })
+              );
+          }),
+          mergeMap((reportID) => {
+        // Add report customization
+        const reportCustomization: ReportCustomization = {
+          // Define your customization properties here
+          reportID: 0,
+          headerBGColor: '#FFFFFF',
+          footerBGColor: '#FFFFFF',
+          bodyBGColor: '#FFFFFF',
+          footerContent: 'Add text here'
+        };
+        return this.reportsService.addReportCustomization(this.selectedReportId, reportCustomization).pipe(
+          map(() => reportID) // Pass reportID along the Observable chain
+        );
+      })
+        )
+        .subscribe(
+          () => {
+            console.log('Report created and data added successfully');
+            this.router
+              .navigateByUrl('/', { skipLocationChange: true })
+              .then(() => {
+                window.location.reload();
+              });
+            // Handle success, e.g., navigate to a different page or show a success message
+            this.toggleReportWizard(modalName);
+          },
+          (error) => {
+            console.error('Error creating report or report data:', error);
+            // Handle error, e.g., show an error message to the user
+          }
+        );
     }
   }
 

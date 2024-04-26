@@ -1,7 +1,7 @@
 <div class="data-toolbar-container">
-  <div class="report-details-container">
+  <div class="report-details-container" *ngIf="report">
     <h5 class="details-heading">Report Details</h5>
-    <div *ngIf="report">
+    <div>
       <p>Last Modified: {{ report.lastModifiedDate | date : 'medium'}}</p>
       <p>Created Date: {{ report.createdDate | date : 'medium' }}</p>
     </div>

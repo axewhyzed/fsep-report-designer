@@ -5,7 +5,7 @@
       <div class="export-dropdown-content">
         <button (click)="exportDivToHtml()">HTML</button>
         <button (click)="generatePDF()">PDF</button>
-        <button >Excel</button>
+        <button (click)="generateReportImage()">Excel</button>
         <button styleSheetFile="assets/styleForPrint.css" printSectionId="printable-section" ngxPrint>Print</button>
       </div>
     </div>
@@ -13,11 +13,10 @@
     <!-- <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br> -->
   </div>
     <div class="report-container" id="printable-section" #exportedDiv>
-      <div class="top-section">
+      <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
         <!-- Image and title -->
         <div class="image-and-title">
           <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
-          <p *ngIf="!logoDataURL">No Logo</p>
           <h1 style="cursor: pointer;" [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">
             {{reportTitle}}
           </h1>
@@ -29,7 +28,7 @@
         </div>
       </div>
         <!-- Body Section -->
-      <div *ngIf="tableHeaders.length > 0">
+      <div *ngIf="tableHeaders.length > 0" class="body-section" [ngStyle]="{'background-color': reportCustomization.bodyBGColor}">
         <div class="table-container">
           <!-- Include the table rendering code here -->
           <table class="tbl-data">
@@ -56,9 +55,9 @@
         </div>
       </div>
       <!-- Bottom Section (Footer) -->
-      <div class="bottom-section">
+      <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
         <!-- Add footer content here if needed -->
-        Footer Content here
+        {{footerText}}
       </div>
       </div>
 </div>

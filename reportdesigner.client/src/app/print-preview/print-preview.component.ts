@@ -4,6 +4,7 @@ import { Report } from '../shared/models/report.model';
 import { ReportData } from '../shared/models/report-data.model';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ReportCustomization } from '../shared/models/report-customization.model';
 
 @Component({
   selector: 'app-print-preview',
@@ -55,6 +56,34 @@ export class PrintPreviewComponent {
 
     if(this.selectedReportId){
       this.fetchReportLogo();
+      this.getReportCustomizationDetails(this.selectedReportId);
+    }
+  }
+
+  reportCustomization!: ReportCustomization;
+  footerText: string = 'Footer content here';
+
+  getReportCustomizationDetails(reportID : number) {
+    this.reportsService.getReportCustomization(reportID)
+      .subscribe(
+        (data: ReportCustomization) => {
+          this.reportCustomization = data;
+          console.log(data);
+          // Apply the fetched customization to HTML elements
+          this.applyCustomization();
+        },
+        error => {
+          console.error('Error fetching report customization:', error);
+        }
+      );
+  }
+
+  applyCustomization() {
+    // Apply fetched customization to HTML elements
+    if (this.reportCustomization) {
+      // Apply footer content
+      this.footerText = this.reportCustomization.footerContent;
+      console.log(this.footerText);
     }
   }
 
@@ -218,6 +247,17 @@ export class PrintPreviewComponent {
     const exportDiv = exportDoc.createElement('div');
     exportDiv.innerHTML = divToExport;
 
+    exportDiv.style.minHeight = '900px';
+     // Set display flex for exportDiv
+     exportDiv.style.display = 'flex';
+     exportDiv.style.flexDirection = 'column';
+    // Set bottom-section to position absolute and bottom 0
+    const bottomSection = exportDiv.querySelector('.bottom-section') as HTMLElement;
+    const repContainer = exportDiv.querySelector('.report-container') as HTMLElement;
+    if (bottomSection) {
+        bottomSection.style.marginTop = 'auto';
+    }
+
     // Append the export div to the body of the export document
     exportDoc.body.appendChild(exportDiv);
 
@@ -254,23 +294,44 @@ export class PrintPreviewComponent {
 
   generatePDF() {
     // Select the printable section
-    html2canvas(this.exportedDiv.nativeElement, { scale: 1 }).then(canvas => {
+    const exportedDiv = this.exportedDiv.nativeElement;
+    const options = { scale: 1 };
+  
+    html2canvas(exportedDiv, options).then(canvas => {
       const imgData = canvas.toDataURL('image/png');
-      // Create a new jsPDF instance
-      const pdf = new jsPDF();
-      const imgWidth = pdf.internal.pageSize.getWidth();
-      // const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-       // Check if content exceeds page size
-    if (imgHeight > pdf.internal.pageSize.getHeight()) {
-      // Scale down content to fit within page
-      const scaleFactor = pdf.internal.pageSize.getHeight() / imgHeight;
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * scaleFactor, pdf.internal.pageSize.getHeight());
-    } else {
-      // Add content as is if it fits within page
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    }
+      // Calculate the dimensions of the content
+      const contentWidth = canvas.width;
+      const contentHeight = canvas.height;
+  
+      // Create a new jsPDF instance with custom page size matching content size
+      const pdf = new jsPDF({
+        orientation: contentWidth > contentHeight ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [contentWidth, contentHeight],
+      });
+  
+      // Add image to PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, contentWidth, contentHeight);
+  
       pdf.save(`${this.reportTitle} - Report.pdf`);
     });
+  }
+  
+  generateReportImage(){
+    // Select the printable section
+  const exportedDiv = this.exportedDiv.nativeElement;
+  const options = { scale: 1 };
+
+  html2canvas(exportedDiv, options).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+
+    // Create a link element
+    const link = document.createElement('a');
+    link.href = imgData;
+    link.download = `${this.reportTitle} - Image.png`;
+
+    // Trigger a click event on the link to download the image
+    link.click();
+  });
   }
 }

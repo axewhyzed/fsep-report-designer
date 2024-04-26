@@ -319,7 +319,13 @@ namespace ReportDesigner.Server.Controllers
                     using (SqlTransaction transaction = connection.BeginTransaction())
                     {
                         try
-                        {   
+                        {
+                            // Delete from ReportCustomization table
+                            string ReportCustomizationQuery = "DELETE FROM ReportCustomization WHERE reportID = @ReportID";
+                            SqlCommand ReportCustomizationCommand = new SqlCommand(ReportCustomizationQuery, connection, transaction);
+                            ReportCustomizationCommand.Parameters.AddWithValue("@ReportID", id);
+                            await ReportCustomizationCommand.ExecuteNonQueryAsync();
+
                             // Delete from ReportFormatting table
                             string reportFormattingQuery = "DELETE FROM ReportFormatting WHERE ReportID = @ReportID";
                             SqlCommand reportFormattingCommand = new SqlCommand(reportFormattingQuery, connection, transaction);
@@ -777,5 +783,150 @@ namespace ReportDesigner.Server.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet("{reportId}/ReportCustomize")]
+        public async Task<IActionResult> GetReportCustomization(int reportId)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    string query = "SELECT * FROM ReportCustomization WHERE reportID = @ReportID";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ReportID", reportId);
+
+                    SqlDataReader reader = await command.ExecuteReaderAsync();
+                    if (reader.Read())
+                    {
+                        var reportCustomization = new
+                        {
+                            reportID = reader.GetInt32(reader.GetOrdinal("reportID")),
+                            headerBGColor = reader.GetString(reader.GetOrdinal("HeaderBGColor")),
+                            footerBGColor = reader.GetString(reader.GetOrdinal("FooterBGColor")),
+                            bodyBGColor = reader.GetString(reader.GetOrdinal("BodyBGColor")),
+                            footerContent = reader.GetString(reader.GetOrdinal("FooterContent"))
+                        };
+                        return Ok(reportCustomization);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("{reportId}/ReportCustomize")]
+        public async Task<IActionResult> PostReportCustomization(int reportId, ReportCustomization reportCustomization)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    // Insert into ReportCustomization table
+                    string insertQuery = @"
+                INSERT INTO ReportCustomization (reportID, HeaderBGColor, FooterBGColor, BodyBGColor, FooterContent)
+                VALUES (@ReportID, @HeaderBGColor, @FooterBGColor, @BodyBGColor, @FooterContent)
+            ";
+                    SqlCommand command = new SqlCommand(insertQuery, connection);
+                    command.Parameters.AddWithValue("@ReportID", reportId);
+                    command.Parameters.AddWithValue("@HeaderBGColor", reportCustomization.HeaderBGColor);
+                    command.Parameters.AddWithValue("@FooterBGColor", reportCustomization.FooterBGColor);
+                    command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
+                    command.Parameters.AddWithValue("@FooterContent", reportCustomization.FooterContent);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPut("{reportId}/ReportCustomize")]
+        public async Task<IActionResult> PutReportCustomization(int reportId, ReportCustomization reportCustomization)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    // Check if the record exists
+                    string checkQuery = "SELECT COUNT(*) FROM ReportCustomization WHERE reportID = @ReportID";
+                    SqlCommand checkCommand = new SqlCommand(checkQuery, connection);
+                    checkCommand.Parameters.AddWithValue("@ReportID", reportId);
+                    int count = (int)await checkCommand.ExecuteScalarAsync();
+
+                    if (count == 0)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update the record
+                    string updateQuery = "UPDATE ReportCustomization SET ";
+                    List<string> updateFields = new List<string>();
+                    if (reportCustomization.HeaderBGColor != null)
+                    {
+                        updateFields.Add("HeaderBGColor = @HeaderBGColor");
+                    }
+                    if (reportCustomization.FooterBGColor != null)
+                    {
+                        updateFields.Add("FooterBGColor = @FooterBGColor");
+                    }
+                    if (reportCustomization.BodyBGColor != null)
+                    {
+                        updateFields.Add("BodyBGColor = @BodyBGColor");
+                    }
+                    if (reportCustomization.FooterContent != null)
+                    {
+                        updateFields.Add("FooterContent = @FooterContent");
+                    }
+
+                    // Combine all fields into the update query
+                    updateQuery += string.Join(", ", updateFields);
+                    updateQuery += " WHERE reportID = @ReportID";
+
+                    SqlCommand command = new SqlCommand(updateQuery, connection);
+                    command.Parameters.AddWithValue("@ReportID", reportId);
+                    if (reportCustomization.HeaderBGColor != null)
+                    {
+                        command.Parameters.AddWithValue("@HeaderBGColor", reportCustomization.HeaderBGColor);
+                    }
+                    if (reportCustomization.FooterBGColor != null)
+                    {
+                        command.Parameters.AddWithValue("@FooterBGColor", reportCustomization.FooterBGColor);
+                    }
+                    if (reportCustomization.BodyBGColor != null)
+                    {
+                        command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
+                    }
+                    if (reportCustomization.FooterContent != null)
+                    {
+                        command.Parameters.AddWithValue("@FooterContent", reportCustomization.FooterContent);
+                    }
+
+                    await command.ExecuteNonQueryAsync();
+
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

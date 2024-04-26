@@ -34,7 +34,6 @@ export class NavigationPanelComponent implements OnInit {
   loadReports() {
     this.reportsService.getReports().subscribe((reports: any) => {
       this.reports = reports;
-      console.log(this.reports);
     });
   }
 
