@@ -12,7 +12,8 @@
     <br>
     <!-- <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br> -->
   </div>
-    <div class="report-container" id="printable-section" #exportedDiv>
+  <div class="no-print-prev" *ngIf="!selectedReportId">Open a report to see the print preview for it.</div>
+    <div class="report-container" id="printable-section" #exportedDiv *ngIf="selectedReportId">
       <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
         <!-- Image and title -->
         <div class="image-and-title">
