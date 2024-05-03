@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
 import { Observable } from 'rxjs';
+import { CustomizeService } from '../shared/services/customize.service';
 
 @Component({
   selector: 'app-data-toolbar',
@@ -14,7 +15,7 @@ export class DataToolbarComponent implements OnInit {
   errorMessage: string = '';
   report!: Report;
 
-  constructor(private router: Router, private reportsService: ReportsService) {}
+  constructor(private router: Router, private reportsService: ReportsService, private customizeService: CustomizeService) {}
 
   ngOnInit(): void {
     const selectedReportIdStr = localStorage.getItem('selectedReportId');
@@ -32,9 +33,28 @@ export class DataToolbarComponent implements OnInit {
           // Handle error if needed
         }
       );
+
+      this.reportsService.getReportCustomization(this.selectedReportId)
+      .subscribe(
+        (data) => {
+          this.footext = data.footerContent;
+        },
+        error => {
+          console.error('Error fetching report customization:', error);
+        }
+      );
     } else {
       this.errorMessage = 'No Report Selected';
     }
+  }
+
+  headerbg: string = '';
+  footerbg: string = '';
+  bodybg: string = '';
+  footext: string = '';
+
+  onInputChange() {
+    this.customizeService.updateVariables(this.headerbg, this.footerbg, this.bodybg, this.footext);
   }
 
   saveReportState() {

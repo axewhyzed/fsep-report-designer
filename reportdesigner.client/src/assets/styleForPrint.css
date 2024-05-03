@@ -1,7 +1,13 @@
-*{
+* {
   color-adjust: exact;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 .print-preview-container {
@@ -9,21 +15,28 @@
   flex-direction: column;
   border: 1px solid black;
   padding: 0 10px;
-  height: 100vh;
-  max-height: calc(100vh - 100px); /* Adjust as needed */
-  overflow: auto !important;
-  flex-grow: 1;
+  min-height: 100%;
+  /* max-height: auto; */
+  /* overflow: auto !important; */
+  /* flex-grow: 1; */
+}
+
+.no-print-prev {
+  padding: 50px;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
 }
 
 .report-container {
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  padding: 0 10px;
-  min-height: 900px;
+  height: 100%;
+  flex-grow: 1;
 }
 
-.report-logo{
+.report-logo {
   margin-right: 15px;
 }
 
@@ -34,7 +47,7 @@
   border-bottom: 1px solid #000;
 }
 
-.body-section{
+.body-section {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -43,19 +56,26 @@
   padding: 50px 0;
 }
 
-.table-container{
+.table-container {
   flex-grow: 1;
   overflow: auto;
 }
 
-.bottom-section{
+.bottom-section {
   border-top: 1px solid #000;
-  margin-top: auto;
+  bottom: 0;
   width: 100%;
+  position:fixed;
   font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
   padding: 10px 0 20px 0;
   text-align: center;
+}
+
+.foo-text {
+  width: 100%;
+  text-align: center;
+  border: 0;
 }
 
 h2,
@@ -67,12 +87,16 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 20px;
+  padding-right: 20px;
 }
 
 .image-and-title img {
   max-width: 100px; /* Adjust image width as needed */
   text-align: center;
+}
+
+.date-time {
+  padding: 10px;
 }
 
 .column-header {
@@ -122,7 +146,6 @@ td {
   margin: 10px;
 }
 
-
 .top-toolbar {
   display: flex;
   justify-content: space-between;
@@ -133,8 +156,8 @@ td {
 }
 
 /* .top-toolbar .export-dropdown {
-  margin-left: auto; /* Pushes the export-dropdown to the right 
-} */
+    margin-left: auto; /* Pushes the export-dropdown to the right 
+  } */
 
 .top-toolbar button {
   padding: 6px 6px;
@@ -183,7 +206,7 @@ td {
   position: absolute;
   background-color: #fff;
   min-width: 100px;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 

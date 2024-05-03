@@ -1,49 +1,102 @@
-.data-toolbar-container{
-    height: 100vh;
-    max-height: calc(100vh - 100px); /* Adjust as needed */
+.data-toolbar-container {
+  height: 100vh;
+  max-height: calc(100vh - 100px); /* Adjust as needed */
 }
 
 .dt-btn {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    font-family: Roboto, sans-serif;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    display: block;
-    margin: 20px auto;
-    transition: all 0.3s;
-  }
-  
-  .dt-btn:hover {
-    background-color: #284976;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  }
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-family: Roboto, sans-serif;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+  transition: all 0.3s;
+}
 
-  .report-details-container {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    padding-left: 20px;
-    width: 200px;
-    background-color: #f3f3f3;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-  }
-  
-  .report-details-container p {
-    margin: 0;
-    padding: 6px 0;
-    font-size: 14px;
-    color: #333;
-  }
+.no-rep-selected {
+  padding: 50px;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+}
 
-  .details-heading {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-    margin: 0;
-    padding: 10px;
-  }
+.dt-btn:hover {
+  background-color: #284976;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.report-details-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  padding-left: 20px;
+  width: 200px;
+  background-color: #f3f3f3;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.report-details-container p {
+  margin: 0;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.details-heading {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
+}
+
+.input-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px; /* Add space between the report details and input group */
+}
+
+.input-wrapper {
+  margin: 10px;
+  display: flex;
+  align-items: center; /* Align label and input vertically */
+}
+
+.input-label {
+  margin-right: 10px; /* Add space between label and input */
+  font-size: 16px; /* Increase font size for better readability */
+}
+
+.color-input {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%; /* Make the color input round */
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out; /* Add simple hover animation */
+}
+
+.color-input:hover {
+  transform: scale(1.1); /* Scale up on hover */
+}
+
+.text-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+  transition: border-color 0.3s ease-in-out; /* Add simple transition for focus */
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px #007bff;
+}

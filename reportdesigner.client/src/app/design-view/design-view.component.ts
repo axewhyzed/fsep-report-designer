@@ -15,6 +15,7 @@ import { ReportFormatting } from '../shared/models/report-formatting.model';
 import { UpdateDataDto } from '../shared/models/update-data-dto.model';
 import { flatMap, map, mergeMap } from 'rxjs';
 import { ReportCustomization } from '../shared/models/report-customization.model';
+import { CustomizeService } from '../shared/services/customize.service';
 
 @Component({
   selector: 'app-design-view',
@@ -49,10 +50,12 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private reportsService: ReportsService
+    private reportsService: ReportsService,
+    private customizeService: CustomizeService
   ) {}
 
-  // localCellFormatting: any;
+  variable1: string = '';
+  variable2: string = '';
 
   // Initialize component data and fetch data if not already stored locally
   ngOnInit(): void {
@@ -76,6 +79,22 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
     );
 
     if (ReportId) {
+      this.customizeService.variable1$.subscribe(value => {
+        this.reportCustomization.headerBGColor = value;
+      });
+  
+      this.customizeService.variable2$.subscribe(value => {
+        this.reportCustomization.footerBGColor = value;
+      });
+
+      this.customizeService.variable3$.subscribe(value => {
+        this.reportCustomization.bodyBGColor = value;
+      });
+  
+      this.customizeService.variable4$.subscribe(value => {
+        this.reportCustomization.footerContent = value;
+      });
+
       this.selectedReportId = JSON.parse(ReportId);
       this.showNewReportForm = false;
       this.showExistingReportForm = false;

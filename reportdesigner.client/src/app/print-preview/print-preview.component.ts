@@ -5,6 +5,7 @@ import { ReportData } from '../shared/models/report-data.model';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ReportCustomization } from '../shared/models/report-customization.model';
+import { CustomizeService } from '../shared/services/customize.service';
 
 @Component({
   selector: 'app-print-preview',
@@ -28,10 +29,28 @@ export class PrintPreviewComponent {
 
   constructor(
     private renderer: Renderer2,
-    private reportsService: ReportsService
+    private reportsService: ReportsService,
+    private customizeService : CustomizeService
   ) {}
 
   ngOnInit(): void {
+
+    this.customizeService.variable1$.subscribe(value => {
+      this.reportCustomization.headerBGColor = value;
+    });
+
+    this.customizeService.variable2$.subscribe(value => {
+      this.reportCustomization.footerBGColor = value;
+    });
+
+    this.customizeService.variable3$.subscribe(value => {
+      this.reportCustomization.bodyBGColor = value;
+    });
+
+    this.customizeService.variable4$.subscribe(value => {
+      this.reportCustomization.footerContent = value;
+    });
+
     setInterval(() => {
       this.currentDateTime = new Date().toLocaleString();
     }, 1000);

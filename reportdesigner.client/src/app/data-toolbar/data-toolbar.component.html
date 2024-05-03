@@ -1,4 +1,6 @@
 <div class="data-toolbar-container">
+  <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn">New Report</button><br>
+  <p class="no-rep-selected" *ngIf="!selectedReportId">No Report Selected</p>
   <div class="report-details-container" *ngIf="report">
     <h5 class="details-heading">Report Details</h5>
     <div>
@@ -7,8 +9,24 @@
     </div>
     <!-- <p *ngIf="!report">{{ errorMessage }}</p> -->
   </div>
-
-  <button (click)="resetReportData()" class="dt-btn">New Report</button><br>
   <!-- <button (click)="saveReportState()">Save Report Data</button><br> -->
   <!-- <input type="file" (change)="loadReportState($event)"> -->
+  <div class="input-group">
+    <div class="input-wrapper">
+      <label class="input-label">Header Color: </label>
+      <input type="color" [(ngModel)]="headerbg" (input)="onInputChange()" class="color-input"><br>
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Footer color: </label>
+      <input type="color" [(ngModel)]="footerbg" (input)="onInputChange()" class="color-input"><br>
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Body Color: </label>
+      <input type="color" [(ngModel)]="bodybg" (input)="onInputChange()" class="color-input"><br>
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Footer Text: </label>
+      <input type="text" [(ngModel)]="footext" (input)="onInputChange()" class="text-input">
+    </div>
+  </div>
 </div>
