@@ -16,6 +16,7 @@ import { UpdateDataDto } from '../shared/models/update-data-dto.model';
 import { flatMap, map, mergeMap } from 'rxjs';
 import { ReportCustomization } from '../shared/models/report-customization.model';
 import { CustomizeService } from '../shared/services/customize.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-design-view',
@@ -51,7 +52,8 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private router: Router,
     private reportsService: ReportsService,
-    private customizeService: CustomizeService
+    private customizeService: CustomizeService,
+    private toastr: ToastrService
   ) {}
 
   variable1: string = '';
@@ -243,7 +245,13 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       .updateReportFormatting(this.selectedReportId, updateDataDtos)
       .subscribe(
         (response) => {
-          alert('Saved changes successfully');
+          this.toastr.success('Changes Saved', '', {
+            timeOut: 5000,
+            easing: 'ease-in',
+            easeTime: 300,
+            progressBar: true,
+            progressAnimation: 'decreasing'
+          });
           console.log('Report formatting updated successfully');
           // Optionally, you can perform any actions after successful update
           this.updatedCells.clear();
@@ -303,6 +311,20 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       this.footerText = this.reportCustomization.footerContent;
       console.log(this.footerText);
     }
+  }
+
+  saveCustomization(){
+    this.reportsService.updateReportCustomization(this.selectedReportId, this.reportCustomization)
+      .subscribe(
+        response => {
+          console.log('Report customization updated successfully:', response);
+          // Handle success, if needed
+        },
+        error => {
+          console.error('Error updating report customization:', error);
+          // Handle error, if needed
+        }
+      );
   }
 
   searchTerm: string = '';

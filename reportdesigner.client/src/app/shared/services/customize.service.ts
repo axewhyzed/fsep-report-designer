@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,9 @@ export class CustomizeService {
   variable3$ = this.variable3Subject.asObservable();
   variable4$ = this.variable4Subject.asObservable();
 
+  private submitActionSubject = new Subject<void>();
+  submitAction$ = this.submitActionSubject.asObservable();
+
   constructor() { }
 
   updateVariables(variable1Value: string, variable2Value: string, variable3Value: string, variable4Value: string) {
@@ -22,5 +25,9 @@ export class CustomizeService {
     this.variable2Subject.next(variable2Value);
     this.variable3Subject.next(variable3Value);
     this.variable4Subject.next(variable4Value);
+  }
+
+  submitAction() {
+    this.submitActionSubject.next();
   }
 }

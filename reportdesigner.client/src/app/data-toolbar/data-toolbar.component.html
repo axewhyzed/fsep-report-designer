@@ -1,5 +1,5 @@
 <div class="data-toolbar-container">
-  <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn">New Report</button><br>
+  <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn" title="Create or Open a new report">New Report</button><br>
   <p class="no-rep-selected" *ngIf="!selectedReportId">No Report Selected</p>
   <div class="report-details-container" *ngIf="report">
     <h5 class="details-heading">Report Details</h5>
@@ -7,7 +7,6 @@
       <p>Last Modified: {{ report.lastModifiedDate | date : 'medium'}}</p>
       <p>Created Date: {{ report.createdDate | date : 'medium' }}</p>
     </div>
-    <!-- <p *ngIf="!report">{{ errorMessage }}</p> -->
   </div>
   <!-- <button (click)="saveReportState()">Save Report Data</button><br> -->
   <!-- <input type="file" (change)="loadReportState($event)"> -->
@@ -28,5 +27,6 @@
       <label class="input-label">Footer Text: </label>
       <input type="text" [(ngModel)]="footext" (input)="onInputChange()" class="text-input">
     </div>
+    <div><button (click)="submitData()" class="dt-btn">Submit</button></div>
   </div>
 </div>

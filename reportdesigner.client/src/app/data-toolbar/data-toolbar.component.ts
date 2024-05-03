@@ -4,6 +4,7 @@ import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
 import { Observable } from 'rxjs';
 import { CustomizeService } from '../shared/services/customize.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-data-toolbar',
@@ -15,7 +16,7 @@ export class DataToolbarComponent implements OnInit {
   errorMessage: string = '';
   report!: Report;
 
-  constructor(private router: Router, private reportsService: ReportsService, private customizeService: CustomizeService) {}
+  constructor(private router: Router, private reportsService: ReportsService, private customizeService: CustomizeService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     const selectedReportIdStr = localStorage.getItem('selectedReportId');
@@ -55,6 +56,18 @@ export class DataToolbarComponent implements OnInit {
 
   onInputChange() {
     this.customizeService.updateVariables(this.headerbg, this.footerbg, this.bodybg, this.footext);
+  }
+
+  submitData() {
+    // Call submitAction method from CustomizeService
+    // this.customizeService.submitAction();
+    this.toastr.success('Changes Saved', '', {
+      timeOut: 5000,
+      easing: 'ease-in',
+      easeTime: 300,
+      progressBar: true,
+      progressAnimation: 'decreasing'
+    });
   }
 
   saveReportState() {
@@ -102,7 +115,13 @@ export class DataToolbarComponent implements OnInit {
     localStorage.removeItem('reportData');
     localStorage.removeItem('reportDetails');
     localStorage.removeItem('selectedReportId');
-    alert('New Report Initiated');
+    this.toastr.success('New Report Initiated', '', {
+      timeOut: 5000,
+      easing: 'ease-in',
+      easeTime: 300,
+      progressBar: true,
+      progressAnimation: 'decreasing'
+    });
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       window.location.reload();
     });

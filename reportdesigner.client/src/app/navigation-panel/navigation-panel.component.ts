@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Report } from '../shared/models/report.model';
 import { ReportsService } from '../shared/services/reports.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-navigation-panel',
@@ -21,7 +22,7 @@ export class NavigationPanelComponent implements OnInit {
   currentLogoImage: string | null = null; // Hold the Base64 string of the current logo image
   selectedFile!: File | undefined; // Hold the selected file
 
-  constructor(private reportsService: ReportsService, private router: Router) {}
+  constructor(private reportsService: ReportsService, private router: Router, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     const reportDetailsJson = localStorage.getItem('reportDetails');
@@ -143,7 +144,13 @@ export class NavigationPanelComponent implements OnInit {
         const reportTitle = delReport ? delReport.title : 'Unknown Title';
         this.reports.splice(delReportIndex, 1);
         this.showDeletePopup = false;
-        alert('Report name: ' + reportTitle + ' has been deleted');
+        this.toastr.success(`${delReport?.title} has been deleted`, 'Report Deleted Successfully', {
+          timeOut: 5000,
+          easing: 'ease-in',
+          easeTime: 300,
+          progressBar: true,
+          progressAnimation: 'decreasing'
+        });
       });
   }
 
