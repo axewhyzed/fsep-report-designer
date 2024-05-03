@@ -240,6 +240,7 @@ table, th, td{
 /* CSS for Report Wizard */
 .report-wizard-popup {
   position: fixed;
+  font-family: Roboto, sans-serif;
   top: 0;
   left: 0;
   width: 100%;
@@ -259,7 +260,26 @@ table, th, td{
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
-.start-wizard-button {
+.popup-content label {
+  /* Add margin below each label */
+  margin-bottom: 10px;
+}
+
+.popup-content input[type="text"],
+.popup-content input[type="file"],
+.popup-content select {
+  /* Add margin below each input */
+  margin-bottom: 10px;
+  /* Increase padding for better spacing within inputs */
+  padding: 10px;
+  /* Ensure inputs fill the width of the container */
+  width: 80%;
+  /* Add border and border-radius for a consistent look */
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.dv-btn {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -273,7 +293,7 @@ table, th, td{
   transition: all 0.3s;
 }
 
-.start-wizard-button:hover {
+.dv-btn:hover {
   background-color: #284976;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
@@ -301,18 +321,30 @@ table, th, td{
 }
 
 .report-modal-title{
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Roboto, sans-serif;
 }
 
 /* For Search Results */
 
 /* CSS for Search Textbox */
 .search-container {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.search-results-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 }
 
 .search-results-header{
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Roboto, sans-serif;
+  margin-top: 0;
+  font-size: 18px;
+  color: #333; /* Set text color */
 }
 
 .search-container input[type="text"] {
@@ -340,7 +372,9 @@ table, th, td{
 
 #selectReportDropdown:focus {
   border: 2px solid;
+  outline: none;
   border-color: #007bff; /* Highlight border color on focus */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* Style for dropdown options */
@@ -356,9 +390,12 @@ table, th, td{
 }
 
 .report-list {
-  border: 1px solid #ccc;
   border-radius: 4px;
+  font-family: Roboto, sans-serif;
+  max-height: 200px;
   margin-left: 10px; /* Adjust spacing */
+  list-style: none; /* Remove default list styles */
+  padding: 0;
 }
 
 .report-item {
@@ -382,8 +419,8 @@ table, th, td{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-family: Roboto, sans-serif;
 }
 
 .report-actions {
@@ -392,18 +429,20 @@ table, th, td{
 }
 
 .report-actions button {
-  padding: 6px 10px;
+  padding: 10px 10px;
   margin-left: 10px;
   border: none;
   border-radius: 4px;
   background-color: #007bff; /* Blue button background */
   color: white;
   cursor: pointer;
+  font-weight: bold;
   transition: background-color 0.3s ease; /* Smooth transition for button background color */
 }
 
 .report-actions button:hover {
-  background-color: #0056b3; /* Darker blue button background on hover */
+  background-color: #284976; /* Darker blue button background on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .report-form-btn-container{
@@ -415,29 +454,29 @@ table, th, td{
 .report-form-btn-container button {
   padding: 10px 20px;
   margin: 0 10px;
+  font-family: Roboto, sans-serif;
   border: none;
+  font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s ease;
 }
 
-.report-form-btn-container button:hover {
-  background-color: #007bff; /* Darker blue on hover */
+.report-form-btn-container .sub-btn:hover {
+  background-color: #284976; /* Darker blue on hover */
   color: white;
 }
 
 /* Cancel Button */
-.report-form-btn-container .cancel-button {
-  background-color: #ccc; /* Light gray */
-}
-
-.report-form-btn-container .cancel-button:hover {
-  background-color: #999; /* Darker gray on hover */
+.report-form-btn-container .cancel-btn:hover {
+  background-color: #FF3131; /* Darker blue on hover */
+  color: white;
 }
 
 /* No Reports Found Message */
 .no-reports-message {
   margin-top: 20px;
+  text-align: center;
   color: #999; /* Light gray text color */
 }

@@ -11,10 +11,11 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class NavigationPanelComponent implements OnInit {
   reportDetails: any;
-  showPopup: boolean = false;
   popupTitle: string = '';
   popupData: any;
   reports: Report[] = [];
+  showDetailsPopup: boolean = false;
+  showReportPopup: boolean = false;
   showEditPopup: boolean = false;
   showDeletePopup: boolean = false;
   currentReportId!: number;
@@ -36,6 +37,25 @@ export class NavigationPanelComponent implements OnInit {
     this.reportsService.getReports().subscribe((reports: any) => {
       this.reports = reports;
     });
+  }
+
+  logoURL: string = '';
+
+  fetchLogo(reportId: number){
+    this.reportsService.getReportLogo(reportId).subscribe(
+      (logoBlob: Blob) => {
+        // Convert the logo blob to a data URL
+        const reader = new FileReader();
+        reader.readAsDataURL(logoBlob);
+        reader.onloadend = () => {
+          // Once the file is read, set the logoDataURL property
+          this.logoURL = reader.result as string;
+        };
+      },
+      (error) => {
+        console.error('Error fetching report logo:', error);
+      }
+    );
   }
 
   searchTerm: string = '';
@@ -75,16 +95,18 @@ export class NavigationPanelComponent implements OnInit {
 
     // Determine the action to perform based on the provided parameter
     switch (action) {
-      case 'view-report':
+      case 'view-details':
         this.reportsService.getReport(reportId).subscribe((report: any) => {
-          this.popupData = Object.entries(report);
-          this.showPopup = true;
+          this.popupData = report;
+          console.log(this.popupData);
+          this.showDetailsPopup = true;
+          this.fetchLogo(reportId);
         });
         break;
-      case 'view-report-data':
+      case 'view-report':
         this.reportsService.getReportData(reportId).subscribe((report: any) => {
           this.popupData = report;
-          this.showPopup = true;
+          this.showReportPopup = true;
         });
         break;
       case 'edit-report':
@@ -196,7 +218,8 @@ export class NavigationPanelComponent implements OnInit {
   }
 
   closePopup(): void {
-    this.showPopup = false;
+    this.showDetailsPopup = false;
+    this.showReportPopup = false;
     this.showEditPopup = false;
     this.showDeletePopup = false;
   }

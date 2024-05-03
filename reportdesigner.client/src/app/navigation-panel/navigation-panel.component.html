@@ -1,9 +1,8 @@
 <!-- navigation-panel.component.html -->
 <div class="db-container">
-
   <!-- Search Section -->
   <div class="search-container">
-    <input type="text" placeholder="Search reports" [(ngModel)]="searchTerm" (ngModelChange)="handleSearchChange()">
+    <input type="text" placeholder="Search reports" [(ngModel)]="searchTerm" (ngModelChange)="handleSearchChange()" />
   </div>
 
   <!-- Search Results Section -->
@@ -15,12 +14,30 @@
           <div class="report-name-container">
             <h5>{{ report.title }}</h5>
             <div class="dropdown">
-              <button class="dropdown-btn material-icons">arrow_drop_down_circle</button>
+              <button class="dropdown-btn material-icons">
+                arrow_drop_down_circle
+              </button>
               <div class="dropdown-content">
-                <button (click)="openPopup(report.title, report.reportID, 'view-report')">View Details</button>
-                <button (click)="openPopup(report.title, report.reportID, 'view-report-data')">View Report</button>
-                <button (click)="openPopup(report.title, report.reportID, 'edit-report')">Edit</button>
-                <button (click)="openPopup(report.title, report.reportID, 'delete-report')">Delete</button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'view-details')
+                  ">
+                  View Details
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'view-report')
+                  ">
+                  View Report
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'edit-report')
+                  ">
+                  Edit
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'delete-report')
+                  ">
+                  Delete
+                </button>
               </div>
             </div>
             <!-- <button class="view-button" (click)="openPopup(report.title, report.reportID)">View</button> -->
@@ -44,12 +61,30 @@
               {{ report.title }}
             </h5>
             <div class="dropdown">
-              <button class="dropdown-btn material-icons">arrow_drop_down_circle</button>
+              <button class="dropdown-btn material-icons">
+                arrow_drop_down_circle
+              </button>
               <div class="dropdown-content">
-                <button (click)="openPopup(report.title, report.reportID, 'view-report')">View Details</button>
-                <button (click)="openPopup(report.title, report.reportID, 'view-report-data')">View Report</button>
-                <button (click)="openPopup(report.title, report.reportID, 'edit-report')">Edit</button>
-                <button (click)="openPopup(report.title, report.reportID, 'delete-report')">Delete</button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'view-details')
+                  ">
+                  View Details
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'view-report')
+                  ">
+                  View Report
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'edit-report')
+                  ">
+                  Edit
+                </button>
+                <button (click)="
+                    openPopup(report.title, report.reportID, 'delete-report')
+                  ">
+                  Delete
+                </button>
               </div>
             </div>
             <!-- <button class="view-button" (click)="openPopup(report.title, report.reportID)">
@@ -61,53 +96,100 @@
     </div>
   </div>
 
-  <!-- Popup Section -->
-  <div class="popup-overlay" *ngIf="showPopup || showEditPopup || showDeletePopup">
-    <div class="popup">
+  <!-- View Details Popup Section -->
+  <div class="popup-overlay" *ngIf="showDetailsPopup">
+    <div class="popup view-details-popup">
       <div class="popup-header">
         <h3>{{ popupTitle }}</h3>
-        <button class="material-icons-round close-button" (click)="closePopup()">close</button>
+        <button class="material-icons-round close-button" (click)="closePopup()">
+          close
+        </button>
       </div>
-      <ng-container *ngIf="!showEditPopup && !showDeletePopup; else editForm">
-        <table>
-          <thead>
-            <tr>
-              <th *ngFor="let column of popupData[0] | keyvalue">
-                {{ column.key }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of popupData">
-              <td *ngFor="let cell of row | keyvalue">{{ cell.value }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <!-- <button class="edit-button" (click)="showEditForm()">Edit</button> -->
-      </ng-container>
-      <ng-container *ngIf="!showEditPopup && !showPopup">
+      <div class="view-details-popup-content">
+        <p class="info-item">
+          <span class="info-label">Report ID:</span>
+          <span class="info-value">{{ popupData.reportID }}</span>
+        </p>
+        <p class="info-item">
+          <span class="info-label">Title:</span>
+          <span class="info-value">{{ popupData.title }}</span>
+        </p>
+        <p class="info-item">
+          <span class="info-label">Logo Image:</span>
+          <span class="info-value">
+            <img *ngIf="logoURL" [src]="logoURL" alt="Report Logo" class="report-logo" />
+          </span>
+        </p>
+        <p class="info-item">
+          <span class="info-label">Created Date:</span>
+          <span class="info-value">{{
+            popupData.createdDate | date : "medium"
+            }}</span>
+        </p>
+        <p class="info-item">
+          <span class="info-label">Last Modified Date:</span>
+          <span class="info-value">{{
+            popupData.lastModifiedDate | date : "medium"
+            }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Report Popup Section -->
+  <div class="popup-overlay" *ngIf="showReportPopup">
+    <div class="popup view-report-popup">
+      <div class="popup-header">
+        <h3>{{ popupTitle }}</h3>
+        <button class="material-icons-round close-button" (click)="closePopup()">
+          close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Popup Section -->
+  <div class="popup-overlay" *ngIf="showEditPopup">
+    <div class="popup edit-report-popup">
+      <div class="popup-header">
+        <h3>{{ popupTitle }}</h3>
+        <button class="material-icons-round close-button" (click)="closePopup()">
+          close
+        </button>
+      </div>
+      <div class="edit-form-container">
+        <form (submit)="submitEdit()">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="editingReport.title" name="title" /><br />
+          <label>Logo Image</label>
+          <img *ngIf="currentLogoImage" [src]="currentLogoImage" alt="Current Logo Image"
+            style="max-width: 200px" /><br />
+          <p *ngIf="!currentLogoImage">No Logo Selected</p>
+          <label for="newLogo">New Logo Image</label>
+          <input type="file" id="newLogo" (change)="onFileSelected($event)" /><br />
+          <!-- Input for logo image, you can customize this based on your requirements -->
+          <button type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Popup Section -->
+  <div class="popup-overlay" *ngIf="showDeletePopup">
+    <div class="popup delete-report-popup">
+      <div class="popup-header">
+        <h3>{{ popupTitle }}</h3>
+        <button class="material-icons-round close-button" (click)="closePopup()">
+          close
+        </button>
+      </div>
+      <ng-container>
         <p>Are you sure you want to delete this report?</p>
         <div>
           <button (click)="submitDelete(currentReportId)">Yes</button>
           <button (click)="closePopup()">No</button>
         </div>
       </ng-container>
-      <ng-template #editForm>
-        <div class="edit-form-container" *ngIf="!showDeletePopup && !showPopup">
-          <form (submit)="submitEdit()">
-            <label>Title</label>
-            <input type="text" [(ngModel)]="editingReport.title" name="title"><br>
-            <label>Logo Image</label>
-            <img *ngIf="currentLogoImage" [src]="currentLogoImage" alt="Current Logo Image"
-              style="max-width: 200px;"><br>
-              <p *ngIf="!currentLogoImage">No Logo Selected</p>
-            <label for="newLogo">New Logo Image</label>
-            <input type="file" id="newLogo" (change)="onFileSelected($event)"><br>
-            <!-- Input for logo image, you can customize this based on your requirements -->
-            <button type="submit">Save</button>
-          </form>
-        </div>
-      </ng-template>
     </div>
   </div>
 </div>

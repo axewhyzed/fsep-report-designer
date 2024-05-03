@@ -59,10 +59,10 @@ tr:hover {
 }
 
 .report-name-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 /* database-info.component.css */
 /* Add a new class for the view button */
@@ -83,6 +83,7 @@ tr:hover {
 /* popup.component.css */
 .popup-overlay {
   position: fixed;
+  padding: 10px;
   top: 0;
   left: 0;
   width: 100%;
@@ -102,12 +103,63 @@ tr:hover {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   max-width: 80%;
   overflow-x: auto;
+  animation: slideIn 0.2s ease-out;
+}
+
+.view-details-popup {
+  max-height: 340px;
+}
+
+/* Popup Content */
+.view-details-popup p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.view-details-popup-content {
+  padding: 20px;
+}
+
+.info-item {
+  margin: 10px 0;
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center items vertically */
+}
+
+.info-value{
+  margin-left: 5px;
+  font-family: Roboto,sans-serif;
+  font-size: 16px;
+  font-weight: 540;
+}
+
+.info-label {
+  font-weight: bold;
+  margin-right: 5px;
+  font-size: 18px;
+  color: #000;
 }
 
 .popup-header {
-    display: flex;
-    justify-content: space-between;
-  }
+  display: flex;
+  justify-content: space-between;
+}
+
+.report-logo{
+  width: 80px;
+}
 
 .close-button {
   background: none;
@@ -177,7 +229,7 @@ tr:hover {
 }
 
 .search-container:hover {
-  color: #1E3A5F; /* Darker text color on hover */
+  color: #1e3a5f; /* Darker text color on hover */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); /* Shadow effect on hover */
 }
 
@@ -188,7 +240,6 @@ tr:hover {
 .search-container input::placeholder {
   color: #999; /* Light gray placeholder text */
 }
-
 
 .search-results {
   display: none; /* Hide search results by default */
@@ -249,7 +300,6 @@ tr:hover {
 .dropdown-content button:hover {
   background-color: #ddd;
 }
-
 
 /* Edit Report Details form */
 /* Add these styles to your CSS file */

@@ -96,9 +96,9 @@
   </div>
 
   <!-- Start Report Wizard button -->
-  <button *ngIf="!showNewReportForm && !showReportContainer && !showExistingReportForm" class="start-wizard-button"
+  <button *ngIf="!showNewReportForm && !showReportContainer && !showExistingReportForm" class="dv-btn"
     (click)="toggleReportWizard('newReport')">Create New Report</button><br>
-  <button *ngIf="!showNewReportForm && !showReportContainer && !showExistingReportForm" class="start-wizard-button"
+  <button *ngIf="!showNewReportForm && !showReportContainer && !showExistingReportForm" class="dv-btn"
     (click)="toggleReportWizard('existingReport')">Open Existing Report</button>
 
   <!-- Popup/modal for creating a new report -->
@@ -120,8 +120,8 @@
       </select>
 
       <div class="report-form-btn-container">
-        <button (click)="submitReport('newReport')">Submit</button>
-        <button (click)="toggleReportWizard('newReport')">Cancel</button>
+        <button class="sub-btn" (click)="submitReport('newReport')">Submit</button>
+        <button class="cancel-btn" (click)="toggleReportWizard('newReport')">Cancel</button>
       </div>
     </div>
   </div>
@@ -140,7 +140,7 @@
         <div *ngIf="searchResults && searchResults.length > 0" class="report-list">
 
           <div *ngFor="let report of searchResults" class="report-item">
-            <div class="report-title" style="display: flex;">
+            <div class="report-title">
               <h5>{{ report.title }}</h5>
             </div>
             <div class="report-actions">
@@ -160,8 +160,8 @@
           <option *ngFor="let report of reports" [value]="report.reportID">{{ report.title }}</option>
         </select>
         <div class="report-form-btn-container">
-          <button (click)="submitReport('existingReport')">Open Report</button>
-          <button (click)="toggleReportWizard('existingReport')">Cancel</button>
+          <button class="sub-btn" (click)="submitReport('existingReport')">Open Report</button>
+          <button class="cancel-btn" (click)="toggleReportWizard('existingReport')">Cancel</button>
         </div>
       </div>
     </div>
