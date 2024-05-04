@@ -1,4 +1,4 @@
-<div class="design-view-container">
+<div class="design-view-container" (click)="clearSelectedCellsOutsideTable($event)">
   <div class="formatting-toolbar">
     <div class="button-container">
       <button class="material-icons menu-icon icon-bold format-button" title="Bold" (click)="toggleFormat('bold')">
@@ -195,14 +195,14 @@
           <table class="tbl-data">
             <thead>
               <tr>
-                <th></th>
+                <th (click)="toggleCellSelection(0, 'corner-select')" class="material-icons selector-btns" title="Select all cells">select_all</th>
                 <th *ngFor="let header of tableHeaders; let i = index"
                   (click)="toggleCellSelection(i, 'column-header')">
                   <div class="column-header">{{ getColumnHeader(i) }}</div>
                 </th>
               </tr>
               <tr>
-                <th></th>
+                <th (click)="toggleCellSelection(0, 'header-select')" class="material-icons selector-btns" title="Select all headers">arrow_right</th>
                 <!-- Include table headers here -->
                 <th *ngFor="let header of tableHeaders; let z = index"
                   (click)="toggleCellSelection(header.reportID, header.dataID)"

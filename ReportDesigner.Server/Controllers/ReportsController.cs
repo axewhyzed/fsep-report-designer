@@ -806,6 +806,10 @@ namespace ReportDesigner.Server.Controllers
                             headerBGColor = reader.GetString(reader.GetOrdinal("HeaderBGColor")),
                             footerBGColor = reader.GetString(reader.GetOrdinal("FooterBGColor")),
                             bodyBGColor = reader.GetString(reader.GetOrdinal("BodyBGColor")),
+                            tableBorderVisible = reader.GetBoolean(reader.GetOrdinal("TableBorderVisible")),
+                            cellContentPadding = reader.GetInt32(reader.GetOrdinal("CellContentPadding")),
+                            tableTopPadding = reader.GetInt32(reader.GetOrdinal("TableTopPadding")),
+                            tableDataAlign = reader.GetString(reader.GetOrdinal("TableDataAlign")),
                             footerContent = reader.GetString(reader.GetOrdinal("FooterContent"))
                         };
                         return Ok(reportCustomization);
@@ -833,14 +837,18 @@ namespace ReportDesigner.Server.Controllers
 
                     // Insert into ReportCustomization table
                     string insertQuery = @"
-                INSERT INTO ReportCustomization (reportID, HeaderBGColor, FooterBGColor, BodyBGColor, FooterContent)
-                VALUES (@ReportID, @HeaderBGColor, @FooterBGColor, @BodyBGColor, @FooterContent)
+                INSERT INTO ReportCustomization (reportID, HeaderBGColor, FooterBGColor, BodyBGColor, TableBorderVisible, CellContentPadding, TableTopPadding, TableDataAlign, FooterContent)
+                VALUES (@ReportID, @HeaderBGColor, @FooterBGColor, @BodyBGColor, @TableBorderVisible, @CellContentPadding, @TableTopPadding, @TableDataAlign, @FooterContent)
             ";
                     SqlCommand command = new SqlCommand(insertQuery, connection);
                     command.Parameters.AddWithValue("@ReportID", reportId);
                     command.Parameters.AddWithValue("@HeaderBGColor", reportCustomization.HeaderBGColor);
                     command.Parameters.AddWithValue("@FooterBGColor", reportCustomization.FooterBGColor);
                     command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
+                    command.Parameters.AddWithValue("@TableBorderVisible", reportCustomization.TableBorderVisible);
+                    command.Parameters.AddWithValue("@CellContentPadding", reportCustomization.CellContentPadding);
+                    command.Parameters.AddWithValue("@TableTopPadding", reportCustomization.TableTopPadding);
+                    command.Parameters.AddWithValue("@TableDataAlign", reportCustomization.TableDataAlign);
                     command.Parameters.AddWithValue("@FooterContent", reportCustomization.FooterContent);
 
                     await command.ExecuteNonQueryAsync();
@@ -889,6 +897,22 @@ namespace ReportDesigner.Server.Controllers
                     {
                         updateFields.Add("BodyBGColor = @BodyBGColor");
                     }
+                    if (reportCustomization.TableBorderVisible != null)
+                    {
+                        updateFields.Add("TableBorderVisible = @TableBorderVisible");
+                    }
+                    if (reportCustomization.CellContentPadding != null)
+                    {
+                        updateFields.Add("CellContentPadding = @CellContentPadding");
+                    }
+                    if (reportCustomization.TableTopPadding != null)
+                    {
+                        updateFields.Add("TableTopPadding = @TableTopPadding");
+                    }
+                    if (reportCustomization.TableDataAlign != null)
+                    {
+                        updateFields.Add("TableDataAlign = @TableDataAlign");
+                    }
                     if (reportCustomization.FooterContent != null)
                     {
                         updateFields.Add("FooterContent = @FooterContent");
@@ -911,6 +935,22 @@ namespace ReportDesigner.Server.Controllers
                     if (reportCustomization.BodyBGColor != null)
                     {
                         command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
+                    }
+                    if (reportCustomization.TableBorderVisible != null)
+                    {
+                        command.Parameters.AddWithValue("@TableBorderVisible", reportCustomization.TableBorderVisible);
+                    }
+                    if (reportCustomization.CellContentPadding != null)
+                    {
+                        command.Parameters.AddWithValue("@CellContentPadding", reportCustomization.CellContentPadding);
+                    }
+                    if (reportCustomization.TableTopPadding != null)
+                    {
+                        command.Parameters.AddWithValue("@TableTopPadding", reportCustomization.TableTopPadding);
+                    }
+                    if (reportCustomization.TableDataAlign != null)
+                    {
+                        command.Parameters.AddWithValue("@TableDataAlign", reportCustomization.TableDataAlign);
                     }
                     if (reportCustomization.FooterContent != null)
                     {

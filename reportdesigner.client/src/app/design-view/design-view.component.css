@@ -1,4 +1,4 @@
-.design-view-container{
+.design-view-container {
   display: flex;
   flex-direction: column;
   border: 1px solid black;
@@ -14,13 +14,13 @@
   outline: 2px solid #0078d4; /* Blue border */
 }
 
-.edit-container{
+.edit-container {
   flex-grow: 1;
   max-width: 100%;
   overflow: auto;
 }
 
-.report-container{
+.report-container {
   display: flex;
   flex-direction: column;
   max-width: 100%;
@@ -30,7 +30,7 @@
   border: 1px solid black;
 }
 
-.report-logo{
+.report-logo {
   margin-right: 15px;
 }
 
@@ -42,7 +42,7 @@
   border-bottom: 1px solid #000;
 }
 
-.body-section{
+.body-section {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -51,31 +51,33 @@
   padding: 50px 0;
 }
 
-.table-container{
+.table-container {
   flex-grow: 1;
   overflow: auto;
 }
 
-.bottom-section{
+.bottom-section {
   border-top: 1px solid #000;
   margin-top: auto;
   width: 100%;
   flex: 0 0 auto;
   font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
-  padding: 10px 0 20px 0;
+  padding: 5px 0 10px 0;
   text-align: center;
 }
 
-.foo-text{
+.foo-text {
   width: 100%;
   text-align: center;
   border: 0;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
   background-color: rgba(0, 0, 0, 0);
 }
 
-h2, h3 {
+h2,
+h3 {
   margin-top: 20px;
 }
 
@@ -91,7 +93,7 @@ h2, h3 {
   text-align: center;
 }
 
-.date-time{
+.date-time {
   padding: 10px;
 }
 
@@ -99,13 +101,15 @@ h2, h3 {
   height: 30px; /* Adjust as needed */
   background-color: rgba(0, 0, 0, 0);
   display: flex;
+  color: darkblue;
+  font-size: 18px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-family: Cambria;
 }
 
-.table-header{
+.table-header {
   padding: 3px;
 }
 
@@ -122,20 +126,30 @@ h2, h3 {
   justify-content: center;
   cursor: pointer;
   font-weight: bold;
+  font-size: 18px;
+  color: darkblue;
   font-family: Cambria;
 }
 
-.cell-content{
+.selector-btns {
+  cursor: pointer;
+  font-size: 30px;
+  color: darkblue;
+}
+
+.cell-content {
   padding: 5px;
   cursor: pointer;
   font-size: 14px;
 }
 
-table, th, td{
+table,
+th,
+td {
   border: 1px solid black;
 }
 
-.tbl-data{
+.tbl-data {
   margin: 10px;
 }
 
@@ -183,7 +197,7 @@ table, th, td{
 }
 
 .color-label {
-  margin:0 6px;
+  margin: 0 6px;
   font-size: 12px;
   font-family: Roboto, sans-serif;
 }
@@ -199,7 +213,7 @@ table, th, td{
   background-color: transparent;
 }
 
-.custom-color-input:hover{
+.custom-color-input:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -214,7 +228,7 @@ table, th, td{
   outline: none;
 }
 
-.select-box:hover{
+.select-box:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -223,7 +237,7 @@ table, th, td{
   margin-right: 20px;
 }
 
-.save_btn{
+.save_btn {
   border: none;
   margin: 0;
   padding: 0;
@@ -233,7 +247,7 @@ table, th, td{
   cursor: pointer;
 }
 
-.save_btn:hover{
+.save_btn:hover {
   box-shadow: 0 2px 4px rgba(0.2, 0.2, 0.2, 0.2);
 }
 
@@ -320,7 +334,7 @@ table, th, td{
   opacity: 0;
 }
 
-.report-modal-title{
+.report-modal-title {
   font-family: Roboto, sans-serif;
 }
 
@@ -340,7 +354,7 @@ table, th, td{
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 }
 
-.search-results-header{
+.search-results-header {
   font-family: Roboto, sans-serif;
   margin-top: 0;
   font-size: 18px;
@@ -445,7 +459,7 @@ table, th, td{
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.report-form-btn-container{
+.report-form-btn-container {
   display: flex;
   justify-content: center;
   margin-top: 20px;
@@ -470,7 +484,7 @@ table, th, td{
 
 /* Cancel Button */
 .report-form-btn-container .cancel-btn:hover {
-  background-color: #FF3131; /* Darker blue on hover */
+  background-color: #ff3131; /* Darker blue on hover */
   color: white;
 }
 

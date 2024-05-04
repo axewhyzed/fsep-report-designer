@@ -1,16 +1,9 @@
 <div class="data-toolbar-container">
   <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn" title="Create or Open a new report">New Report</button><br>
   <p class="no-rep-selected" *ngIf="!selectedReportId">No Report Selected</p>
-  <div class="report-details-container" *ngIf="report">
-    <h5 class="details-heading">Report Details</h5>
-    <div>
-      <p>Last Modified: {{ report.lastModifiedDate | date : 'medium'}}</p>
-      <p>Created Date: {{ report.createdDate | date : 'medium' }}</p>
-    </div>
-  </div>
   <!-- <button (click)="saveReportState()">Save Report Data</button><br> -->
   <!-- <input type="file" (change)="loadReportState($event)"> -->
-  <div class="input-group">
+  <div class="input-group" *ngIf="selectedReportId">
     <div class="input-wrapper">
       <label class="input-label">Header Color: </label>
       <input type="color" [(ngModel)]="headerbg" (input)="onInputChange()" class="color-input"><br>

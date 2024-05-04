@@ -3,6 +3,10 @@ export interface ReportCustomization {
     headerBGColor: string;
     footerBGColor: string;
     bodyBGColor: string;
+    tableBorderVisible: boolean;
+    cellContentPadding: number;
+    tableTopPadding: number;
+    tableDataAlign: string;
     footerContent: string;
   }
   

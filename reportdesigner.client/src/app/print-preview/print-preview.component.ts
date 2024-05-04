@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
 import { ReportData } from '../shared/models/report-data.model';

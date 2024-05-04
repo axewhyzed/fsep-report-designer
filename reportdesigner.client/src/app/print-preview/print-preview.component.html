@@ -13,52 +13,53 @@
     <!-- <button styleSheetFile="assets/style.css" printSectionId="printable-section" ngxPrint>Print</button><br> -->
   </div>
   <div class="no-print-prev" *ngIf="!selectedReportId">Open a report to see the print preview for it.</div>
-    <div class="report-container" id="printable-section" #exportedDiv *ngIf="selectedReportId">
-      <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
-        <!-- Image and title -->
-        <div class="image-and-title">
-          <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
-          <h1 style="cursor: pointer;" [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">
-            {{reportTitle}}
-          </h1>
-        </div>
-        <!-- Current date/time -->
-        <div class="date-time">
-          <p>{{ currentDateTime | date: 'longDate' }}</p>
-          <p>{{ currentDateTime | date: 'mediumTime' }}</p>
-        </div>
+  <div class="report-container" id="printable-section" #exportedDiv *ngIf="selectedReportId">
+    <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
+      <!-- Image and title -->
+      <div class="image-and-title">
+        <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
+        <h1 style="cursor: pointer;" [ngStyle]="applyStyle(selectedReportId, titleData?.dataID)">
+          {{reportTitle}}
+        </h1>
       </div>
-        <!-- Body Section -->
-      <div *ngIf="tableHeaders.length > 0" class="body-section" [ngStyle]="{'background-color': reportCustomization.bodyBGColor}">
-        <div class="table-container">
-          <!-- Include the table rendering code here -->
-          <table class="tbl-data">
-            <thead>
-              <tr>
-                <!-- Include table headers here -->
-                <th *ngFor="let header of tableHeaders; let z = index"
-                  [ngStyle]="applyStyle(header.reportID, header.dataID)">
-                  <div class="table-header">{{ header.cellValue }}</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let rowData of tableData; let i = index">
-                <script>console.log(rowData);</script>
-                <!-- Include table cells here -->
-                <td *ngFor="let cell of rowData; let j = index" class="cell-content"
-                  [ngStyle]="applyStyle(cell.reportID, cell.dataID)" [attr.data-row]="i" [attr.data-col]="j">
-                  {{ cell.cellValue }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- Current date/time -->
+      <div class="date-time">
+        <p>{{ currentDateTime | date: 'longDate' }}</p>
+        <p>{{ currentDateTime | date: 'mediumTime' }}</p>
       </div>
-      <!-- Bottom Section (Footer) -->
-      <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
-        <!-- Add footer content here if needed -->
-        {{footerText}}
+    </div>
+    <!-- Body Section -->
+    <div *ngIf="tableHeaders.length > 0" class="body-section"
+      [ngStyle]="{'background-color': reportCustomization.bodyBGColor,'padding-top': reportCustomization.tableTopPadding + 'px'}">
+      <div class="table-container">
+        <!-- Include the table rendering code here -->
+        <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? reportCustomization.tableBorderVisible : 'none', 'text-align': reportCustomization.tableDataAlign}">
+          <thead>
+            <tr>
+              <!-- Include table headers here -->
+              <th *ngFor="let header of tableHeaders; let z = index"
+                [ngStyle]="applyStyle(header.reportID, header.dataID)">
+                <div class="table-header">{{ header.cellValue }}</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rowData of tableData; let i = index">
+              <script>console.log(rowData);</script>
+              <!-- Include table cells here -->
+              <td *ngFor="let cell of rowData; let j = index" class="cell-content"
+                [ngStyle]="applyStyle(cell.reportID, cell.dataID)" [attr.data-row]="i" [attr.data-col]="j">
+                {{ cell.cellValue }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      </div>
+    </div>
+    <!-- Bottom Section (Footer) -->
+    <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
+      <!-- Add footer content here if needed -->
+      {{footerText}}
+    </div>
+  </div>
 </div>

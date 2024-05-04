@@ -65,6 +65,8 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       this.currentDateTime = new Date().toLocaleString();
     }, 1000);
 
+    this.initializeClickOutsideListener();
+
     const ReportId = localStorage.getItem('selectedReportId');
 
     // Fetch all reports for the dropdown
@@ -563,7 +565,11 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
           headerBGColor: '#FFFFFF',
           footerBGColor: '#FFFFFF',
           bodyBGColor: '#FFFFFF',
-          footerContent: 'Add text here'
+          tableBorderVisible: true,
+          cellContentPadding: 5,
+          tableTopPadding: 50,
+          tableDataAlign: 'left',
+          footerContent: 'Add text here',
         };
         return this.reportsService.addReportCustomization(this.selectedReportId, reportCustomization).pipe(
           map(() => reportID) // Pass reportID along the Observable chain
@@ -670,7 +676,31 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
         console.log(newCellKey);
         this.selectedCells.add(`${newCellKey}`);
       }
-    } else {
+    }
+    
+    else if(columnName === 'header-select'){
+      this.selectedCells.clear();
+      // Adding the table headers
+      for (const colHeader of this.tableHeaders) {
+        this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`);
+      }
+    }
+    
+    else if(columnName === 'corner-select'){
+      this.selectedCells.clear();
+      // Adding the table headers
+      for (const colHeader of this.tableHeaders) {
+        this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`);
+      }
+      // Adding all cells
+      for (const rowData of this.tableData) {
+        for (const cell of rowData) {
+          const newCellKey = `${cell.reportID}|${cell.dataID}`;
+          this.selectedCells.add(`${newCellKey}`);
+        }
+      }
+    }
+    else {
       // For normal cells
       console.log(cellKey);
       this.selectedCells.clear(); // Clear previous selections
@@ -685,6 +715,17 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChild('editableDiv') editableDiv!: ElementRef;
+
+  clearSelectedCellsOutsideTable(event: MouseEvent): void {
+    const isClickInsideTable = (event.target as HTMLElement).closest('.design-view-container');
+    if (!isClickInsideTable) {
+      this.selectedCells.clear(); // Clear selected cells if click is outside the table
+    }
+  }
+
+  initializeClickOutsideListener(): void {
+    document.body.addEventListener('click', this.clearSelectedCellsOutsideTable.bind(this));
+  }
 
   // Function to check if a cell is a title cell or in the first row
   isSpecialCell(reportId: number, dataId: number): boolean {

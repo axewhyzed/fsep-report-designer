@@ -92,17 +92,14 @@ tr:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: auto;
 }
 
 .popup {
   background-color: white;
   padding: 20px;
-  height: 60%;
+  /* max-height: 80%; */
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-  max-width: 80%;
-  overflow-x: auto;
   animation: slideIn 0.2s ease-out;
 }
 
@@ -155,6 +152,12 @@ tr:hover {
 .popup-header {
   display: flex;
   justify-content: space-between;
+}
+
+.view-report-popup{
+  height: 90%;
+  overflow: hidden;
+  margin-bottom: 50px;
 }
 
 .report-logo{
@@ -308,21 +311,34 @@ tr:hover {
 .edit-form-container {
   max-width: 400px;
   margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Form inputs */
 .edit-form-container input[type="text"] {
   width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
+  font-size: 16px;
+}
+
+.edit-form-container input[type="file"] {
+  padding: 10px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
 }
 
 /* Form labels */
 .edit-form-container label {
   font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
 }
 
 /* Form submit button */
@@ -330,11 +346,43 @@ tr:hover {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .edit-form-container button[type="submit"]:hover {
   background-color: #0056b3;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.del-confirm-btn,
+.del-cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.del-confirm-btn {
+  background-color: #007bff;
+  color: #fff;
+  margin-right: 10px;
+}
+
+.del-cancel-btn {
+  background-color: #ddd;
+  color: #333;
+}
+
+.del-confirm-btn:hover,
+.del-cancel-btn:hover {
+  opacity: 0.8;
 }

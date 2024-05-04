@@ -98,21 +98,16 @@ export class NavigationPanelComponent implements OnInit {
       case 'view-details':
         this.reportsService.getReport(reportId).subscribe((report: any) => {
           this.popupData = report;
-          console.log(this.popupData);
           this.showDetailsPopup = true;
           this.fetchLogo(reportId);
         });
         break;
-      case 'view-report':
-        this.reportsService.getReportData(reportId).subscribe((report: any) => {
-          this.popupData = report;
-          this.showReportPopup = true;
-        });
-        break;
       case 'edit-report':
         this.reportsService.getReport(reportId).subscribe((report: Report) => {
+          this.popupData = report;
           this.editingReport = { ...report }; // Create a copy of the report to avoid directly modifying the original
           this.showEditPopup = true;
+          this.fetchLogo(reportId);
         });
         break;
       case 'delete-report':
@@ -194,6 +189,13 @@ export class NavigationPanelComponent implements OnInit {
       .subscribe(
         () => {
           console.log('Report updated successfully');
+          this.toastr.success('', 'Changes saved', {
+            timeOut: 5000,
+            easing: 'ease-in',
+            easeTime: 300,
+            progressBar: true,
+            progressAnimation: 'decreasing'
+          });
           this.reports.forEach((report) => {
             if (report.reportID === this.editingReport.reportID) {
               report.title = this.editingReport.title!;
@@ -211,7 +213,13 @@ export class NavigationPanelComponent implements OnInit {
           this.showEditPopup = false;
         },
         (error) => {
-          console.error('Error updating report:', error);
+          this.toastr.error('There was an error while saving changes', 'Error', {
+            timeOut: 5000,
+            easing: 'ease-in',
+            easeTime: 300,
+            progressBar: true,
+            progressAnimation: 'decreasing'
+          });
           // Handle error if necessary
         }
       );

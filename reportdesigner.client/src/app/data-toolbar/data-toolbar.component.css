@@ -29,32 +29,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.report-details-container {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  padding-left: 20px;
-  width: 200px;
-  background-color: #f3f3f3;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-.report-details-container p {
-  margin: 0;
-  padding: 6px 0;
-  font-size: 14px;
-  color: #333;
-}
-
-.details-heading {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
-  margin: 0;
-  padding: 10px;
-}
-
 .input-group {
   display: flex;
   flex-wrap: wrap;
