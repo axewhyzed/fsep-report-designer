@@ -83,19 +83,35 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
     );
 
     if (ReportId) {
-      this.customizeService.variable1$.subscribe(value => {
+      this.customizeService.headerBG$.subscribe(value => {
         this.reportCustomization.headerBGColor = value;
       });
   
-      this.customizeService.variable2$.subscribe(value => {
+      this.customizeService.footerBG$.subscribe(value => {
         this.reportCustomization.footerBGColor = value;
       });
 
-      this.customizeService.variable3$.subscribe(value => {
+      this.customizeService.bodyBG$.subscribe(value => {
         this.reportCustomization.bodyBGColor = value;
       });
+
+      this.customizeService.tableBorder$.subscribe(value => {
+        this.reportCustomization.tableBorderVisible = value;
+      });
+
+      this.customizeService.cellPadding$.subscribe(value => {
+        this.reportCustomization.cellContentPadding = value;
+      });
   
-      this.customizeService.variable4$.subscribe(value => {
+      this.customizeService.tablePadding$.subscribe(value => {
+        this.reportCustomization.tableTopPadding = value;
+      });
+  
+      this.customizeService.tableAlign$.subscribe(value => {
+        this.reportCustomization.tableDataAlign = value;
+      });
+  
+      this.customizeService.footerContent$.subscribe(value => {
         this.reportCustomization.footerContent = value;
       });
 

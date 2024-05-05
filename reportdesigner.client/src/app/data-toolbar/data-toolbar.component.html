@@ -5,21 +5,46 @@
   <!-- <input type="file" (change)="loadReportState($event)"> -->
   <div class="input-group" *ngIf="selectedReportId">
     <div class="input-wrapper">
-      <label class="input-label">Header Color: </label>
-      <input type="color" [(ngModel)]="headerbg" (input)="onInputChange()" class="color-input"><br>
+      <label class="input-label">Table Border:</label>
+      <input type="checkbox" [(ngModel)]="tableBord" (change)="onInputChange()" class="checkbox-input">
+      <span>{{ tableBord ? 'Enabled' : 'Disabled' }}</span>
     </div>
     <div class="input-wrapper">
-      <label class="input-label">Footer color: </label>
-      <input type="color" [(ngModel)]="footerbg" (input)="onInputChange()" class="color-input"><br>
+      <label class="input-label">Cell Padding:</label>
+      <input type="number" [(ngModel)]="cellPad" (input)="onInputChange()" class="number-input">
     </div>
     <div class="input-wrapper">
-      <label class="input-label">Body Color: </label>
-      <input type="color" [(ngModel)]="bodybg" (input)="onInputChange()" class="color-input"><br>
+      <label class="input-label">Table Padding:</label>
+      <input type="number" [(ngModel)]="tablePad" (input)="onInputChange()" class="number-input">
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Table Alignment:</label>
+      <select [(ngModel)]="tableAlign" (change)="onInputChange()" class="select-input">
+        <option value="">None</option>
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+      </select>
     </div>
     <div class="input-wrapper">
       <label class="input-label">Footer Text: </label>
-      <input type="text" [(ngModel)]="footext" (input)="onInputChange()" class="text-input">
+      <input type="text" [(ngModel)]="footCont" (input)="onInputChange()" class="text-input">
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Header Color: </label>
+      <input type="color" [(ngModel)]="headerBG" (input)="onInputChange()" class="color-input">
+      <div class="color-preview" [style.background-color]="headerBG"></div>
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Footer color: </label>
+      <input type="color" [(ngModel)]="footerBG" (input)="onInputChange()" class="color-input">
+      <div class="color-preview" [style.background-color]="footerBG"></div>
+    </div>
+    <div class="input-wrapper">
+      <label class="input-label">Body Color: </label>
+      <input type="color" [(ngModel)]="bodyBG" (input)="onInputChange()" class="color-input">
+      <div class="color-preview" [style.background-color]="bodyBG"></div>
     </div>
     <div><button (click)="submitData()" class="dt-btn">Submit</button></div>
-  </div>
+  </div>  
 </div>

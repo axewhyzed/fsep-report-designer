@@ -38,7 +38,16 @@ export class DataToolbarComponent implements OnInit {
       this.reportsService.getReportCustomization(this.selectedReportId)
       .subscribe(
         (data) => {
-          this.footext = data.footerContent;
+          if(data){
+            this.headerBG = data.headerBGColor;
+            this.footerBG = data.footerBGColor;
+            this.bodyBG = data.bodyBGColor;
+            this.tableBord = data.tableBorderVisible;
+            this.cellPad = data.cellContentPadding;
+            this.tablePad = data.tableTopPadding;
+            this.tableAlign = data.tableDataAlign;
+            this.footCont = data.footerContent;
+          }
         },
         error => {
           console.error('Error fetching report customization:', error);
@@ -49,13 +58,17 @@ export class DataToolbarComponent implements OnInit {
     }
   }
 
-  headerbg: string = '';
-  footerbg: string = '';
-  bodybg: string = '';
-  footext: string = '';
+  headerBG: string = '';
+  footerBG: string = '';
+  bodyBG: string = '';
+  tableBord: boolean = true;
+  cellPad: number = 0;
+  tablePad: number = 0;
+  tableAlign: string = '';
+  footCont: string = '';
 
   onInputChange() {
-    this.customizeService.updateVariables(this.headerbg, this.footerbg, this.bodybg, this.footext);
+    this.customizeService.updateVariables(this.headerBG, this.footerBG, this.bodyBG, this.tableBord, this.cellPad, this.tablePad, this.tableAlign, this.footCont);
   }
 
   submitData() {

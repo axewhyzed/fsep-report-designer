@@ -77,3 +77,37 @@
   border-color: #007bff;
   box-shadow: 0 0 5px #007bff;
 }
+
+.color-preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-left: 10px;
+}
+
+.checkbox-input,
+.number-input,
+.select-input {
+  margin-left: 10px;
+}
+
+.checkbox-input + span,
+.number-input + span,
+.select-input + span {
+  margin-left: 5px;
+  font-family: Roboto, sans-serif;
+}
+
+.select-input {
+  padding: 5px;
+}
+
+.input-wrapper select,
+.input-wrapper input[type="number"] {
+  width: 80px;
+}
+
+.input-wrapper input[type="checkbox"] {
+  vertical-align: middle;
+}
+

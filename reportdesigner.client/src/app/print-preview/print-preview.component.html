@@ -5,7 +5,7 @@
       <div class="export-dropdown-content">
         <button (click)="exportDivToHtml()">HTML</button>
         <button (click)="generatePDF()">PDF</button>
-        <button (click)="generateReportImage()">Excel</button>
+        <button (click)="generateReportImage()">Image</button>
         <button styleSheetFile="assets/styleForPrint.css" printSectionId="printable-section" ngxPrint>Print</button>
       </div>
     </div>
@@ -14,7 +14,7 @@
   </div>
   <div class="no-print-prev" *ngIf="!selectedReportId">Open a report to see the print preview for it.</div>
   <div class="report-container" id="printable-section" #exportedDiv *ngIf="selectedReportId">
-    <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
+    <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor ? reportCustomization.headerBGColor : '#ffffff'}">
       <!-- Image and title -->
       <div class="image-and-title">
         <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
@@ -30,10 +30,10 @@
     </div>
     <!-- Body Section -->
     <div *ngIf="tableHeaders.length > 0" class="body-section"
-      [ngStyle]="{'background-color': reportCustomization.bodyBGColor,'padding-top': reportCustomization.tableTopPadding + 'px'}">
+      [ngStyle]="{'background-color': reportCustomization.bodyBGColor ? reportCustomization.bodyBGColor : '#ffffff' ,'padding-top': reportCustomization.tableTopPadding ? reportCustomization.tableTopPadding + 'px' : '50px'}">
       <div class="table-container">
         <!-- Include the table rendering code here -->
-        <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? reportCustomization.tableBorderVisible : 'none', 'text-align': reportCustomization.tableDataAlign}">
+        <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? reportCustomization.tableBorderVisible : 'none', 'text-align': reportCustomization.tableDataAlign ? reportCustomization.tableDataAlign : 'left'}">
           <thead>
             <tr>
               <!-- Include table headers here -->
@@ -57,7 +57,7 @@
       </div>
     </div>
     <!-- Bottom Section (Footer) -->
-    <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
+    <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor ? reportCustomization.footerBGColor : '#ffffff'}">
       <!-- Add footer content here if needed -->
       {{footerText}}
     </div>

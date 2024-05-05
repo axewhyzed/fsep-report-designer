@@ -171,7 +171,7 @@
   <div class="edit-container" #editableDiv>
     <div class="report-container" *ngIf="showReportContainer">
       <!-- Header Section -->
-      <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor}">
+      <div class="top-section" [ngStyle]="{'background-color': reportCustomization.headerBGColor ? reportCustomization.headerBGColor : '#ffffff'}">
         <!-- Image and title -->
         <div class="image-and-title">
           <img *ngIf="logoDataURL" [src]="logoDataURL" alt="Report Logo" class="report-logo" />
@@ -189,10 +189,10 @@
       </div>
 
       <!-- Body Section -->
-      <div *ngIf="tableHeaders.length > 0" class="body-section" [ngStyle]="{'background-color': reportCustomization.bodyBGColor}">
+      <div *ngIf="tableHeaders.length > 0" class="body-section" [ngStyle]="{'background-color': reportCustomization.bodyBGColor ? reportCustomization.bodyBGColor : '#ffffff' ,'padding-top': reportCustomization.tableTopPadding ? reportCustomization.tableTopPadding + 'px' : '50px'}">
         <div class="table-container">
           <!-- Include the table rendering code here -->
-          <table class="tbl-data">
+          <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? reportCustomization.tableBorderVisible : 'none', 'text-align': reportCustomization.tableDataAlign ? reportCustomization.tableDataAlign : 'left'}">
             <thead>
               <tr>
                 <th (click)="toggleCellSelection(0, 'corner-select')" class="material-icons selector-btns" title="Select all cells">select_all</th>
@@ -231,7 +231,7 @@
         </div>
       </div>
       <!-- Bottom Section (Footer) -->
-      <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor}">
+      <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor ? reportCustomization.footerBGColor : '#ffffff'}">
         <!-- Add footer content here if needed -->
         <p class="foo-text">{{reportCustomization.footerContent}}</p>
       </div>

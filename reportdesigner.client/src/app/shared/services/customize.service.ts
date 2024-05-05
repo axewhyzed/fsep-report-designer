@@ -5,26 +5,38 @@ import { BehaviorSubject, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class CustomizeService {
-  private variable1Subject = new BehaviorSubject<string>('initial value 1');
-  private variable2Subject = new BehaviorSubject<string>('initial value 2');
-  private variable3Subject = new BehaviorSubject<string>('initial value 3');
-  private variable4Subject = new BehaviorSubject<string>('initial value 4');
+  private headerBGSubject = new BehaviorSubject<string>('#ffffff');
+  private footerBGSubject = new BehaviorSubject<string>('#ffffff');
+  private bodyBGSubject = new BehaviorSubject<string>('#ffffff');
+  private tableBorderSubject = new BehaviorSubject<boolean>(true);
+  private cellPaddingSubject = new BehaviorSubject<number>(5);
+  private tablePaddingSubject = new BehaviorSubject<number>(50);
+  private tableAlignSubject = new BehaviorSubject<string>('left');
+  private footerContentSubject = new BehaviorSubject<string>('Add text here');
 
-  variable1$ = this.variable1Subject.asObservable();
-  variable2$ = this.variable2Subject.asObservable();
-  variable3$ = this.variable3Subject.asObservable();
-  variable4$ = this.variable4Subject.asObservable();
+  headerBG$ = this.headerBGSubject.asObservable();
+  footerBG$ = this.footerBGSubject.asObservable();
+  bodyBG$ = this.bodyBGSubject.asObservable();
+  tableBorder$ = this.tableBorderSubject.asObservable();
+  cellPadding$ = this.cellPaddingSubject.asObservable();
+  tablePadding$ = this.tablePaddingSubject.asObservable();
+  tableAlign$ = this.tableAlignSubject.asObservable();
+  footerContent$ = this.footerContentSubject.asObservable();
 
   private submitActionSubject = new Subject<void>();
   submitAction$ = this.submitActionSubject.asObservable();
 
   constructor() { }
 
-  updateVariables(variable1Value: string, variable2Value: string, variable3Value: string, variable4Value: string) {
-    this.variable1Subject.next(variable1Value);
-    this.variable2Subject.next(variable2Value);
-    this.variable3Subject.next(variable3Value);
-    this.variable4Subject.next(variable4Value);
+  updateVariables(headerBGValue: string, footerBGValue: string, bodyBGValue: string, tableBorderValue: boolean, cellPaddingValue: number, tablePaddingValue: number, tableAlignValue: string, footerContentValue: string) {
+    this.headerBGSubject.next(headerBGValue);
+    this.footerBGSubject.next(footerBGValue);
+    this.bodyBGSubject.next(bodyBGValue);
+    this.tableBorderSubject.next(tableBorderValue);
+    this.cellPaddingSubject.next(cellPaddingValue);
+    this.tablePaddingSubject.next(tablePaddingValue);
+    this.tableAlignSubject.next(tableAlignValue);
+    this.footerContentSubject.next(footerContentValue);
   }
 
   submitAction() {
