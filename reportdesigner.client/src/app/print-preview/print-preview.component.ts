@@ -1,4 +1,10 @@
-import { Component, ElementRef, Input, Renderer2, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { ReportsService } from '../shared/services/reports.service';
 import { Report } from '../shared/models/report.model';
 import { ReportData } from '../shared/models/report-data.model';
@@ -6,8 +12,6 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ReportCustomization } from '../shared/models/report-customization.model';
 import { CustomizeService } from '../shared/services/customize.service';
-import * as mammoth from 'mammoth';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-print-preview',
@@ -32,40 +36,39 @@ export class PrintPreviewComponent {
   constructor(
     private renderer: Renderer2,
     private reportsService: ReportsService,
-    private customizeService : CustomizeService
+    private customizeService: CustomizeService,
   ) {}
 
   ngOnInit(): void {
-
-    this.customizeService.headerBG$.subscribe(value => {
+    this.customizeService.headerBG$.subscribe((value) => {
       this.reportCustomization.headerBGColor = value;
     });
 
-    this.customizeService.footerBG$.subscribe(value => {
+    this.customizeService.footerBG$.subscribe((value) => {
       this.reportCustomization.footerBGColor = value;
     });
 
-    this.customizeService.bodyBG$.subscribe(value => {
+    this.customizeService.bodyBG$.subscribe((value) => {
       this.reportCustomization.bodyBGColor = value;
     });
 
-    this.customizeService.tableBorder$.subscribe(value => {
+    this.customizeService.tableBorder$.subscribe((value) => {
       this.reportCustomization.tableBorderVisible = value;
     });
-    
-    this.customizeService.cellPadding$.subscribe(value => {
+
+    this.customizeService.cellPadding$.subscribe((value) => {
       this.reportCustomization.cellContentPadding = value;
     });
 
-    this.customizeService.tablePadding$.subscribe(value => {
+    this.customizeService.tablePadding$.subscribe((value) => {
       this.reportCustomization.tableTopPadding = value;
     });
 
-    this.customizeService.tableAlign$.subscribe(value => {
+    this.customizeService.tableAlign$.subscribe((value) => {
       this.reportCustomization.tableDataAlign = value;
     });
 
-    this.customizeService.footerContent$.subscribe(value => {
+    this.customizeService.footerContent$.subscribe((value) => {
       this.reportCustomization.footerContent = value;
     });
 
@@ -91,7 +94,7 @@ export class PrintPreviewComponent {
       }
     );
 
-    if(this.selectedReportId){
+    if (this.selectedReportId) {
       this.fetchReportLogo();
       this.getReportCustomizationDetails(this.selectedReportId);
     }
@@ -100,19 +103,18 @@ export class PrintPreviewComponent {
   reportCustomization!: ReportCustomization;
   footerText: string = 'Footer content here';
 
-  getReportCustomizationDetails(reportID : number) {
-    this.reportsService.getReportCustomization(reportID)
-      .subscribe(
-        (data: ReportCustomization) => {
-          this.reportCustomization = data;
-          console.log(data);
-          // Apply the fetched customization to HTML elements
-          this.applyCustomization();
-        },
-        error => {
-          console.error('Error fetching report customization:', error);
-        }
-      );
+  getReportCustomizationDetails(reportID: number) {
+    this.reportsService.getReportCustomization(reportID).subscribe(
+      (data: ReportCustomization) => {
+        this.reportCustomization = data;
+        console.log(data);
+        // Apply the fetched customization to HTML elements
+        this.applyCustomization();
+      },
+      (error) => {
+        console.error('Error fetching report customization:', error);
+      }
+    );
   }
 
   applyCustomization() {
@@ -214,8 +216,12 @@ export class PrintPreviewComponent {
       fontColor: '#000000',
       fontFamily: 'Arial',
       backgroundColor: '#FFFFFF',
-      border: this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
-      padding: this.reportCustomization.cellContentPadding ? this.reportCustomization.cellContentPadding + 'px' : '0',
+      border: this.reportCustomization.tableBorderVisible
+        ? '1px solid black'
+        : 'none',
+      padding: this.reportCustomization.cellContentPadding
+        ? this.reportCustomization.cellContentPadding + 'px'
+        : '0',
     };
 
     // Retrieve cellFormatting from localStorage
@@ -227,8 +233,12 @@ export class PrintPreviewComponent {
       // Check if the style in cellFormatting differs from default style
       if (formatting && !this.isDefaultStyle(formatting)) {
         const style: any = {
-          'border': this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
-          'padding': this.reportCustomization.cellContentPadding ? this.reportCustomization.cellContentPadding + 'px' : '0',
+          border: this.reportCustomization.tableBorderVisible
+            ? '1px solid black'
+            : 'none',
+          padding: this.reportCustomization.cellContentPadding
+            ? this.reportCustomization.cellContentPadding + 'px'
+            : '0',
         };
 
         if (formatting.bold) style['font-weight'] = 'bold';
@@ -240,7 +250,7 @@ export class PrintPreviewComponent {
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
-        if(this.titleData?.dataID === cellDataId){
+        if (this.titleData?.dataID === cellDataId) {
           style['border'] = 'none';
           style['padding'] = '0';
           return style;
@@ -295,14 +305,18 @@ export class PrintPreviewComponent {
     exportDiv.innerHTML = divToExport;
 
     exportDiv.style.minHeight = '900px';
-     // Set display flex for exportDiv
-     exportDiv.style.display = 'flex';
-     exportDiv.style.flexDirection = 'column';
+    // Set display flex for exportDiv
+    exportDiv.style.display = 'flex';
+    exportDiv.style.flexDirection = 'column';
     // Set bottom-section to position absolute and bottom 0
-    const bottomSection = exportDiv.querySelector('.bottom-section') as HTMLElement;
-    const repContainer = exportDiv.querySelector('.report-container') as HTMLElement;
+    const bottomSection = exportDiv.querySelector(
+      '.bottom-section'
+    ) as HTMLElement;
+    const repContainer = exportDiv.querySelector(
+      '.report-container'
+    ) as HTMLElement;
     if (bottomSection) {
-        bottomSection.style.marginTop = 'auto';
+      bottomSection.style.marginTop = 'auto';
     }
 
     // Append the export div to the body of the export document
@@ -343,42 +357,137 @@ export class PrintPreviewComponent {
     // Select the printable section
     const exportedDiv = this.exportedDiv.nativeElement;
     const options = { scale: 1 };
-  
-    html2canvas(exportedDiv, options).then(canvas => {
+
+    html2canvas(exportedDiv, options).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       // Calculate the dimensions of the content
       const contentWidth = canvas.width;
       const contentHeight = canvas.height;
-  
+
       // Create a new jsPDF instance with custom page size matching content size
       const pdf = new jsPDF({
         orientation: contentWidth > contentHeight ? 'landscape' : 'portrait',
         unit: 'px',
         format: [contentWidth, contentHeight],
       });
-  
+
       // Add image to PDF
       pdf.addImage(imgData, 'PNG', 0, 0, contentWidth, contentHeight);
-  
+
       pdf.save(`${this.reportTitle} - Report.pdf`);
     });
   }
-  
-  generateReportImage(){
+
+  generateReportImage() {
     // Select the printable section
-  const exportedDiv = this.exportedDiv.nativeElement;
-  const options = { scale: 1 };
+    const exportedDiv = this.exportedDiv.nativeElement;
+    const options = { scale: 1 };
 
-  html2canvas(exportedDiv, options).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
+    html2canvas(exportedDiv, options).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
 
-    // Create a link element
-    const link = document.createElement('a');
-    link.href = imgData;
-    link.download = `${this.reportTitle} - Image.png`;
+      // Create a link element
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = `${this.reportTitle} - Image.png`;
 
-    // Trigger a click event on the link to download the image
-    link.click();
-  });
+      // Trigger a click event on the link to download the image
+      link.click();
+    });
+  }
+
+  exportToCsv() {
+    const exportDiv = document.getElementById('body-section');
+    if (exportDiv) {
+      const table = exportDiv.querySelector('table');
+      if (table) {
+        const headers = Array.from(table.querySelectorAll('th')).map(header => header.innerText.trim());
+        const rows = Array.from(table.querySelectorAll('tr')).slice(1);
+        const data = rows.map(row => Array.from(row.querySelectorAll('td')).map(cell => cell.innerText.trim()));
+  
+        const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...data.map(row => row.join(','))].join('\n');
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", `${this.reportTitle}.csv`);
+        document.body.appendChild(link);
+        link.click();
+      } else {
+        console.error("Table not found inside element with ID 'body-section'.");
+      }
+    } else {
+      console.error("Element with ID 'body-section' not found.");
+    }
+  }
+  
+  exportToWord(){
+    const divToExport = this.exportedDiv.nativeElement.innerHTML;
+    const exportDoc = document.implementation.createHTMLDocument(
+      `${this.reportTitle} - Report.html`
+    );
+
+    // Create a div element to hold the exported content
+    const exportDiv = exportDoc.createElement('div');
+    exportDiv.innerHTML = divToExport;
+
+    exportDiv.style.minHeight = '900px';
+    // Set display flex for exportDiv
+    exportDiv.style.display = 'flex';
+    exportDiv.style.flexDirection = 'column';
+    // Set bottom-section to position absolute and bottom 0
+    const bottomSection = exportDiv.querySelector(
+      '.bottom-section'
+    ) as HTMLElement;
+    const repContainer = exportDiv.querySelector(
+      '.report-container'
+    ) as HTMLElement;
+    if (bottomSection) {
+      bottomSection.style.marginTop = 'auto';
+    }
+
+    // Append the export div to the body of the export document
+    exportDoc.body.appendChild(exportDiv);
+
+    // Inject CSS styles
+    const styles = Array.from(document.styleSheets)
+      .filter(
+        (styleSheet) =>
+          !styleSheet.href || !styleSheet.href.endsWith('styles.css')
+      ) // Exclude styles.css
+      .map((styleSheet) =>
+        Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join('\n')
+      )
+      .join('\n');
+    const styleElement = exportDoc.createElement('style');
+    styleElement.textContent = styles;
+    exportDoc.head.appendChild(styleElement);
+    const exportedHtml = exportDoc.documentElement.outerHTML;
+      const filename = `${this.reportTitle}`;
+      const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+      const postHtml = "</body></html>";
+      const html = preHtml + exportedHtml + postHtml;
+  
+      const blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+      });
+  
+      const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+      const fullFilename = filename ? filename + '.doc' : 'document.doc';
+  
+      const downloadLink = document.createElement("a");
+      document.body.appendChild(downloadLink);
+  
+      if ('download' in downloadLink) { // Check for modern browsers supporting the 'download' attribute
+        downloadLink.href = url;
+        downloadLink.download = fullFilename;
+        downloadLink.click();
+      } else {
+        console.error('Your browser does not support downloading files. Please use a different browser.');
+        // You can provide fallback mechanism here, like displaying a message to the user.
+      }
+  
+      document.body.removeChild(downloadLink);
+
   }
 }

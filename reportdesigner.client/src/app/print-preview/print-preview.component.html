@@ -1,11 +1,13 @@
 <div class="print-preview-container">
-  <div class="top-toolbar">
+  <div class="top-toolbar" *ngIf="selectedReportId">
     <div class="export-dropdown">
       <button class="export-button">Export As</button>
       <div class="export-dropdown-content">
         <button (click)="exportDivToHtml()">HTML</button>
         <button (click)="generatePDF()">PDF</button>
         <button (click)="generateReportImage()">Image</button>
+        <button (click)="exportToCsv()">CSV</button>
+        <button (click)="exportToWord()">Word</button>
         <button styleSheetFile="assets/styleForPrint.css" printSectionId="printable-section" ngxPrint>Print</button>
       </div>
     </div>
@@ -29,7 +31,7 @@
       </div>
     </div>
     <!-- Body Section -->
-    <div *ngIf="tableHeaders.length > 0" class="body-section"
+    <div *ngIf="tableHeaders.length > 0" class="body-section" id="body-section"
       [ngStyle]="{'background-color': reportCustomization.bodyBGColor ? reportCustomization.bodyBGColor : '#ffffff' ,'padding-top': reportCustomization.tableTopPadding ? reportCustomization.tableTopPadding + 'px' : '50px'}">
       <div class="table-container">
         <!-- Include the table rendering code here -->
