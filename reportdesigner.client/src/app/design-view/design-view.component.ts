@@ -1011,6 +1011,9 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       fontFamily: 'Arial',
       backgroundColor: '',
       border: this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
+      padding: this.reportCustomization.cellContentPadding
+        ? this.reportCustomization.cellContentPadding + 'px'
+        : '0',
     };
 
     // Retrieve cellFormatting from localStorage
@@ -1022,7 +1025,10 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       // Check if the style in cellFormatting differs from default style
       if (formatting && !this.isDefaultStyle(formatting)) {
         const style: any = {
-          'border': this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none'
+          border: this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
+          padding: this.reportCustomization.cellContentPadding
+            ? this.reportCustomization.cellContentPadding + 'px'
+            : '0',
         };
 
         if (formatting.bold) style['font-weight'] = 'bold';
@@ -1034,8 +1040,9 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
-        if(this.titleData?.dataID === cellDataId){
+        if (this.titleData?.dataID === cellDataId) {
           style['border'] = 'none';
+          style['padding'] = '0';
           return style;
         }
 

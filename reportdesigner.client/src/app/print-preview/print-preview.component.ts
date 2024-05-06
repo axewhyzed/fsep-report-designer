@@ -37,7 +37,7 @@ export class PrintPreviewComponent {
     private renderer: Renderer2,
     private reportsService: ReportsService,
     private customizeService: CustomizeService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.customizeService.headerBG$.subscribe((value) => {
@@ -404,7 +404,7 @@ export class PrintPreviewComponent {
         const headers = Array.from(table.querySelectorAll('th')).map(header => header.innerText.trim());
         const rows = Array.from(table.querySelectorAll('tr')).slice(1);
         const data = rows.map(row => Array.from(row.querySelectorAll('td')).map(cell => cell.innerText.trim()));
-  
+
         const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...data.map(row => row.join(','))].join('\n');
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csvContent));
@@ -418,8 +418,8 @@ export class PrintPreviewComponent {
       console.error("Element with ID 'body-section' not found.");
     }
   }
-  
-  exportToWord(){
+
+  exportToWord() {
     const divToExport = this.exportedDiv.nativeElement.innerHTML;
     const exportDoc = document.implementation.createHTMLDocument(
       `${this.reportTitle} - Report.html`
@@ -463,31 +463,31 @@ export class PrintPreviewComponent {
     styleElement.textContent = styles;
     exportDoc.head.appendChild(styleElement);
     const exportedHtml = exportDoc.documentElement.outerHTML;
-      const filename = `${this.reportTitle}`;
-      const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
-      const postHtml = "</body></html>";
-      const html = preHtml + exportedHtml + postHtml;
-  
-      const blob = new Blob(['\ufeff', html], {
-        type: 'application/msword'
-      });
-  
-      const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-      const fullFilename = filename ? filename + '.doc' : 'document.doc';
-  
-      const downloadLink = document.createElement("a");
-      document.body.appendChild(downloadLink);
-  
-      if ('download' in downloadLink) { // Check for modern browsers supporting the 'download' attribute
-        downloadLink.href = url;
-        downloadLink.download = fullFilename;
-        downloadLink.click();
-      } else {
-        console.error('Your browser does not support downloading files. Please use a different browser.');
-        // You can provide fallback mechanism here, like displaying a message to the user.
-      }
-  
-      document.body.removeChild(downloadLink);
+    const filename = `${this.reportTitle}`;
+    const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    const postHtml = "</body></html>";
+    const html = preHtml + exportedHtml + postHtml;
+
+    const blob = new Blob(['\ufeff', html], {
+      type: 'application/msword'
+    });
+
+    const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    const fullFilename = filename ? filename + '.doc' : 'document.doc';
+
+    const downloadLink = document.createElement("a");
+    document.body.appendChild(downloadLink);
+
+    if ('download' in downloadLink) { // Check for modern browsers supporting the 'download' attribute
+      downloadLink.href = url;
+      downloadLink.download = fullFilename;
+      downloadLink.click();
+    } else {
+      console.error('Your browser does not support downloading files. Please use a different browser.');
+      // You can provide fallback mechanism here, like displaying a message to the user.
+    }
+
+    document.body.removeChild(downloadLink);
 
   }
 }
