@@ -1,50 +1,93 @@
 <div class="data-toolbar-container">
-  <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn" title="Create or Open a new report">New Report</button><br>
+  <button (click)="resetReportData()" *ngIf="selectedReportId" class="dt-btn" title="Create or Open a new report">
+    New Report</button>
   <p class="no-rep-selected" *ngIf="!selectedReportId">No Report Selected</p>
-  <!-- <button (click)="saveReportState()">Save Report Data</button><br> -->
-  <!-- <input type="file" (change)="loadReportState($event)"> -->
   <div class="input-group" *ngIf="selectedReportId">
+    <table>
+      <tr>
+        <td><label class="input-label">Table <br>Border:</label></td>
+        <td><input type="checkbox" [(ngModel)]="tableBord" (change)="onInputChange()" class="checkbox-input">
+          <span style="font-size: 14px; font-family: Arial; padding-left: 5px;">{{ tableBord ? 'Enabled' : 'Disabled' }}</span>
+        </td>
+      </tr>
+      <tr>
+        <td><label class="input-label">Cell <br>Padding:</label></td>
+        <td><input type="number" [(ngModel)]="cellPad" (input)="onInputChange()" class="number-input"></td>
+      </tr>
+      <tr>
+        <td><label class="input-label">Table <br>Padding:</label></td>
+        <td><input type="number" [(ngModel)]="tablePad" (input)="onInputChange()" class="number-input"></td>
+      </tr>
+      <tr>
+        <td><label class="input-label">Data <br>Align:</label></td>
+        <td>
+          <select [(ngModel)]="tableAlign" (change)="onInputChange()" class="select-input">
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><label class="input-label">BgColor <br>Mode:</label></td>
+        <td colspan="2">
+          <div class="radio-wrapper">
+            <input type="radio" name="colorOption" id="individual" [(ngModel)]="colorOption" value="individual">
+            <label for="individual">Single</label>
+          </div>
+          <div class="radio-wrapper">
+            <input type="radio" name="colorOption" id="headerFooter" [(ngModel)]="colorOption" value="headerFooter">
+            <label for="headerFooter">Dual</label>
+          </div>
+          <div class="radio-wrapper">
+            <input type="radio" name="colorOption" id="allColors" [(ngModel)]="colorOption" value="allColors">
+            <label for="allColors">All</label>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="colorOption === 'individual'">
+        <td><label class="input-label">Header <br>Color: </label></td>
+        <td><input type="color" [(ngModel)]="headerBG" (input)="onInputChange()" class="color-input"></td>
+          <!-- <div class="color-preview" [style.background-color]="headerBG"></div> -->
+      </tr>
+      <tr *ngIf="colorOption === 'individual'">
+        <td><label class="input-label">Footer <br>color: </label></td>
+        <td><input type="color" [(ngModel)]="footerBG" (input)="onInputChange()" class="color-input"></td>
+          <!-- <div class="color-preview" [style.background-color]="footerBG"></div> -->
+      </tr>
+      <tr *ngIf="colorOption === 'individual'">
+        <td><label class="input-label">Body <br>Color: </label></td>
+        <td>
+          <input type="color" [(ngModel)]="bodyBG" (input)="onInputChange()" class="color-input">
+          <!-- <div class="color-preview" [style.background-color]="bodyBG"></div> -->
+        </td>
+      </tr>
+      <tr *ngIf="colorOption === 'headerFooter'">
+        <td><label class="input-label">Header & <br>Footer <br>Color: </label></td>
+        <td>
+          <input type="color" [(ngModel)]="headerFooterBG" (input)="onHeaderFooterChange()" class="color-input">
+          <!-- <div class="color-preview" [style.background-color]="headerFooterBG"></div> -->
+        </td>
+      </tr>
+      <tr *ngIf="colorOption === 'headerFooter'">
+        <td><label class="input-label">Body <br>Color: </label></td>
+        <td>
+          <input type="color" [(ngModel)]="bodyBG" (input)="onInputChange()" class="color-input">
+          <!-- <div class="color-preview" [style.background-color]="bodyBG"></div> -->
+        </td>
+      </tr>
+      <tr *ngIf="colorOption === 'allColors'">
+        <td><label class="input-label">All <br>Colors: </label></td>
+        <td>
+          <input type="color" [(ngModel)]="allColors" (input)="onAllColorsChange()" class="color-input">
+          <!-- <div class="color-preview" [style.background-color]="allColors"></div> -->
+        </td>
+      </tr>
+    </table>
     <div class="input-wrapper">
-      <label class="input-label">Table Border:</label>
-      <input type="checkbox" [(ngModel)]="tableBord" (change)="onInputChange()" class="checkbox-input">
-      <span>{{ tableBord ? 'Enabled' : 'Disabled' }}</span>
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Cell Padding:</label>
-      <input type="number" [(ngModel)]="cellPad" (input)="onInputChange()" class="number-input">
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Table Padding:</label>
-      <input type="number" [(ngModel)]="tablePad" (input)="onInputChange()" class="number-input">
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Table Alignment:</label>
-      <select [(ngModel)]="tableAlign" (change)="onInputChange()" class="select-input">
-        <option value="">None</option>
-        <option value="left">Left</option>
-        <option value="center">Center</option>
-        <option value="right">Right</option>
-      </select>
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Footer Text: </label>
+      <label class="input-label">Footer Text:</label>
       <input type="text" [(ngModel)]="footCont" (input)="onInputChange()" class="text-input">
     </div>
-    <div class="input-wrapper">
-      <label class="input-label">Header Color: </label>
-      <input type="color" [(ngModel)]="headerBG" (input)="onInputChange()" class="color-input">
-      <div class="color-preview" [style.background-color]="headerBG"></div>
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Footer color: </label>
-      <input type="color" [(ngModel)]="footerBG" (input)="onInputChange()" class="color-input">
-      <div class="color-preview" [style.background-color]="footerBG"></div>
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">Body Color: </label>
-      <input type="color" [(ngModel)]="bodyBG" (input)="onInputChange()" class="color-input">
-      <div class="color-preview" [style.background-color]="bodyBG"></div>
-    </div>
     <div><button (click)="submitData()" class="dt-btn">Submit</button></div>
-  </div>  
+  </div>
 </div>

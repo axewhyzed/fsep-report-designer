@@ -28,10 +28,16 @@
     display: flex;
 }
 
-.navigation-panel-section, .property-sheet-section{
-    width: 16%;
+.navigation-panel-section{
+    width: 17%;
     border: 2px solid black;
-    padding: 0 10px;
+    padding: 0 5px;
+}
+
+.property-sheet-section{
+    width: 20%;
+    border: 2px solid black;
+    padding: 0 5px;
 } 
 
 .work-area-section{

@@ -54,7 +54,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
     private reportsService: ReportsService,
     private customizeService: CustomizeService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   variable1: string = '';
   variable2: string = '';
@@ -86,7 +86,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       this.customizeService.headerBG$.subscribe(value => {
         this.reportCustomization.headerBGColor = value;
       });
-  
+
       this.customizeService.footerBG$.subscribe(value => {
         this.reportCustomization.footerBGColor = value;
       });
@@ -102,17 +102,23 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       this.customizeService.cellPadding$.subscribe(value => {
         this.reportCustomization.cellContentPadding = value;
       });
-  
+
       this.customizeService.tablePadding$.subscribe(value => {
         this.reportCustomization.tableTopPadding = value;
       });
-  
+
       this.customizeService.tableAlign$.subscribe(value => {
         this.reportCustomization.tableDataAlign = value;
       });
-  
+
       this.customizeService.footerContent$.subscribe(value => {
         this.reportCustomization.footerContent = value;
+      });
+
+      // Subscribe to submitAction$ Observable
+      this.customizeService.submitAction$.subscribe(() => {
+        // Execute the function or update state in Component 2
+        this.saveCustomization();
       });
 
       this.selectedReportId = JSON.parse(ReportId);
@@ -167,7 +173,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-      this.applyCustomization();
+    this.applyCustomization();
   }
 
   @HostListener('window:beforeunload', ['$event'])
@@ -307,7 +313,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
 
   reportCustomization!: ReportCustomization;
 
-  getReportCustomizationDetails(reportID : number) {
+  getReportCustomizationDetails(reportID: number) {
     this.reportsService.getReportCustomization(reportID)
       .subscribe(
         (data: ReportCustomization) => {
@@ -331,11 +337,17 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
     }
   }
 
-  saveCustomization(){
+  saveCustomization() {
     this.reportsService.updateReportCustomization(this.selectedReportId, this.reportCustomization)
       .subscribe(
         response => {
-          console.log('Report customization updated successfully:', response);
+          this.toastr.success('Customization Saved', '', {
+            timeOut: 5000,
+            easing: 'ease-in',
+            easeTime: 300,
+            progressBar: true,
+            progressAnimation: 'decreasing'
+          });
           // Handle success, if needed
         },
         error => {
@@ -561,7 +573,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
                         data.cellValue === this.reportTitle ? '24px' : '14px',
                       fontFamily: 'Arial',
                       fontColor: '#000000',
-                      backgroundColor: data.cellValue === this.reportTitle ? '' : '#FFFFFF',
+                      backgroundColor: data.cellValue === this.reportTitle ? '' : '',
                     })
                   );
 
@@ -574,23 +586,23 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
               );
           }),
           mergeMap((reportID) => {
-        // Add report customization
-        const reportCustomization: ReportCustomization = {
-          // Define your customization properties here
-          reportID: 0,
-          headerBGColor: '#FFFFFF',
-          footerBGColor: '#FFFFFF',
-          bodyBGColor: '#FFFFFF',
-          tableBorderVisible: true,
-          cellContentPadding: 5,
-          tableTopPadding: 50,
-          tableDataAlign: 'left',
-          footerContent: 'Add text here',
-        };
-        return this.reportsService.addReportCustomization(this.selectedReportId, reportCustomization).pipe(
-          map(() => reportID) // Pass reportID along the Observable chain
-        );
-      })
+            // Add report customization
+            const reportCustomization: ReportCustomization = {
+              // Define your customization properties here
+              reportID: 0,
+              headerBGColor: '#FFFFFF',
+              footerBGColor: '#FFFFFF',
+              bodyBGColor: '#FFFFFF',
+              tableBorderVisible: true,
+              cellContentPadding: 5,
+              tableTopPadding: 50,
+              tableDataAlign: 'left',
+              footerContent: 'Add text here',
+            };
+            return this.reportsService.addReportCustomization(this.selectedReportId, reportCustomization).pipe(
+              map(() => reportID) // Pass reportID along the Observable chain
+            );
+          })
         )
         .subscribe(
           () => {
@@ -693,16 +705,16 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
         this.selectedCells.add(`${newCellKey}`);
       }
     }
-    
-    else if(columnName === 'header-select'){
+
+    else if (columnName === 'header-select') {
       this.selectedCells.clear();
       // Adding the table headers
       for (const colHeader of this.tableHeaders) {
         this.selectedCells.add(`${colHeader.reportID}|${colHeader.dataID}`);
       }
     }
-    
-    else if(columnName === 'corner-select'){
+
+    else if (columnName === 'corner-select') {
       this.selectedCells.clear();
       // Adding the table headers
       for (const colHeader of this.tableHeaders) {
@@ -907,7 +919,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
         fontSize: '14px',
         fontColor: '#000000',
         fontFamily: 'Arial',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '',
       };
 
       // Check if rowIndex is 0 or isTitle is true
@@ -997,7 +1009,8 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       fontSize: '14px',
       fontColor: '#000000',
       fontFamily: 'Arial',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '',
+      border: this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
     };
 
     // Retrieve cellFormatting from localStorage
@@ -1008,7 +1021,9 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
 
       // Check if the style in cellFormatting differs from default style
       if (formatting && !this.isDefaultStyle(formatting)) {
-        const style: any = {};
+        const style: any = {
+          'border': this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none'
+        };
 
         if (formatting.bold) style['font-weight'] = 'bold';
         if (formatting.italic) style['font-style'] = 'italic';
@@ -1019,6 +1034,10 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
+        if(this.titleData?.dataID === cellDataId){
+          style['border'] = 'none';
+          return style;
+        }
 
         return style;
       }
@@ -1036,7 +1055,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
       fontSize: '14px',
       fontColor: '#000000',
       fontFamily: 'Arial',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: '',
     };
     // List of properties to ignore during comparison
     const ignoreProperties = ['reportID', 'dataID'];
@@ -1089,7 +1108,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
           fontSize: '14px',
           fontFamily: 'Arial',
           fontColor: '#000000',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '',
         };
       }
 
@@ -1144,7 +1163,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
           fontSize: '14px',
           fontFamily: 'Arial',
           fontColor: '#000000',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '',
         };
       }
 
@@ -1197,7 +1216,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
           fontSize: '14px',
           fontFamily: 'Arial',
           fontColor: '#000000',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '',
         };
       }
 
@@ -1251,7 +1270,7 @@ export class DesignViewComponent implements OnInit, AfterViewInit {
           fontSize: '14px',
           fontFamily: 'Arial',
           fontColor: '#000000',
-          backgroundColor: '#FFFFFF',
+          backgroundColor: '',
         };
       }
 

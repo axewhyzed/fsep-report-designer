@@ -33,7 +33,7 @@
       [ngStyle]="{'background-color': reportCustomization.bodyBGColor ? reportCustomization.bodyBGColor : '#ffffff' ,'padding-top': reportCustomization.tableTopPadding ? reportCustomization.tableTopPadding + 'px' : '50px'}">
       <div class="table-container">
         <!-- Include the table rendering code here -->
-        <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? reportCustomization.tableBorderVisible : 'none', 'text-align': reportCustomization.tableDataAlign ? reportCustomization.tableDataAlign : 'left'}">
+        <table class="tbl-data" [ngStyle]="{'border': reportCustomization.tableBorderVisible ? '1px solid black' : 'none', 'text-align': reportCustomization.tableDataAlign ? reportCustomization.tableDataAlign : 'left'}">
           <thead>
             <tr>
               <!-- Include table headers here -->
@@ -59,7 +59,7 @@
     <!-- Bottom Section (Footer) -->
     <div class="bottom-section" [ngStyle]="{'background-color': reportCustomization.footerBGColor ? reportCustomization.footerBGColor : '#ffffff'}">
       <!-- Add footer content here if needed -->
-      {{footerText}}
+      {{reportCustomization.footerContent}}
     </div>
   </div>
 </div>

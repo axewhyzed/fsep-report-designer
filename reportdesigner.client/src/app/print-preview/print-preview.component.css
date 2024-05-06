@@ -40,13 +40,11 @@
   flex-grow: 1;
   flex-direction: column;
   align-items: center;
-  overflow: auto;
   padding: 50px 0;
 }
 
 .table-container{
   flex-grow: 1;
-  overflow: auto;
 }
 
 .bottom-section{
@@ -84,6 +82,7 @@ h3 {
 
 .date-time{
   padding: 10px;
+  font-size: 16px;
 }
 
 .column-header {
@@ -153,7 +152,6 @@ td {
   font-weight: bold;
   text-transform: uppercase;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -183,7 +181,6 @@ td {
   font-weight: bold;
   text-transform: uppercase;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -201,9 +198,9 @@ td {
 .export-dropdown-content button {
   display: block;
   width: 100%;
-  /* padding: 8px 16px; */
-  font-size: 12px;
-  text-align: left;
+  padding: 5px 10px;
+  font-size: 14px;
+  text-align: center;
   cursor: pointer;
   transition: background-color 0.3s, color 0.3s;
 }

@@ -214,6 +214,8 @@ export class PrintPreviewComponent {
       fontColor: '#000000',
       fontFamily: 'Arial',
       backgroundColor: '#FFFFFF',
+      border: this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
+      padding: this.reportCustomization.cellContentPadding ? this.reportCustomization.cellContentPadding + 'px' : '0',
     };
 
     // Retrieve cellFormatting from localStorage
@@ -224,7 +226,10 @@ export class PrintPreviewComponent {
 
       // Check if the style in cellFormatting differs from default style
       if (formatting && !this.isDefaultStyle(formatting)) {
-        const style: any = {};
+        const style: any = {
+          'border': this.reportCustomization.tableBorderVisible ? '1px solid black' : 'none',
+          'padding': this.reportCustomization.cellContentPadding ? this.reportCustomization.cellContentPadding + 'px' : '0',
+        };
 
         if (formatting.bold) style['font-weight'] = 'bold';
         if (formatting.italic) style['font-style'] = 'italic';
@@ -235,6 +240,11 @@ export class PrintPreviewComponent {
         style.color = formatting.fontColor;
         style['font-family'] = formatting.fontFamily;
         style['background-color'] = formatting.backgroundColor;
+        if(this.titleData?.dataID === cellDataId){
+          style['border'] = 'none';
+          style['padding'] = '0';
+          return style;
+        }
 
         return style;
       }

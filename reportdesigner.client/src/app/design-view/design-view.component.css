@@ -95,6 +95,7 @@ h3 {
 
 .date-time {
   padding: 10px;
+  font-size: 16px;
 }
 
 .column-header {
@@ -140,7 +141,6 @@ h3 {
 .cell-content {
   padding: 5px;
   cursor: pointer;
-  font-size: 14px;
 }
 
 table,
@@ -171,7 +171,7 @@ td {
 } */
 
 .button-container {
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
 .format-button {
@@ -193,12 +193,11 @@ td {
 
 .color-container {
   align-items: center;
-  margin-right: 5px;
 }
 
 .color-label {
   margin: 0 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-family: Roboto, sans-serif;
 }
 
@@ -208,7 +207,7 @@ td {
   width: 30px;
   height: 30px;
   padding: 0;
-  margin: 0;
+  margin-right: 5px;
   cursor: pointer;
   background-color: transparent;
 }
@@ -219,9 +218,10 @@ td {
 
 .select-box {
   padding: 6px;
-  margin-right: 20px;
+  margin-right: 5px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .select-box:focus {
@@ -277,6 +277,7 @@ td {
 .popup-content label {
   /* Add margin below each label */
   margin-bottom: 10px;
+  font-size: 16px;
 }
 
 .popup-content input[type="text"],
@@ -284,6 +285,7 @@ td {
 .popup-content select {
   /* Add margin below each input */
   margin-bottom: 10px;
+  font-size: 16px;
   /* Increase padding for better spacing within inputs */
   padding: 10px;
   /* Ensure inputs fill the width of the container */
@@ -300,6 +302,7 @@ td {
   border: none;
   font-family: Roboto, sans-serif;
   font-weight: bold;
+  font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
   display: block;
@@ -336,6 +339,7 @@ td {
 
 .report-modal-title {
   font-family: Roboto, sans-serif;
+  font-size: 24px;
 }
 
 /* For Search Results */
@@ -352,6 +356,10 @@ td {
   padding: 10px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+}
+
+.search-results-container button{
+  font-size: 14px;
 }
 
 .search-results-header {
@@ -493,4 +501,8 @@ td {
   margin-top: 20px;
   text-align: center;
   color: #999; /* Light gray text color */
+}
+
+.search-results-container p{
+  font-size: 16px;
 }

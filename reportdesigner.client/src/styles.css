@@ -23,9 +23,11 @@ body, html {
 
 .toast-title {
   font-family: Roboto, sans-serif;
+  font-size: 16px;
 }
 
 .toast-message {
   font-weight: normal; /* Make the message normal (not bold) */
   font-family: Roboto, sans-serif;
+  font-size: 14px;
 }

@@ -871,95 +871,117 @@ namespace ReportDesigner.Server.Controllers
                 {
                     await connection.OpenAsync();
 
-                    // Check if the record exists
-                    string checkQuery = "SELECT COUNT(*) FROM ReportCustomization WHERE reportID = @ReportID";
-                    SqlCommand checkCommand = new SqlCommand(checkQuery, connection);
-                    checkCommand.Parameters.AddWithValue("@ReportID", reportId);
-                    int count = (int)await checkCommand.ExecuteScalarAsync();
+                    // Begin transaction
+                    SqlTransaction transaction = connection.BeginTransaction();
 
-                    if (count == 0)
+                    try
                     {
-                        return NotFound();
-                    }
+                        // Check if the record exists
+                        string checkQuery = "SELECT COUNT(*) FROM ReportCustomization WHERE reportID = @ReportID";
+                        SqlCommand checkCommand = new SqlCommand(checkQuery, connection, transaction);
+                        checkCommand.Parameters.AddWithValue("@ReportID", reportId);
+                        int count = (int)await checkCommand.ExecuteScalarAsync();
 
-                    // Update the record
-                    string updateQuery = "UPDATE ReportCustomization SET ";
-                    List<string> updateFields = new List<string>();
-                    if (reportCustomization.HeaderBGColor != null)
-                    {
-                        updateFields.Add("HeaderBGColor = @HeaderBGColor");
-                    }
-                    if (reportCustomization.FooterBGColor != null)
-                    {
-                        updateFields.Add("FooterBGColor = @FooterBGColor");
-                    }
-                    if (reportCustomization.BodyBGColor != null)
-                    {
-                        updateFields.Add("BodyBGColor = @BodyBGColor");
-                    }
-                    if (reportCustomization.TableBorderVisible != null)
-                    {
-                        updateFields.Add("TableBorderVisible = @TableBorderVisible");
-                    }
-                    if (reportCustomization.CellContentPadding != null)
-                    {
-                        updateFields.Add("CellContentPadding = @CellContentPadding");
-                    }
-                    if (reportCustomization.TableTopPadding != null)
-                    {
-                        updateFields.Add("TableTopPadding = @TableTopPadding");
-                    }
-                    if (reportCustomization.TableDataAlign != null)
-                    {
-                        updateFields.Add("TableDataAlign = @TableDataAlign");
-                    }
-                    if (reportCustomization.FooterContent != null)
-                    {
-                        updateFields.Add("FooterContent = @FooterContent");
-                    }
+                        if (count == 0)
+                        {
+                            return NotFound();
+                        }
 
-                    // Combine all fields into the update query
-                    updateQuery += string.Join(", ", updateFields);
-                    updateQuery += " WHERE reportID = @ReportID";
+                        // Update the record
+                        string updateQuery = "UPDATE ReportCustomization SET ";
+                        List<string> updateFields = new List<string>();
+                        if (reportCustomization.HeaderBGColor != null)
+                        {
+                            updateFields.Add("HeaderBGColor = @HeaderBGColor");
+                        }
+                        if (reportCustomization.FooterBGColor != null)
+                        {
+                            updateFields.Add("FooterBGColor = @FooterBGColor");
+                        }
+                        if (reportCustomization.BodyBGColor != null)
+                        {
+                            updateFields.Add("BodyBGColor = @BodyBGColor");
+                        }
+                        if (reportCustomization.TableBorderVisible != null)
+                        {
+                            updateFields.Add("TableBorderVisible = @TableBorderVisible");
+                        }
+                        if (reportCustomization.CellContentPadding != null)
+                        {
+                            updateFields.Add("CellContentPadding = @CellContentPadding");
+                        }
+                        if (reportCustomization.TableTopPadding != null)
+                        {
+                            updateFields.Add("TableTopPadding = @TableTopPadding");
+                        }
+                        if (reportCustomization.TableDataAlign != null)
+                        {
+                            updateFields.Add("TableDataAlign = @TableDataAlign");
+                        }
+                        if (reportCustomization.FooterContent != null)
+                        {
+                            updateFields.Add("FooterContent = @FooterContent");
+                        }
 
-                    SqlCommand command = new SqlCommand(updateQuery, connection);
-                    command.Parameters.AddWithValue("@ReportID", reportId);
-                    if (reportCustomization.HeaderBGColor != null)
-                    {
-                        command.Parameters.AddWithValue("@HeaderBGColor", reportCustomization.HeaderBGColor);
-                    }
-                    if (reportCustomization.FooterBGColor != null)
-                    {
-                        command.Parameters.AddWithValue("@FooterBGColor", reportCustomization.FooterBGColor);
-                    }
-                    if (reportCustomization.BodyBGColor != null)
-                    {
-                        command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
-                    }
-                    if (reportCustomization.TableBorderVisible != null)
-                    {
-                        command.Parameters.AddWithValue("@TableBorderVisible", reportCustomization.TableBorderVisible);
-                    }
-                    if (reportCustomization.CellContentPadding != null)
-                    {
-                        command.Parameters.AddWithValue("@CellContentPadding", reportCustomization.CellContentPadding);
-                    }
-                    if (reportCustomization.TableTopPadding != null)
-                    {
-                        command.Parameters.AddWithValue("@TableTopPadding", reportCustomization.TableTopPadding);
-                    }
-                    if (reportCustomization.TableDataAlign != null)
-                    {
-                        command.Parameters.AddWithValue("@TableDataAlign", reportCustomization.TableDataAlign);
-                    }
-                    if (reportCustomization.FooterContent != null)
-                    {
-                        command.Parameters.AddWithValue("@FooterContent", reportCustomization.FooterContent);
-                    }
+                        // Combine all fields into the update query
+                        updateQuery += string.Join(", ", updateFields);
+                        updateQuery += " WHERE reportID = @ReportID";
 
-                    await command.ExecuteNonQueryAsync();
+                        SqlCommand command = new SqlCommand(updateQuery, connection, transaction);
+                        command.Parameters.AddWithValue("@ReportID", reportId);
+                        if (reportCustomization.HeaderBGColor != null)
+                        {
+                            command.Parameters.AddWithValue("@HeaderBGColor", reportCustomization.HeaderBGColor);
+                        }
+                        if (reportCustomization.FooterBGColor != null)
+                        {
+                            command.Parameters.AddWithValue("@FooterBGColor", reportCustomization.FooterBGColor);
+                        }
+                        if (reportCustomization.BodyBGColor != null)
+                        {
+                            command.Parameters.AddWithValue("@BodyBGColor", reportCustomization.BodyBGColor);
+                        }
+                        if (reportCustomization.TableBorderVisible != null)
+                        {
+                            command.Parameters.AddWithValue("@TableBorderVisible", reportCustomization.TableBorderVisible);
+                        }
+                        if (reportCustomization.CellContentPadding != null)
+                        {
+                            command.Parameters.AddWithValue("@CellContentPadding", reportCustomization.CellContentPadding);
+                        }
+                        if (reportCustomization.TableTopPadding != null)
+                        {
+                            command.Parameters.AddWithValue("@TableTopPadding", reportCustomization.TableTopPadding);
+                        }
+                        if (reportCustomization.TableDataAlign != null)
+                        {
+                            command.Parameters.AddWithValue("@TableDataAlign", reportCustomization.TableDataAlign);
+                        }
+                        if (reportCustomization.FooterContent != null)
+                        {
+                            command.Parameters.AddWithValue("@FooterContent", reportCustomization.FooterContent);
+                        }
 
-                    return Ok();
+                        await command.ExecuteNonQueryAsync();
+
+                        // Update LastModifiedDate in Reports table
+                        string updateReportsQuery = "UPDATE Reports SET LastModifiedDate = @LastModifiedDate WHERE ReportID = @ReportID";
+                        SqlCommand updateReportsCommand = new SqlCommand(updateReportsQuery, connection, transaction);
+                        updateReportsCommand.Parameters.AddWithValue("@ReportID", reportId);
+                        updateReportsCommand.Parameters.AddWithValue("@LastModifiedDate", DateTime.Now);
+                        await updateReportsCommand.ExecuteNonQueryAsync();
+
+                        // Commit transaction
+                        transaction.Commit();
+
+                        return Ok();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback transaction if an error occurs
+                        transaction.Rollback();
+                        return StatusCode(500, $"An error occurred: {ex.Message}");
+                    }
                 }
             }
             catch (Exception ex)

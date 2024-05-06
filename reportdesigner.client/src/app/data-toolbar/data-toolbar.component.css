@@ -1,6 +1,10 @@
 .data-toolbar-container {
   height: 100vh;
+  margin: 0 auto;
   max-height: calc(100vh - 100px); /* Adjust as needed */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .dt-btn {
@@ -10,6 +14,7 @@
   border: none;
   font-family: Roboto, sans-serif;
   font-weight: bold;
+  font-size: 14px;
   border-radius: 4px;
   cursor: pointer;
   display: block;
@@ -30,24 +35,58 @@
 }
 
 .input-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 20px; /* Add space between the report details and input group */
+  padding: 10px 20px;
 }
 
 .input-wrapper {
-  margin: 5px 10px;
-  display: flex;
-  align-items: center; /* Align label and input vertically */
-  flex-grow: 1;
-  flex-direction: row;
+  margin: 10px 10px;
 }
 
 .input-label {
-  margin-right: 10px; /* Add space between label and input */
-  font-size: 16px; /* Increase font size for better readability */
+  font-size: 14px; /* Increase font size for better readability */
+  font-family: Arial;
+  text-align: center;
+}
+
+.text-input {
+  padding: 10px;
+  margin-top: 5px;
+  width: 80%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s ease-in-out; /* Add simple transition for focus */
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px #007bff;
+}
+
+.number-input{
+  width: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.checkbox-input {
+  margin-top: 5px;
+}
+
+.select-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   font-family: Roboto, sans-serif;
+  font-size: 14px;
+}
+
+.radio-wrapper {
+  margin-right: 10px;
 }
 
 .color-input {
@@ -64,50 +103,27 @@
   transform: scale(1.1); /* Scale up on hover */
 }
 
-.text-input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 150px;
-  transition: border-color 0.3s ease-in-out; /* Add simple transition for focus */
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 5px #007bff;
-}
-
 .color-preview {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   margin-left: 10px;
 }
 
-.checkbox-input,
-.number-input,
-.select-input {
-  margin-left: 10px;
+/* Table styles */
+table {
+  width: 90%;
+  position: inherit;
+  border-collapse: collapse;
 }
 
-.checkbox-input + span,
-.number-input + span,
-.select-input + span {
-  margin-left: 5px;
-  font-family: Roboto, sans-serif;
-}
-
-.select-input {
+td {
   padding: 5px;
+  /* border: 1px solid #ccc; */
 }
 
-.input-wrapper select,
-.input-wrapper input[type="number"] {
-  width: 80px;
+th {
+  padding: 5px;
+  /* border: 1px solid #ccc; */
+  background-color: #f0f0f0;
 }
-
-.input-wrapper input[type="checkbox"] {
-  vertical-align: middle;
-}
-
