@@ -290,7 +290,7 @@ export class PrintPreviewComponent {
 
   exportDivToHtml() {
     //Get Report Title
-    const reportDataString = localStorage.getItem('reportData');
+    const reportDataString = localStorage.getItem('selectedReportId');
     if (!reportDataString) {
       alert('No report data found to save');
       return;
